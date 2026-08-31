@@ -28,6 +28,24 @@ function cashfreeCredentials() {
   };
 }
 
+function checkoutTokenSecret() {
+  return process.env.QIVROPAY_SESSION_SECRET || process.env.CASHFREE_SECRET_KEY || 'qivropay-session-secret';
+}
+
+function signCheckoutSession(session) {
+  const payload = Buffer.from(JSON.stringify(session), 'utf8').toString('base64url');
+  const signature = crypto.createHmac('sha256', checkoutTokenSecret()).update(payload).digest('base64url');
+  return `${payload}.${signature}`;
+}
+
+function verifyCheckoutSession(token) {
+  const [payload, signature] = String(token || '').split('.');
+  if (!payload || !signature) return null;
+  const expected = crypto.createHmac('sha256', checkoutTokenSecret()).update(payload).digest('base64url');
+  if (signature.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+  try { return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch { return null; }
+}
+
 app.use(cors());
 // Cashfree signs the exact raw request body. Keep this route raw before the
 // global JSON parser so signature verification cannot be bypassed by re-serialisation.
@@ -304,16 +322,18 @@ app.post('/api/v1/payments/create-session', (req, res) => {
 
   writeDB(db);
 
+  const checkoutToken = signCheckoutSession(db.sessions[sessionId]);
+
   res.json({
     success: true,
-    sessionId,
-    url: `${PUBLIC_URL || 'http://localhost:' + PORT}/checkout/${sessionId}`
+    sessionId: checkoutToken,
+    url: `${PUBLIC_URL || 'http://localhost:' + PORT}/checkout/${checkoutToken}`
   });
 });
 
 app.get('/api/v1/payments/session/:id', (req, res) => {
   const db = readDB();
-  const session = (db.sessions || {})[req.params.id];
+  const session = (db.sessions || {})[req.params.id] || verifyCheckoutSession(req.params.id);
   if (!session) {
     return res.json({ success: false, error: 'Session not found' });
   }
