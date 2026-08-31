@@ -134,7 +134,18 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
 
   const handlePay = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!customerEmail || !customerName) return;
+    if (!customerName.trim()) {
+      setPaymentError('Apna naam enter karein.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.trim())) {
+      setPaymentError('Valid email address enter karein.');
+      return;
+    }
+    if ((sessionData?.currency || '').toUpperCase() === 'INR' && !/^\+?\d[\d\s-]{9,14}$/.test(customerPhone.trim())) {
+      setPaymentError('Valid 10-digit mobile number enter karein.');
+      return;
+    }
 
     setIsProcessing(true);
     setPaymentError(null);
@@ -910,3 +921,4 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
     </div>
   );
 };
+
