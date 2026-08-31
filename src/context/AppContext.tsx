@@ -77,9 +77,10 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentView, setCurrentViewInternal] = useState<CurrentViewType>('landing');
+  const initialCheckoutId = typeof window !== 'undefined' ? window.location.pathname.match(/^\/checkout\/([^/]+)/)?.[1] : null;
+  const [currentView, setCurrentViewInternal] = useState<CurrentViewType>(initialCheckoutId ? 'checkout' : 'landing');
   const [dashboardTab, setDashboardTab] = useState<DashboardTabType>('home');
-  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(initialCheckoutId ? decodeURIComponent(initialCheckoutId) : null);
   const [isTestMode, setIsTestMode] = useState<boolean>(false);
   const [currentBrand, setCurrentBrand] = useState<Brand | null>(null);
 
