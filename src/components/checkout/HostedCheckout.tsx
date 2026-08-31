@@ -212,7 +212,8 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
         setPaymentError(null);
         setIsProcessing(false);
       } catch (err: any) {
-        setPaymentError(err?.message || 'Live payment start nahi ho saka');
+        const qrRendered = Boolean(cashfreeContainerRef.current?.childElementCount);
+        setPaymentError(qrRendered ? null : (err?.message || 'Live payment start nahi ho saka'));
         setIsProcessing(false);
       }
       return;
