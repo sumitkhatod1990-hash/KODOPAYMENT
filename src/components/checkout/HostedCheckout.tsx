@@ -93,6 +93,10 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
         const data = await res.json();
         if (data.success && data.session) {
           setSessionData(data.session);
+          if (String(data.session.currency || '').toUpperCase() === 'INR') {
+            setSelectedCountry('IN');
+            if (data.session.customerEmail) setCustomerEmail(data.session.customerEmail);
+          }
         } else {
           const p = products[0] || { name: 'AI Token Starter Pack', price: 29.00, currency: 'USD', credits: 5000000 };
           setSessionData({
@@ -125,6 +129,8 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   const pppDetails = calculatePPPPrice(basePrice, selectedCountry);
   
   const isInrSession = (sessionData?.currency || '').toUpperCase() === 'INR';
+  const displayCurrency = isInrSession ? 'INR' : 'USD';
+  const displaySymbol = isInrSession ? '₹' : '$';
   let finalUsdAmount = isInrSession ? basePrice : (enablePPP ? pppDetails.discountedUsd : basePrice);
   if (discountApplied) {
     finalUsdAmount = finalUsdAmount * 0.5;
@@ -461,7 +467,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
               <div className="space-y-2 text-xs font-mono pt-4 border-t border-black/[0.06]">
                 <div className="flex justify-between text-[#8C90A0]">
                   <span>Base Price</span>
-                  <span>${basePrice.toFixed(2)} USD</span>
+                  <span>{displaySymbol}{basePrice.toFixed(2)} {displayCurrency}</span>
                 </div>
                 {orderBumpSelected && (
                   <div className="flex justify-between text-[#0055FF] font-bold">
@@ -483,11 +489,11 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                 )}
                 <div className="flex justify-between text-[#8C90A0]">
                   <span>VAT / Sales Tax</span>
-                  <span className="text-emerald-700 font-bold">$0.00 (MoR Auto-Remitted)</span>
+                  <span className="text-emerald-700 font-bold">{displaySymbol}0.00 (MoR Auto-Remitted)</span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-[#0A0D14] pt-2 border-t border-black/[0.06] font-sans">
                   <span>Total Due</span>
-                  <span className="text-[#0055FF]">${finalUsdAmount.toFixed(2)} USD</span>
+                  <span className="text-[#0055FF]">{displaySymbol}{finalUsdAmount.toFixed(2)} {displayCurrency}</span>
                 </div>
               </div>
 
@@ -934,4 +940,3 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
     </div>
   );
 };
-
