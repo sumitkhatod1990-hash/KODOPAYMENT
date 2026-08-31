@@ -1,11 +1,11 @@
 {
   "brands": [
     {
-      "id": "brand_kodo_01",
-      "name": "KODO AI Technologies Inc.",
-      "domain": "kodo.io",
-      "statementDescriptor": "KODO*AI",
-      "supportEmail": "billing@kodo.io",
+      "id": "brand_qivro_01",
+      "name": "QivroPay Technologies India Pvt Ltd",
+      "domain": "qivropay.in",
+      "statementDescriptor": "QIVRO*PAY",
+      "supportEmail": "billing@qivropay.in",
       "default": true
     },
     {

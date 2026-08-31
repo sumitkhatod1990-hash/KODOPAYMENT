@@ -118,17 +118,17 @@ export const Footer: React.FC = () => {
         {/* Bottom Banner */}
         <div className="pt-8 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[#86868b]">
           <div className="flex items-center gap-4">
-            <span>© 2026 KODO Payments Inc. All rights reserved.</span>
+            <span>© 2026 QivroPay Technologies India Pvt Ltd. All rights reserved.</span>
             <span>•</span>
             <span>PCI-DSS Level 1</span>
             <span>•</span>
-            <span>220+ Countries Handled</span>
+            <span>Bharat Sovereign MoR</span>
           </div>
 
           <div className="flex items-center gap-6">
             <span className="hover:text-[#1d1d1f] cursor-pointer">Privacy Policy</span>
             <span className="hover:text-[#1d1d1f] cursor-pointer">Terms of Service</span>
-            <span className="hover:text-[#1d1d1f] cursor-pointer">Reseller Agreement</span>
+            <span className="hover:text-[#1d1d1f] cursor-pointer">Master Reseller Agreement</span>
           </div>
         </div>
 

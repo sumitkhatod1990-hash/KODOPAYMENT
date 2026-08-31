@@ -444,11 +444,11 @@ export const DashboardLayout: React.FC = () => {
             >
               <div className="flex items-center gap-2 text-left truncate">
                 <div className="w-6 h-6 rounded-lg bg-black text-white flex items-center justify-center font-bold text-[10px]">
-                  {currentBrand?.name.charAt(0) || 'K'}
+                  {currentBrand?.name.charAt(0) || 'Q'}
                 </div>
                 <div className="truncate">
-                  <div className="font-bold text-[#1d1d1f] truncate">{currentBrand?.name || 'KODO Labs'}</div>
-                  <div className="text-[10px] text-[#86868b] font-mono">{currentBrand?.domain || 'kodo.io'}</div>
+                  <div className="font-bold text-[#1d1d1f] truncate">{currentBrand?.name || 'QivroPay Labs'}</div>
+                  <div className="text-[10px] text-[#86868b] font-mono">{currentBrand?.domain || 'qivropay.in'}</div>
                 </div>
               </div>
               <ChevronDown className="w-3.5 h-3.5 text-[#86868b] shrink-0" />

@@ -41,7 +41,7 @@ export const Hero: React.FC = () => {
             The Merchant of Record built for India's SaaS &amp; AI Apps.
           </h1>
           <p className="text-lg sm:text-xl text-[#6E717D] max-w-2xl mx-auto font-normal leading-relaxed">
-            Sell software, AI apps, and digital subscriptions across India. KODO takes 100% liability for GST filings, UPI AutoPay recurring billing, Section 194-O TDS withholding, and instant Cashfree Easy Split bank payouts.
+            Sell software, AI apps, and digital subscriptions across India. QivroPay takes 100% liability for GST filings, UPI AutoPay recurring billing, Section 194-O TDS withholding, and instant Cashfree Easy Split bank payouts.
           </p>
 
           {/* Action CTAs */}
@@ -85,15 +85,15 @@ export const Hero: React.FC = () => {
             {/* Header / Interactive Switcher */}
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-black/[0.06] pb-6">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-2xl bg-[#0A0D14] text-white flex items-center justify-center font-bold text-sm">
-                  K
+                <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-[#0055FF] to-[#7B2CBF] text-white flex items-center justify-center font-bold text-sm">
+                  Q
                 </div>
                 <div>
                   <div className="font-bold text-[#0A0D14] text-sm tracking-tight font-sans">
-                    KODO Payment Orchestrator
+                    QivroPay Payment Orchestrator
                   </div>
                   <div className="text-[11px] font-mono text-[#8C90A0]">
-                    Real-time transaction & settlement journey
+                    Real-time transaction &amp; settlement journey
                   </div>
                 </div>
               </div>

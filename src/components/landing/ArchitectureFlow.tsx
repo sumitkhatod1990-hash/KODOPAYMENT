@@ -62,31 +62,31 @@ export const ArchitectureFlow: React.FC = () => {
         
         {/* Header */}
         <div className="text-center max-w-4xl mx-auto mb-16 space-y-3">
-          <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#0071e3]">
-            How KODO Works As Your Merchant of Record
+          <div className="text-xs font-mono font-bold uppercase tracking-widest text-[#0055FF]">
+            How QivroPay Works As Your Merchant of Record
           </div>
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#1d1d1f] tracking-tight">
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#0A0D14] tracking-tight">
             The Complete End-to-End Flow.
           </h2>
-          <p className="text-base sm:text-lg text-[#6e6e73] max-w-2xl mx-auto">
-            From checkout and billing to global tax compliance and direct bank payouts.
+          <p className="text-base sm:text-lg text-[#6E717D] max-w-2xl mx-auto">
+            From checkout and billing to Indian GST compliance and direct bank payouts.
           </p>
         </div>
 
         {/* Master Flow Interactive Canvas */}
-        <div className="max-w-5xl mx-auto rounded-3xl bg-[#f5f5f7] border border-black/10 p-6 sm:p-12 shadow-sm space-y-10">
+        <div className="max-w-5xl mx-auto rounded-3xl bg-[#F4F5F8] border border-black/10 p-6 sm:p-12 shadow-sm space-y-10">
           
           {/* Level 0: Master Hub Node */}
           <div className="flex justify-center">
-            <div className="p-4 sm:px-8 sm:py-4 rounded-2xl bg-[#1d1d1f] text-white shadow-lg border border-black flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-white text-black font-extrabold flex items-center justify-center text-sm font-sans">
-                K
+            <div className="p-4 sm:px-8 sm:py-4 rounded-2xl bg-[#0A0D14] text-white shadow-lg border border-black flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0055FF] to-[#7B2CBF] text-white font-extrabold flex items-center justify-center text-sm font-sans">
+                Q
               </div>
               <div>
                 <div className="font-extrabold text-sm sm:text-base tracking-tight font-sans">
-                  KODO PAYMENTS
+                  QIVROPAY
                 </div>
-                <div className="text-[10px] text-[#86868b] font-mono">
+                <div className="text-[10px] text-[#8C90A0] font-mono">
                   Merchant of Record Engine (MoR)
                 </div>
               </div>
