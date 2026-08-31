@@ -11,9 +11,33 @@ const DB_PATH = path.join(__dirname, 'db.json');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+const CASHFREE_ENV = (process.env.CASHFREE_ENV || (process.env.NODE_ENV === 'production' ? 'PROD' : 'SANDBOX')).toUpperCase();
+const CASHFREE_API_VERSION = process.env.CASHFREE_API_VERSION || '2025-01-01';
+const PUBLIC_URL = (process.env.PUBLIC_URL || '').replace(/\/$/, '');
+
+function cashfreeBaseUrl() {
+  return CASHFREE_ENV === 'PROD' || CASHFREE_ENV === 'PRODUCTION'
+    ? 'https://api.cashfree.com/pg'
+    : 'https://sandbox.cashfree.com/pg';
+}
+
+function cashfreeCredentials() {
+  return {
+    appId: process.env.CASHFREE_APP_ID || '',
+    secretKey: process.env.CASHFREE_SECRET_KEY || ''
+  };
+}
 
 app.use(cors());
+// Cashfree signs the exact raw request body. Keep this route raw before the
+// global JSON parser so signature verification cannot be bypassed by re-serialisation.
+app.use('/api/v1/webhooks/cashfree', express.raw({ type: 'application/json' }));
 app.use(express.json());
+
+// Deployment health check. This must not depend on the database or a payment provider.
+app.get('/api/v1/health', (req, res) => {
+  res.json({ success: true, service: 'qivropay-api', environment: process.env.NODE_ENV || 'development' });
+});
 
 // Database Helpers
 function readDB() {
@@ -283,7 +307,7 @@ app.post('/api/v1/payments/create-session', (req, res) => {
   res.json({
     success: true,
     sessionId,
-    url: `http://localhost:${PORT}/checkout/${sessionId}`
+    url: `${PUBLIC_URL || 'http://localhost:' + PORT}/checkout/${sessionId}`
   });
 });
 
@@ -297,6 +321,9 @@ app.get('/api/v1/payments/session/:id', (req, res) => {
 });
 
 app.post('/api/v1/payments/process', (req, res) => {
+  if (CASHFREE_ENV === 'PROD' || CASHFREE_ENV === 'PRODUCTION') {
+    return res.status(410).json({ success: false, error: 'Legacy demo payment processing is disabled in production. Use the Cashfree checkout flow.' });
+  }
   const { sessionId, customerName, customerEmail, paymentMethod = 'card', cardLast4 = '4242', country = 'US', promoCode } = req.body;
   const db = readDB();
 
@@ -2050,9 +2077,8 @@ app.get('/api/v1/india/jjm-water', (req, res) => {
 // 129. INDIA: CASHFREE GATEWAY & EASY SPLIT CREDENTIALS VERIFICATION API
 // -------------------------------------------------------------
 app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
-  const { appId, secretKey, environment, beneficiaryIfsc, beneficiaryAccount } = req.body;
-  const currentAppId = appId || process.env.CASHFREE_APP_ID || 'TEST110559449949df01b9dff3b901f544955011';
-  const currentSecretKey = secretKey || process.env.CASHFREE_SECRET_KEY || '';
+  const { environment, beneficiaryIfsc, beneficiaryAccount } = req.body;
+  const { appId: currentAppId, secretKey: currentSecretKey } = cashfreeCredentials();
 
   if (!currentSecretKey) {
     return res.status(400).json({
@@ -2062,12 +2088,12 @@ app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
   }
 
   try {
-    // Real live ping test to Cashfree Sandbox Orders API
+    // Server-side credential check. Secrets must never arrive from the browser.
     const testOrderId = `cf_test_${Date.now()}`;
-    const cfResponse = await fetch('https://sandbox.cashfree.com/pg/orders', {
+    const cfResponse = await fetch(`${cashfreeBaseUrl()}/orders`, {
       method: 'POST',
       headers: {
-        'x-api-version': '2023-08-01',
+        'x-api-version': CASHFREE_API_VERSION,
         'x-client-id': currentAppId,
         'x-client-secret': currentSecretKey,
         'Content-Type': 'application/json'
@@ -2082,7 +2108,8 @@ app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
           customer_phone: '9876543210'
         },
         order_meta: {
-          return_url: `http://localhost:${PORT}/dashboard?order_id={order_id}`
+          return_url: `${PUBLIC_URL || 'http://localhost:' + PORT}/dashboard?order_id={order_id}`,
+          notify_url: `${PUBLIC_URL || 'http://localhost:' + PORT}/api/v1/webhooks/cashfree`
         },
         order_note: 'KODO Payments Gateway Verification'
       })
@@ -2094,7 +2121,6 @@ app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
       const db = readDB();
       db.cashfreeConfig = {
         appId: currentAppId,
-        secretKey: currentSecretKey,
         environment: environment || 'SANDBOX',
         status: 'connected',
         lastVerifiedAt: new Date().toISOString()
@@ -2139,26 +2165,29 @@ app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
 // 130. INDIA: CASHFREE CREATE LIVE REAL ORDER API
 // -------------------------------------------------------------
 app.post('/api/v1/india/cashfree/create-order', async (req, res) => {
-  const { orderAmount = 4999.00, customerEmail = 'founder@bangalore.in', customerPhone = '9876543210', orderNote = 'KODO MoR - Pro SaaS Plan' } = req.body;
-  const db = readDB();
-  const cfConfig = db.cashfreeConfig || {
-    appId: process.env.CASHFREE_APP_ID || 'TEST110559449949df01b9dff3b901f544955011',
-    secretKey: process.env.CASHFREE_SECRET_KEY || ''
-  };
+  const { orderAmount, customerEmail, customerPhone, orderNote = 'QivroPay payment' } = req.body;
+  const { appId, secretKey } = cashfreeCredentials();
+
+  if (!appId || !secretKey || !PUBLIC_URL) {
+    return res.status(503).json({ success: false, error: 'Cashfree production credentials and PUBLIC_URL are required' });
+  }
+  if (!Number.isFinite(Number(orderAmount)) || Number(orderAmount) <= 0 || !customerEmail || !customerPhone) {
+    return res.status(400).json({ success: false, error: 'orderAmount, customerEmail and customerPhone are required' });
+  }
 
   try {
-    const orderId = `kodo_cf_${Date.now()}`;
-    const cfResponse = await fetch('https://sandbox.cashfree.com/pg/orders', {
+    const orderId = `qv_cf_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
+    const cfResponse = await fetch(`${cashfreeBaseUrl()}/orders`, {
       method: 'POST',
       headers: {
-        'x-api-version': '2023-08-01',
-        'x-client-id': cfConfig.appId,
-        'x-client-secret': cfConfig.secretKey,
+        'x-api-version': CASHFREE_API_VERSION,
+        'x-client-id': appId,
+        'x-client-secret': secretKey,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         order_id: orderId,
-        order_amount: Number(orderAmount),
+        order_amount: Number(Number(orderAmount).toFixed(2)),
         order_currency: 'INR',
         customer_details: {
           customer_id: `cus_${crypto.randomBytes(4).toString('hex')}`,
@@ -2166,7 +2195,8 @@ app.post('/api/v1/india/cashfree/create-order', async (req, res) => {
           customer_phone: customerPhone
         },
         order_meta: {
-          return_url: `http://localhost:${PORT}/dashboard?order_id={order_id}`
+          return_url: `${PUBLIC_URL}/dashboard?order_id={order_id}`,
+          notify_url: `${PUBLIC_URL}/api/v1/webhooks/cashfree`
         },
         order_note: orderNote
       })
@@ -2183,7 +2213,7 @@ app.post('/api/v1/india/cashfree/create-order', async (req, res) => {
         orderAmount: cfData.order_amount,
         orderCurrency: cfData.order_currency,
         orderStatus: cfData.order_status,
-        checkoutUrl: `https://payments-test.cashfree.com/forms/${cfData.payment_session_id}`
+        environment: CASHFREE_ENV,
       });
     } else {
       return res.status(400).json({
@@ -2197,6 +2227,53 @@ app.post('/api/v1/india/cashfree/create-order', async (req, res) => {
       error: err.message || 'Failed to communicate with Cashfree'
     });
   }
+});
+
+// Cashfree production webhook receiver. The raw body is verified before JSON
+// parsing and every provider delivery is recorded idempotently.
+app.post('/api/v1/webhooks/cashfree', (req, res) => {
+  const webhookSecret = process.env.CASHFREE_WEBHOOK_SECRET || process.env.QIVROPAY_WEBHOOK_SECRET || '';
+  if (!webhookSecret) {
+    return res.status(503).json({ success: false, error: 'Cashfree webhook secret is not configured' });
+  }
+
+  const timestamp = req.get('x-webhook-timestamp');
+  const signature = req.get('x-webhook-signature');
+  const rawBody = Buffer.isBuffer(req.body) ? req.body : Buffer.from(String(req.body || ''), 'utf8');
+  if (!timestamp || !signature) {
+    return res.status(400).json({ success: false, error: 'Missing Cashfree webhook signature headers' });
+  }
+
+  const timestampMs = Number(timestamp);
+  if (!Number.isFinite(timestampMs) || Math.abs(Date.now() - timestampMs) > 5 * 60 * 1000) {
+    return res.status(400).json({ success: false, error: 'Expired Cashfree webhook timestamp' });
+  }
+
+  const expected = crypto.createHmac('sha256', webhookSecret)
+    .update(`${timestamp}${rawBody.toString('utf8')}`)
+    .digest('base64');
+  const expectedBuffer = Buffer.from(expected);
+  const signatureBuffer = Buffer.from(signature);
+  if (expectedBuffer.length !== signatureBuffer.length || !crypto.timingSafeEqual(expectedBuffer, signatureBuffer)) {
+    return res.status(401).json({ success: false, error: 'Invalid Cashfree webhook signature' });
+  }
+
+  let event;
+  try {
+    event = JSON.parse(rawBody.toString('utf8'));
+  } catch {
+    return res.status(400).json({ success: false, error: 'Invalid webhook JSON' });
+  }
+
+  const eventId = req.get('x-idempotency-key') || crypto.createHash('sha256').update(rawBody).digest('hex');
+  const db = readDB();
+  db.webhookEvents = db.webhookEvents || [];
+  if (!db.webhookEvents.some(item => item.id === eventId)) {
+    db.webhookEvents.push({ id: eventId, provider: 'cashfree', event, receivedAt: new Date().toISOString() });
+    writeDB(db);
+  }
+
+  res.status(200).json({ success: true, received: true, eventId });
 });
 
 // Analytics Dashboard Endpoint
@@ -2234,6 +2311,12 @@ if (fs.existsSync(distPath)) {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`⚡ KODO Payments Engine running on http://localhost:${PORT}`);
-});
+// Vercel imports the Express app as a serverless function. Keep the listener for
+// local Docker/VM deployments, but never open a port inside a Vercel function.
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`⚡ QivroPay Payments Engine running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
