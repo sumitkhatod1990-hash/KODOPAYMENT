@@ -82,6 +82,8 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [completedTx, setCompletedTx] = useState<any>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [checkoutStep, setCheckoutStep] = useState<1 | 2>(1);
+  const [billingAddress, setBillingAddress] = useState('');
   const [cashfreePaymentStarted, setCashfreePaymentStarted] = useState(false);
   const cashfreeContainerRef = useRef<HTMLDivElement>(null);
   const cashfreePaymentMethodRef = useRef<any>(null);
@@ -127,6 +129,15 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
     if (promoCode.trim().toUpperCase() === 'LAUNCH50') {
       setDiscountApplied(true);
     }
+  };
+
+  const handleContinueToPayment = () => {
+    if (!customerName.trim()) return setPaymentError('Apna naam enter karein.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.trim())) return setPaymentError('Valid email address enter karein.');
+    if (isInrSession && !/^\+?\d[\d\s-]{9,14}$/.test(customerPhone.trim())) return setPaymentError('Valid 10-digit mobile number enter karein.');
+    if (!billingAddress.trim()) return setPaymentError('Billing address enter karein.');
+    setPaymentError(null);
+    setCheckoutStep(2);
   };
 
   const basePrice = sessionData?.amount || 29.00;
@@ -514,8 +525,31 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
             {/* Right: Payment Method Form (7 Cols) */}
             <div className="lg:col-span-7 opp-card p-6 sm:p-8 space-y-6">
               
+              {/* Dodo-style checkout steps */}
+              <div className="flex items-center gap-2 text-[11px] font-mono font-bold uppercase tracking-wide">
+                <span className={checkoutStep === 1 ? 'text-[#0055FF]' : 'text-emerald-700'}>1. Contact & billing</span>
+                <span className="text-[#C4C7D0]">→</span>
+                <span className={checkoutStep === 2 ? 'text-[#0055FF]' : 'text-[#A5A8B4]'}>2. Payment</span>
+              </div>
+
+              {checkoutStep === 1 && (
+                <div className="space-y-4 rounded-2xl border border-black/10 bg-[#FAFBFD] p-5">
+                  <div>
+                    <h3 className="text-base font-bold text-[#0A0D14]">Contact Information</h3>
+                    <p className="mt-1 text-xs text-[#8C90A0]">We’ll use these details for your receipt and order updates.</p>
+                  </div>
+                  <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Full name" className="w-full rounded-xl border border-black/10 bg-white p-3 text-sm outline-none focus:border-[#0055FF]" />
+                  <input type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} placeholder="Email address" className="w-full rounded-xl border border-black/10 bg-white p-3 text-sm outline-none focus:border-[#0055FF]" />
+                  <input type="tel" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} placeholder="Phone number" className="w-full rounded-xl border border-black/10 bg-white p-3 text-sm outline-none focus:border-[#0055FF]" />
+                  <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} className="w-full rounded-xl border border-black/10 bg-white p-3 text-sm outline-none focus:border-[#0055FF]"><option value="IN">India (+91)</option><option value="US">United States (+1)</option><option value="GB">United Kingdom (+44)</option></select>
+                  <textarea value={billingAddress} onChange={(e) => setBillingAddress(e.target.value)} placeholder="Billing address" rows={3} className="w-full resize-none rounded-xl border border-black/10 bg-white p-3 text-sm outline-none focus:border-[#0055FF]" />
+                  {paymentError && <p className="text-xs text-red-600" role="alert">{paymentError}</p>}
+                  <button type="button" onClick={handleContinueToPayment} className="opp-btn-primary w-full py-3 text-sm font-bold">Continue to Payment →</button>
+                </div>
+              )}
+
               {/* Category Selector */}
-              <div className="space-y-3">
+              <div className={`space-y-3 ${checkoutStep === 1 ? 'hidden' : ''}`}>
                 <div className="flex items-center justify-between text-xs font-semibold text-[#8C90A0]">
                   <span>SELECT PAYMENT METHOD</span>
                   <span className="text-[10px] text-emerald-700 font-bold">● 220+ Countries Active</span>
@@ -704,7 +738,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
               </div>
 
               {/* Dynamic Rail Form */}
-              <form onSubmit={handlePay} className="space-y-4 text-xs">
+              <form onSubmit={handlePay} className={`space-y-4 text-xs ${checkoutStep === 1 ? 'hidden' : ''}`}>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
