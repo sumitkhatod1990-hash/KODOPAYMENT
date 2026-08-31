@@ -168,7 +168,10 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
         }
         const cashfree = (window as any).Cashfree?.({ mode: 'production' });
         if (!cashfree) throw new Error('Cashfree checkout SDK load nahi hua');
-        await cashfree.checkout({ paymentSessionId: orderData.paymentSessionId, redirectTarget: '_self' });
+        // Keep the customer on qivropay.com while Cashfree renders its secure
+        // payment UI in a modal. Payment data still goes directly to Cashfree.
+        const checkoutResult = await cashfree.checkout({ paymentSessionId: orderData.paymentSessionId, redirectTarget: '_modal' });
+        if (checkoutResult?.error) throw new Error(checkoutResult.error.message || 'Cashfree checkout could not be opened');
       } catch (err: any) {
         setPaymentError(err?.message || 'Live payment start nahi ho saka');
         setIsProcessing(false);
