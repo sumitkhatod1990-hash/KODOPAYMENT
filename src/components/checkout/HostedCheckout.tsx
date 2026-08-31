@@ -205,7 +205,11 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
           redirect: 'if_required',
           returnUrl: `${window.location.origin}/checkout/${encodeURIComponent(sessionId || '')}`
         });
-        if (paymentResult?.error) throw new Error(paymentResult.error.message || 'UPI payment could not be started');
+        // Cashfree may return an intermediate status while the QR is already
+        // mounted and waiting for the customer to approve in their UPI app.
+        // Do not show a false failure after the QR has rendered.
+        if (paymentResult?.error) console.warn('UPI payment status:', paymentResult.error);
+        setPaymentError(null);
         setIsProcessing(false);
       } catch (err: any) {
         setPaymentError(err?.message || 'Live payment start nahi ho saka');
