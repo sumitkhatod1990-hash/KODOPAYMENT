@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Logo } from '../common/Logo';
 import { 
@@ -82,6 +82,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [completedTx, setCompletedTx] = useState<any>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const cashfreeContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -168,9 +169,14 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
         }
         const cashfree = (window as any).Cashfree?.({ mode: 'production' });
         if (!cashfree) throw new Error('Cashfree checkout SDK load nahi hua');
-        // Keep the customer on qivropay.com while Cashfree renders its secure
-        // payment UI in a modal. Payment data still goes directly to Cashfree.
-        const checkoutResult = await cashfree.checkout({ paymentSessionId: orderData.paymentSessionId, redirectTarget: '_modal' });
+        // Render Cashfree's PCI-compliant payment UI inside the QivroPay page.
+        // Payment data still goes directly to Cashfree; it never touches us.
+        if (!cashfreeContainerRef.current) throw new Error('Payment container could not be opened');
+        const checkoutResult = await cashfree.checkout({
+          paymentSessionId: orderData.paymentSessionId,
+          redirectTarget: cashfreeContainerRef.current,
+          appearance: { width: '100%', height: '700px' }
+        });
         if (checkoutResult?.error) throw new Error(checkoutResult.error.message || 'Cashfree checkout could not be opened');
       } catch (err: any) {
         setPaymentError(err?.message || 'Live payment start nahi ho saka');
@@ -851,6 +857,10 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                   <Lock className="w-4 h-4 fill-white" />
                   {isProcessing ? 'Opening secure Cashfree checkout...' : `Pay ${isInrSession ? '₹' : '$'}${finalUsdAmount.toFixed(2)} ${isInrSession ? 'INR' : 'USD'} via ${paymentRail.toUpperCase().replace('_', ' ')}`}
                 </button>
+
+                {isInrSession && (
+                  <div ref={cashfreeContainerRef} className="mt-4 min-h-0 overflow-hidden rounded-2xl border border-black/10 bg-white" aria-label="Secure QivroPay payment form" />
+                )}
 
                 <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] text-[#8C90A0] font-medium pt-2">
                   <span>🔒 PCI-DSS Level 1</span>
