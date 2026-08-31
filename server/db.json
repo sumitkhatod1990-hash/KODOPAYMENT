@@ -1,0 +1,2040 @@
+{
+  "brands": [
+    {
+      "id": "brand_kodo_01",
+      "name": "KODO AI Technologies Inc.",
+      "domain": "kodo.io",
+      "statementDescriptor": "KODO*AI",
+      "supportEmail": "billing@kodo.io",
+      "default": true
+    },
+    {
+      "id": "brand_kodo_02",
+      "name": "HyperScale Labs",
+      "domain": "hyperscale.ai",
+      "statementDescriptor": "HYPERSCALE*API",
+      "supportEmail": "support@hyperscale.ai",
+      "default": false
+    }
+  ],
+  "products": [
+    {
+      "id": "prod_copilot_c2debd",
+      "name": "Pro AI Supercharge Plan",
+      "description": "Auto-generated from natural language prompt: \"Create a $49/mo Pro AI plan with 50M tokens and 50% India PPP discount\"",
+      "price": 49,
+      "currency": "USD",
+      "type": "credits",
+      "active": true,
+      "createdAt": "2026-08-30T23:31:27.581Z"
+    },
+    {
+      "id": "prod_copilot_e6a5ed",
+      "name": "AI Copilot Generated Product",
+      "description": "Auto-generated from natural language prompt: \"Create a $79/mo subscription for Enterprise AI Developers\"",
+      "price": 79,
+      "currency": "USD",
+      "type": "subscription",
+      "active": true,
+      "createdAt": "2026-08-30T23:18:24.612Z"
+    },
+    {
+      "id": "prod_kodo_01",
+      "name": "AI Token Starter Pack",
+      "description": "5,000,000 GPT-4o & Claude 3.5 Sonnet tokens with zero rate-limit constraints.",
+      "price": 29,
+      "currency": "USD",
+      "type": "credits",
+      "credits": 5000000,
+      "active": true,
+      "createdAt": "2026-08-20T10:00:00Z"
+    },
+    {
+      "id": "prod_kodo_02",
+      "name": "Pro Intelligence SaaS",
+      "description": "Monthly subscription with 50M tokens, automated smart dunning, and dedicated GPU priority queue.",
+      "price": 99,
+      "currency": "USD",
+      "type": "subscription",
+      "interval": "month",
+      "active": true,
+      "createdAt": "2026-08-22T14:30:00Z"
+    },
+    {
+      "id": "prod_kodo_03",
+      "name": "Self-Hosted Agent Runtime (Perpetual)",
+      "description": "Commercial node license with offline cryptographic key verification.",
+      "price": 499,
+      "currency": "USD",
+      "type": "license",
+      "licenseType": "perpetual",
+      "active": true,
+      "createdAt": "2026-08-25T09:15:00Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_kodo_aad396bb",
+      "amount": 29,
+      "currency": "USD",
+      "status": "succeeded",
+      "customerEmail": "alex.chen@synthflow.ai",
+      "customerName": "Alex Chen",
+      "productName": "AI Token Starter Pack",
+      "paymentMethod": "upi",
+      "cardLast4": "UPI",
+      "fee": 1.56,
+      "net": 27.44,
+      "country": "US",
+      "createdAt": "2026-08-31T07:05:57.459Z"
+    },
+    {
+      "id": "tx_kodo_9881",
+      "amount": 49,
+      "currency": "USD",
+      "fee": 2.36,
+      "net": 46.64,
+      "status": "succeeded",
+      "customerName": "Alex Chen",
+      "customerEmail": "alex.chen@synthflow.ai",
+      "productName": "AI Inference Credit Pack",
+      "paymentMethod": "apple_pay",
+      "cardLast4": "APPLE PAY",
+      "country": "US",
+      "riskScore": 12,
+      "createdAt": "2026-08-30T22:15:00Z"
+    },
+    {
+      "id": "tx_kodo_9882",
+      "amount": 99,
+      "currency": "USD",
+      "fee": 4.36,
+      "net": 94.64,
+      "status": "succeeded",
+      "customerName": "Sophia Lindqvist",
+      "customerEmail": "sophia@nordicai.io",
+      "productName": "Pro Intelligence SaaS",
+      "paymentMethod": "ideal",
+      "cardLast4": "IDEAL NL",
+      "country": "NL",
+      "riskScore": 8,
+      "createdAt": "2026-08-30T21:40:00Z"
+    },
+    {
+      "id": "tx_kodo_9883",
+      "amount": 29,
+      "currency": "USD",
+      "fee": 1.56,
+      "net": 27.44,
+      "status": "succeeded",
+      "customerName": "Rohan Sharma",
+      "customerEmail": "rohan@promptforge.in",
+      "productName": "AI Token Starter Pack",
+      "paymentMethod": "upi",
+      "cardLast4": "UPI IN",
+      "country": "IN",
+      "riskScore": 15,
+      "createdAt": "2026-08-30T20:10:00Z"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "sub_kodo_771",
+      "customerName": "Alex Chen",
+      "customerEmail": "alex.chen@synthflow.ai",
+      "planName": "Pro Intelligence SaaS",
+      "amount": 99,
+      "interval": "month",
+      "status": "active",
+      "currentPeriodEnd": "2026-09-30",
+      "cancelAtPeriodEnd": false
+    },
+    {
+      "id": "sub_kodo_772",
+      "customerName": "Liam Davies",
+      "customerEmail": "liam@autolink.uk",
+      "planName": "Pro Intelligence SaaS",
+      "amount": 99,
+      "interval": "month",
+      "status": "active",
+      "currentPeriodEnd": "2026-09-28",
+      "cancelAtPeriodEnd": false
+    }
+  ],
+  "customers": [
+    {
+      "id": "cus_kodo_9910",
+      "name": "Alex Chen",
+      "email": "alex.chen@synthflow.ai",
+      "country": "US",
+      "totalSpend": 247,
+      "activeSubscriptions": 1,
+      "joinedAt": "2026-08-15",
+      "totalSpent": null,
+      "lastActive": "2026-08-31T07:05:57.459Z"
+    },
+    {
+      "id": "cus_kodo_9911",
+      "name": "Sophia Lindqvist",
+      "email": "sophia@nordicai.io",
+      "country": "NL",
+      "totalSpend": 198,
+      "activeSubscriptions": 1,
+      "joinedAt": "2026-08-18"
+    }
+  ],
+  "discounts": [
+    {
+      "id": "disc_01",
+      "code": "LAUNCH50",
+      "percentOff": 50,
+      "redemptions": 14,
+      "maxRedemptions": 100,
+      "active": true
+    }
+  ],
+  "licenses": [
+    {
+      "id": "lic_9901",
+      "key": "KODO-8F3A-99B2-C14D-7E82",
+      "customerEmail": "alex.chen@synthflow.ai",
+      "productName": "Self-Hosted Agent Runtime",
+      "activations": 1,
+      "maxActivations": 3,
+      "status": "active",
+      "createdAt": "2026-08-28"
+    }
+  ],
+  "payouts": [
+    {
+      "id": "po_kodo_401",
+      "amount": 3480.5,
+      "currency": "USD",
+      "status": "paid",
+      "destination": "Silicon Valley Bank (••••9812)",
+      "schedule": "T+2_Rolling",
+      "arrivalDate": "2026-08-30"
+    }
+  ],
+  "usageMeters": [
+    {
+      "id": "meter_01",
+      "name": "LLM Inference Tokens",
+      "unit": "tokens",
+      "event": "llm_tokens_consumed",
+      "aggregation": "sum",
+      "totalReportedUnits": 128450000
+    }
+  ],
+  "apiKeys": [
+    {
+      "id": "key_live_01",
+      "name": "Production Server Key",
+      "key": "kodo_live_9a7d3c5f8e1b4a20984efc71289a0b34",
+      "prefix": "kodo_live_",
+      "environment": "live",
+      "createdAt": "2026-08-20T12:00:00Z",
+      "lastUsed": "2 mins ago"
+    }
+  ],
+  "webhooks": [
+    {
+      "id": "wh_01",
+      "url": "https://api.synthflow.ai/webhooks/kodo",
+      "events": [
+        "payment.succeeded",
+        "subscription.created"
+      ],
+      "secret": "whsec_kodo_7719a8bc43d0e9812f",
+      "active": true,
+      "createdAt": "2026-08-20T12:30:00Z"
+    }
+  ],
+  "affiliates": [
+    {
+      "id": "aff_01",
+      "name": "David Miller (AI Tech Reviews)",
+      "email": "david@aitechreviews.com",
+      "referralCode": "david",
+      "commissionRate": 20,
+      "clicks": 1420,
+      "conversions": 38,
+      "referredVolume": 3762,
+      "unpaidCommissions": 752.4,
+      "status": "active"
+    },
+    {
+      "id": "aff_02",
+      "name": "Elena Rostova (Prompt Masters)",
+      "email": "elena@promptmasters.io",
+      "referralCode": "elena",
+      "commissionRate": 25,
+      "clicks": 890,
+      "conversions": 22,
+      "referredVolume": 2178,
+      "unpaidCommissions": 544.5,
+      "status": "active"
+    }
+  ],
+  "agentWallets": [
+    {
+      "id": "wallet_agent_c5575c",
+      "agentName": "kl",
+      "balance": 400,
+      "currency": "USD",
+      "autoRefillThreshold": 10,
+      "autoRefillAmount": 50,
+      "status": "active",
+      "totalConsumed": 0,
+      "lastRefill": "Just now"
+    },
+    {
+      "id": "wallet_agent_01",
+      "agentName": "ResearchCrawler-Agent-V4",
+      "balance": 84.5,
+      "currency": "USD",
+      "autoRefillThreshold": 10,
+      "autoRefillAmount": 50,
+      "status": "active",
+      "totalConsumed": 428.5,
+      "lastRefill": "Yesterday at 4:15 PM"
+    },
+    {
+      "id": "wallet_agent_02",
+      "agentName": "CustomerSupport-LLM-Worker",
+      "balance": 142.2,
+      "currency": "USD",
+      "autoRefillThreshold": 20,
+      "autoRefillAmount": 100,
+      "status": "active",
+      "totalConsumed": 890,
+      "lastRefill": "Aug 28 at 10:00 AM"
+    }
+  ],
+  "teamMembers": [
+    {
+      "id": "team_01",
+      "name": "Alex Kodo (Founder & CEO)",
+      "email": "founder@kodo.io",
+      "role": "Owner",
+      "status": "active",
+      "lastActive": "Just now"
+    },
+    {
+      "id": "team_02",
+      "name": "Devin Lead Architect",
+      "email": "devin@kodo.io",
+      "role": "Developer",
+      "status": "active",
+      "lastActive": "15 mins ago"
+    },
+    {
+      "id": "team_03",
+      "name": "Sarah Accounting Lead",
+      "email": "sarah@kodo.io",
+      "role": "Accountant",
+      "status": "active",
+      "lastActive": "2 hours ago"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "log_8801",
+      "action": "API Key Generated",
+      "user": "founder@kodo.io",
+      "details": "Generated key_live_01 (Production Server Key)",
+      "timestamp": "2026-08-30T22:10:00Z"
+    },
+    {
+      "id": "log_8802",
+      "action": "Webhook Dispatch",
+      "user": "System Engine",
+      "details": "Event payment.succeeded dispatched to https://api.synthflow.ai/webhooks/kodo",
+      "timestamp": "2026-08-30T22:15:00Z"
+    },
+    {
+      "id": "log_8803",
+      "action": "Bank Payout Batch Initiated",
+      "user": "MoR Settlement Engine",
+      "details": "Batched $3,480.50 for rolling T+2 direct deposit to SVB",
+      "timestamp": "2026-08-30T22:00:00Z"
+    }
+  ],
+  "abandonedCheckouts": [
+    {
+      "id": "abn_kodo_01",
+      "customerEmail": "marcus.vance@axonlabs.io",
+      "productName": "Pro Intelligence SaaS",
+      "amount": 99,
+      "currency": "USD",
+      "lastStep": "card_entry",
+      "abandonedAt": "2026-08-30T21:30:00Z",
+      "recoveryStatus": "email_sent",
+      "discountOffered": 15
+    },
+    {
+      "id": "abn_kodo_02",
+      "customerEmail": "charlotte@creativespark.design",
+      "productName": "AI Token Starter Pack",
+      "amount": 29,
+      "currency": "USD",
+      "lastStep": "payment_method_select",
+      "abandonedAt": "2026-08-30T20:15:00Z",
+      "recoveryStatus": "pending",
+      "discountOffered": 15
+    }
+  ],
+  "workflows": [
+    {
+      "id": "wf_01",
+      "name": "High-Value Payment Slack Alert",
+      "trigger": "payment.succeeded",
+      "condition": "amount >= 100",
+      "action": "slack_notification",
+      "target": "#revenue-celebrations",
+      "executions": 42,
+      "active": true
+    },
+    {
+      "id": "wf_02",
+      "name": "Pro SaaS Discord VIP Role Grant",
+      "trigger": "subscription.created",
+      "condition": "plan == Pro Intelligence SaaS",
+      "action": "discord_role",
+      "target": "role_vip_member",
+      "executions": 18,
+      "active": true
+    },
+    {
+      "id": "wf_03",
+      "name": "Auto-Generate License Key",
+      "trigger": "payment.succeeded",
+      "condition": "type == license",
+      "action": "issue_license_key",
+      "target": "customer_email",
+      "executions": 7,
+      "active": true
+    }
+  ],
+  "vendors": [
+    {
+      "id": "ven_kodo_01",
+      "name": "NeuralVoice Plugins Inc.",
+      "email": "partners@neuralvoice.ai",
+      "platformFeePercent": 15,
+      "grossSales": 14280,
+      "vendorPayoutDue": 12138,
+      "platformCommissionEarned": 2142,
+      "status": "verified",
+      "payoutMethod": "US Bank (••••4190)"
+    },
+    {
+      "id": "ven_kodo_02",
+      "name": "Autonomous Vision Models LLC",
+      "email": "billing@autovision.io",
+      "platformFeePercent": 10,
+      "grossSales": 8950,
+      "vendorPayoutDue": 8055,
+      "platformCommissionEarned": 895,
+      "status": "verified",
+      "payoutMethod": "SEPA Bank (••••7821)"
+    }
+  ],
+  "dunningRetries": [
+    {
+      "id": "dun_01",
+      "customerEmail": "tech.lead@datanode.cloud",
+      "planName": "Pro Intelligence SaaS (/mo)",
+      "failReason": "insufficient_funds",
+      "retryCount": 2,
+      "nextSmartRetry": "Tomorrow at 9:15 AM (ML Payday Window)",
+      "recoveryProbability": "88%",
+      "status": "retrying"
+    },
+    {
+      "id": "dun_02",
+      "customerEmail": "finance@vectorflow.ai",
+      "planName": "Pro Intelligence SaaS (/mo)",
+      "failReason": "card_expired",
+      "retryCount": 1,
+      "nextSmartRetry": "Portal Email Dispatched",
+      "recoveryProbability": "94%",
+      "status": "portal_link_sent"
+    }
+  ],
+  "sessions": {
+    "cs_kodo_92d441d8e2a1690fbdbf0ba8": {
+      "sessionId": "cs_kodo_92d441d8e2a1690fbdbf0ba8",
+      "productId": "custom",
+      "title": "Custom AI Payment Link",
+      "amount": 49,
+      "currency": "USD",
+      "customerEmail": "",
+      "credits": 5000000,
+      "type": "credits",
+      "createdAt": "2026-08-30T23:02:42.164Z"
+    }
+  },
+  "disputes": [
+    {
+      "id": "dp_kodo_01",
+      "transactionId": "tx_kodo_9881",
+      "amount": 49,
+      "currency": "USD",
+      "reason": "fraudulent_claim",
+      "status": "under_review",
+      "evidenceStatus": "ai_compiled_ready",
+      "customerEmail": "alex.chen@synthflow.ai",
+      "disputeDeadline": "In 4 days",
+      "evidenceScore": "98% Win Probability (3DS Verified + Token Logs)"
+    }
+  ],
+  "b2bInvoices": [
+    {
+      "id": "inv_b2b_1001",
+      "companyName": "Synthetix Global Corp",
+      "taxId": "US-EIN-94-3829104",
+      "amount": 12500,
+      "currency": "USD",
+      "terms": "Net 30",
+      "status": "sent",
+      "dueDate": "2026-09-30",
+      "virtualIban": "US84 KODO 0192 8847 2910 44",
+      "items": [
+        "Enterprise AI Gateway Dedicated Cluster (Annual License)",
+        "Custom SLA & 24/7 Support"
+      ]
+    },
+    {
+      "id": "inv_b2b_1002",
+      "companyName": "Nordic Autonomous Systems AB",
+      "taxId": "SE556012345601",
+      "amount": 8400,
+      "currency": "EUR",
+      "terms": "Net 15",
+      "status": "paid",
+      "dueDate": "2026-08-25",
+      "virtualIban": "DE89 KODO 0044 0532 0130 99",
+      "items": [
+        "Self-Hosted On-Premise GPU Nodes (5 Seats)"
+      ]
+    }
+  ],
+  "giftCards": [
+    {
+      "id": "gc_kodo_01",
+      "code": "GIFT-KODO-9812-PRO",
+      "initialAmount": 100,
+      "currentBalance": 71,
+      "currency": "USD",
+      "recipientEmail": "sarah.dev@promptworks.io",
+      "senderName": "Alex Founder",
+      "status": "active",
+      "createdAt": "2026-08-28T14:00:00Z"
+    },
+    {
+      "id": "gc_kodo_02",
+      "code": "GIFT-KODO-4410-VIP",
+      "initialAmount": 50,
+      "currentBalance": 50,
+      "currency": "USD",
+      "recipientEmail": "jason@hyperstack.ai",
+      "senderName": "Elena Marketing",
+      "status": "active",
+      "createdAt": "2026-08-29T10:30:00Z"
+    }
+  ],
+  "abTests": [
+    {
+      "id": "test_01",
+      "name": "Checkout Pricing Structure Experiment",
+      "variantA": "One-Time Payment (.00 USD)",
+      "variantB": "Monthly Subscription (.00/mo)",
+      "trafficSplit": "50% / 50%",
+      "viewsA": 1420,
+      "conversionsA": 82,
+      "conversionRateA": "5.77%",
+      "viewsB": 1390,
+      "conversionsB": 118,
+      "conversionRateB": "8.49%",
+      "winner": "Variant B (+47.1% Lift)",
+      "status": "active"
+    },
+    {
+      "id": "test_02",
+      "name": "Apple Pay Priority vs Default Card",
+      "variantA": "Default Card Form First",
+      "variantB": "Apple Pay One-Click Banner First",
+      "trafficSplit": "50% / 50%",
+      "viewsA": 950,
+      "conversionsA": 48,
+      "conversionRateA": "5.05%",
+      "viewsB": 970,
+      "conversionsB": 79,
+      "conversionRateB": "8.14%",
+      "winner": "Variant B (+61.2% Lift)",
+      "status": "active"
+    }
+  ],
+  "taxNexusRecords": [
+    {
+      "region": "European Union (EU VAT OSS)",
+      "nexusThreshold": "€10,000 across EU",
+      "currentVolume": "€48,290 / yr",
+      "status": "Fully Compliant & Auto-Remitted",
+      "taxRateApplied": "17% - 27% (Origin Destination Mapped)",
+      "nexusId": "EU37209182"
+    },
+    {
+      "region": "United States (Economic Nexus)",
+      "nexusThreshold": ",000 / 200 txs per state",
+      "currentVolume": ",800 / yr",
+      "status": "Fully Compliant & Insulated",
+      "taxRateApplied": "State & Local Sales Tax Managed by KODO",
+      "nexusId": "US-EIN-94-3829104"
+    },
+    {
+      "region": "United Kingdom (UK HMRC VAT)",
+      "nexusThreshold": "£85,000",
+      "currentVolume": "£34,100 / yr",
+      "status": "Registered & Remitted",
+      "taxRateApplied": "20% UK Standard VAT",
+      "nexusId": "GB992817402"
+    },
+    {
+      "region": "India (GST OIDAR)",
+      "nexusThreshold": "Immediate OIDAR digital services",
+      "currentVolume": "₹1,480,000 / yr",
+      "status": "Compliant",
+      "taxRateApplied": "18% IGST OIDAR",
+      "nexusId": "9921IND9812K1Z0"
+    }
+  ],
+  "pricingRules": [
+    {
+      "id": "pr_01",
+      "productName": "AI Token Starter Pack",
+      "basePrice": 29,
+      "elasticPrice": 34,
+      "trigger": "High Demand Peak Hours (2 PM - 6 PM UTC)",
+      "projectedRevenueLift": "+17.4%",
+      "status": "active"
+    },
+    {
+      "id": "pr_02",
+      "productName": "Pro Intelligence SaaS",
+      "basePrice": 99,
+      "elasticPrice": 89,
+      "trigger": "High Churn Risk Region Exit Intent",
+      "projectedRevenueLift": "+22.8% Retention Lift",
+      "status": "active"
+    }
+  ],
+  "deadLetterQueue": [
+    {
+      "id": "dlq_kodo_991",
+      "eventId": "evt_kodo_7718a2",
+      "eventType": "payment.succeeded",
+      "targetUrl": "https://api.synthflow.ai/webhooks/kodo",
+      "lastAttempt": "10 mins ago",
+      "failureReason": "HTTP 504 Gateway Timeout",
+      "retryCount": 3,
+      "nextScheduledRetry": "In 50 mins (Exponential Backoff)",
+      "status": "quarantined"
+    },
+    {
+      "id": "dlq_kodo_992",
+      "eventId": "evt_kodo_8819b4",
+      "eventType": "subscription.canceled",
+      "targetUrl": "https://api.nordicai.io/billing-events",
+      "lastAttempt": "2 hours ago",
+      "failureReason": "HTTP 502 Bad Gateway",
+      "retryCount": 4,
+      "nextScheduledRetry": "In 4 hours",
+      "status": "quarantined"
+    }
+  ],
+  "treasuryBalances": [
+    {
+      "currency": "USD",
+      "amount": 84250,
+      "symbol": "$",
+      "name": "US Dollar"
+    },
+    {
+      "currency": "EUR",
+      "amount": 38100,
+      "symbol": "€",
+      "name": "Euro"
+    },
+    {
+      "currency": "GBP",
+      "amount": 14500,
+      "symbol": "£",
+      "name": "British Pound"
+    },
+    {
+      "currency": "USDC",
+      "amount": 22000,
+      "symbol": "USDC",
+      "name": "USD Coin (Solana/Base)"
+    }
+  ],
+  "fxRates": {
+    "EUR_USD": 1.09,
+    "GBP_USD": 1.28,
+    "USD_EUR": 0.92,
+    "USD_GBP": 0.78,
+    "USD_USDC": 1
+  },
+  "taxExemptions": [
+    {
+      "id": "exm_kodo_101",
+      "organizationName": "Mozilla Open Source Foundation",
+      "type": "501(c)(3) Non-Profit Charity",
+      "certificateNumber": "US-EXM-94-382910",
+      "jurisdiction": "United States (Federal + California)",
+      "status": "verified",
+      "expiresAt": "2028-12-31",
+      "verifiedAt": "2026-08-15"
+    },
+    {
+      "id": "exm_kodo_102",
+      "organizationName": "NextGen Systems Reseller Corp",
+      "type": "Wholesale B2B Resale Exemption",
+      "certificateNumber": "TX-RESALE-8849102",
+      "jurisdiction": "Texas, USA",
+      "status": "verified",
+      "expiresAt": "2027-06-30",
+      "verifiedAt": "2026-08-20"
+    }
+  ],
+  "inAppNotifications": [
+    {
+      "id": "notif_01",
+      "title": "New B2B Wire Received",
+      "message": "$12,500.00 USD received via vIBAN from Synthetix Global Corp.",
+      "type": "payment",
+      "read": false,
+      "createdAt": "5 mins ago"
+    },
+    {
+      "id": "notif_02",
+      "title": "AI Churn Interceptor Deflected Cancellation",
+      "message": "Saved subscriber alex.chen@synthflow.ai with 50% discount rescue offer.",
+      "type": "retention",
+      "read": false,
+      "createdAt": "25 mins ago"
+    },
+    {
+      "id": "notif_03",
+      "title": "Chargeback Defense Won",
+      "message": "Dispute dp_kodo_01 won with 100% MoR protection against Visa network.",
+      "type": "security",
+      "read": true,
+      "createdAt": "2 hours ago"
+    }
+  ],
+  "meteredOverageTiers": [
+    {
+      "meterName": "AI Inference Tokens (Millions)",
+      "includedUnits": "50M Tokens",
+      "tier1": "0 - 50M: Included in $49/mo Base",
+      "tier2": "50M - 200M: $0.0008 / 1k Tokens",
+      "tier3": "200M+: $0.0005 / 1k Tokens (Volume Discount)",
+      "autoBumpThreshold": "250M Tokens (Auto-upgrades to Enterprise Cluster)",
+      "status": "active"
+    },
+    {
+      "meterName": "Dedicated GPU Node Hours",
+      "includedUnits": "100 Hours",
+      "tier1": "0 - 100 Hrs: Included in Base",
+      "tier2": "100 - 500 Hrs: $0.45 / GPU Hour",
+      "tier3": "500+ Hrs: $0.35 / GPU Hour",
+      "autoBumpThreshold": "600 Hrs (Auto-upgrades to Dedicated Rack)",
+      "status": "active"
+    }
+  ],
+  "fraudShieldRules": [
+    {
+      "id": "fs_01",
+      "name": "Card Velocity Velocity Limiter",
+      "condition": "Max 3 failed checkout attempts per IP in 60 mins",
+      "action": "Block IP & Require Captcha",
+      "blockedCount": 142,
+      "status": "active"
+    },
+    {
+      "id": "fs_02",
+      "name": "TOR & Anonymous Proxy Filter",
+      "condition": "Incoming IP matched to known TOR exit relay or open VPN",
+      "action": "Trigger Mandatory 3DS 2.0 Step-Up",
+      "blockedCount": 389,
+      "status": "active"
+    },
+    {
+      "id": "fs_03",
+      "name": "High-Risk BIN Range Geofence",
+      "condition": "Prepaid disposable card BINs with 0 balance history",
+      "action": "Block & Request Alternative Rail",
+      "blockedCount": 68,
+      "status": "active"
+    }
+  ],
+  "creditNotes": [
+    {
+      "id": "cn_kodo_701",
+      "originalInvoiceId": "inv_kodo_9881",
+      "customerEmail": "elena.tech@berlin-ai.de",
+      "taxId": "DE391029482",
+      "amount": 49,
+      "adjustmentAmount": 9.31,
+      "reason": "Retroactive B2B EU VAT Exemption Applied (0% Reverse-Charge)",
+      "status": "issued_refunded",
+      "issuedAt": "2026-08-28"
+    }
+  ],
+  "instantPayoutRecords": [
+    {
+      "id": "pout_inst_901",
+      "amount": 8500,
+      "currency": "EUR",
+      "rail": "SEPA Instant (EU)",
+      "recipientBank": "Deutsche Bank AG (DE89 3704 ...)",
+      "fee": 1.5,
+      "settlementTime": "Sub-10 seconds",
+      "status": "settled",
+      "timestamp": "Today, 04:30 AM"
+    },
+    {
+      "id": "pout_inst_902",
+      "amount": 4200,
+      "currency": "GBP",
+      "rail": "Faster Payments (UK)",
+      "recipientBank": "Barclays Bank UK (GB29 BUKB ...)",
+      "fee": 1,
+      "settlementTime": "Sub-10 seconds",
+      "status": "settled",
+      "timestamp": "Yesterday, 02:15 PM"
+    }
+  ],
+  "customDomains": [
+    {
+      "id": "dom_kodo_01",
+      "domain": "billing.synthflow.ai",
+      "targetCname": "custom.kodo.io",
+      "sslStatus": "issued_active",
+      "dnsStatus": "verified",
+      "createdAt": "2026-08-25"
+    }
+  ],
+  "corporateEntities": [
+    {
+      "id": "ent_kodo_101",
+      "name": "KODO Global Holdings Delaware Inc.",
+      "jurisdiction": "Delaware, United States",
+      "taxId": "US-EIN-94-3829104",
+      "role": "Parent Global Holding Entity",
+      "annualVolume": ",280,000.00 USD"
+    },
+    {
+      "id": "ent_kodo_102",
+      "name": "KODO European Operations Ireland Ltd.",
+      "jurisdiction": "Dublin, Ireland",
+      "taxId": "IE99382104M",
+      "role": "EU & UK MoR Operating Subsidiary",
+      "annualVolume": "€2,490,000.00 EUR"
+    },
+    {
+      "id": "ent_kodo_103",
+      "name": "KODO Asia-Pacific Pte. Ltd.",
+      "jurisdiction": "Singapore",
+      "taxId": "SG202601928K",
+      "role": "APAC Regional Gateway Entity",
+      "annualVolume": "S,820,000.00 SGD"
+    }
+  ],
+  "contracts": [
+    {
+      "id": "cnt_kodo_881",
+      "title": "Enterprise Master Services Agreement (MSA) & 99.99% SLA",
+      "clientName": "Synthetix Global Corp",
+      "contractValue": ",000.00 / yr",
+      "status": "signed_active",
+      "signerEmail": "legal@synthetix.com",
+      "sha256Hash": "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e",
+      "signedAt": "2026-08-27"
+    }
+  ],
+  "issuedCards": [
+    {
+      "id": "crd_kodo_001",
+      "cardholderName": "Autonomous AI Agent #04",
+      "last4": "8841",
+      "exp": "08/29",
+      "brand": "Visa Business Corporate",
+      "spendLimitMonthly": 5000,
+      "spentThisMonth": 1420.5,
+      "status": "active",
+      "type": "virtual"
+    },
+    {
+      "id": "crd_kodo_002",
+      "cardholderName": "DevOps Cluster Infra",
+      "last4": "4291",
+      "exp": "11/28",
+      "brand": "Mastercard Commercial",
+      "spendLimitMonthly": 10000,
+      "spentThisMonth": 3820,
+      "status": "active",
+      "type": "virtual"
+    }
+  ],
+  "insurancePolicy": {
+    "policyNumber": "POL-KODO-LLOYDS-99482",
+    "underwriter": "Lloyds & KODO Risk Syndication LLC",
+    "coverageLimit": ",500,000.00 USD",
+    "status": "active",
+    "reimbursementRate": "100% Guaranteed",
+    "totalClaimsPaid": "zsh.00 (Zero Unrecovered Fraud)",
+    "effectiveDate": "2026-01-01",
+    "expiresDate": "2027-12-31"
+  },
+  "waterfallRules": [
+    {
+      "id": "wf_split_01",
+      "beneficiary": "Founder 1 (Delaware LLC)",
+      "share": "45.0%",
+      "bankAccount": "Chase Private Client (...9921)",
+      "totalDistributed": ",200.00 USD",
+      "status": "active"
+    },
+    {
+      "id": "wf_split_02",
+      "beneficiary": "Founder 2 (Tech Lead)",
+      "share": "35.0%",
+      "bankAccount": "Silicon Valley Bank (...4012)",
+      "totalDistributed": ",480.00 USD",
+      "status": "active"
+    },
+    {
+      "id": "wf_split_03",
+      "beneficiary": "Seed Investor Pool / LP Syndicate",
+      "share": "20.0%",
+      "bankAccount": "First Republic Trust (...1190)",
+      "totalDistributed": ",420.00 USD",
+      "status": "active"
+    }
+  ],
+  "acquirerRails": [
+    {
+      "id": "acq_01",
+      "name": "JPMorgan Chase Direct",
+      "region": "North America (USD)",
+      "authRate": "97.4%",
+      "priority": 1,
+      "latency": "42ms",
+      "status": "healthy"
+    },
+    {
+      "id": "acq_02",
+      "name": "Adyen Global Rail",
+      "region": "Europe & UK (EUR/GBP)",
+      "authRate": "96.8%",
+      "priority": 2,
+      "latency": "55ms",
+      "status": "healthy"
+    },
+    {
+      "id": "acq_03",
+      "name": "Barclays Merchant Rail",
+      "region": "UK & Commonwealth (GBP)",
+      "authRate": "95.9%",
+      "priority": 3,
+      "latency": "61ms",
+      "status": "healthy"
+    },
+    {
+      "id": "acq_04",
+      "name": "Checkout.com Multi-Currency",
+      "region": "APAC & MENA (SGD/AED/AUD)",
+      "authRate": "96.2%",
+      "priority": 4,
+      "latency": "68ms",
+      "status": "healthy"
+    }
+  ],
+  "capitalAdvances": [
+    {
+      "id": "cap_adv_901",
+      "approvedAmount": 75000,
+      "repaymentRate": "10% Daily Net Volume Split",
+      "fee": 4500,
+      "totalToRepay": 79500,
+      "repaidSoFar": 14250,
+      "status": "active_repaying",
+      "fundedAt": "2026-08-10"
+    }
+  ],
+  "taxFilings": [
+    {
+      "id": "tax_fl_2026_q2_eu",
+      "jurisdiction": "EU VAT One-Stop Shop (OSS)",
+      "period": "2026 Q2",
+      "taxCollected": "€18,420.00 EUR",
+      "filingStatus": "ready_to_remit",
+      "deadline": "Sep 30, 2026",
+      "format": "XML & CSV Schema"
+    },
+    {
+      "id": "tax_fl_2026_q2_uk",
+      "jurisdiction": "UK HMRC VAT Return",
+      "period": "2026 Q2",
+      "taxCollected": "£11,280.00 GBP",
+      "filingStatus": "ready_to_remit",
+      "deadline": "Oct 07, 2026",
+      "format": "MTD VAT JSON"
+    },
+    {
+      "id": "tax_fl_2026_q2_us",
+      "jurisdiction": "US Multi-State DOR Summary",
+      "period": "2026 Q2",
+      "taxCollected": ",650.00 USD",
+      "filingStatus": "remitted_settled",
+      "deadline": "Aug 20, 2026",
+      "format": "NACHA & State CSV"
+    }
+  ],
+  "treasuryYield": {
+    "currentApy": "4.80%",
+    "underlyingAsset": "US Short-Term Treasury Bills (T-Bills 0-3M)",
+    "totalFloatInvested": 148500,
+    "lifetimeYieldEarned": 3420.8,
+    "dailyInterestAccrual": 19.53,
+    "sweepStatus": "active_daily_compounding"
+  },
+  "eInvoices": [
+    {
+      "id": "einv_it_9981",
+      "country": "Italy (Agenzia delle Entrate - SDI)",
+      "recipientCompany": "Milano AI Software S.r.l.",
+      "recipientTaxId": "IT10293840192",
+      "sdiCode": "M5UXCR1",
+      "amount": "€1,200.00 EUR",
+      "clearanceStatus": "cleared_delivered",
+      "irnHash": "SDI-IT-2026-9981029381",
+      "clearedAt": "2026-08-25"
+    },
+    {
+      "id": "einv_in_4421",
+      "country": "India (GST e-Invoice Portal - NIC)",
+      "recipientCompany": "Bengaluru Cloud Infra Pvt Ltd",
+      "recipientTaxId": "29AABCU9603R1ZM",
+      "sdiCode": "N/A (IRN Portal)",
+      "amount": "₹145,000.00 INR",
+      "clearanceStatus": "cleared_delivered",
+      "irnHash": "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e",
+      "clearedAt": "2026-08-28"
+    }
+  ],
+  "customerSignals": [
+    {
+      "id": "sig_01",
+      "customerEmail": "tech@synthetix.com",
+      "signalType": "expansion_upsell",
+      "metric": "92% Token Quota Used (Approaching 500M Limit)",
+      "healthScore": "98 / 100",
+      "recommendedAction": "Dispatch Enterprise Dedicated Cluster Upgrade Offer",
+      "status": "action_required"
+    },
+    {
+      "id": "sig_02",
+      "customerEmail": "marcus@hypercompute.de",
+      "signalType": "churn_risk",
+      "metric": "Usage dropped -44% week-over-week",
+      "healthScore": "42 / 100",
+      "recommendedAction": "Trigger Automated Retention Check-in & Engineer Assist Call",
+      "status": "action_required"
+    }
+  ],
+  "zkReceipts": [
+    {
+      "id": "zk_kodo_01",
+      "txHash": "0x7f8e...3b2a",
+      "zkProof": "zk-SNARK-BN254:0x49a8d29b01c3e4f7a8b9c0d1e2f3a4b5",
+      "settlementVerified": true,
+      "taxSegregated": true,
+      "piiProtected": true,
+      "timestamp": "2026-08-29"
+    }
+  ],
+  "referralCampaigns": [
+    {
+      "id": "ref_cmp_01",
+      "name": "Viral Customer Drip Program (Give 20%, Get  Credit)",
+      "activeAdvocates": 184,
+      "referralSalesGenerated": ",280.00 USD",
+      "creditsDistributed": ",840.00 USD",
+      "status": "active"
+    }
+  ],
+  "disputeAnalytics": {
+    "totalAnalyzedDisputes": 14,
+    "topRootCause": "Confusing Credit Card Billing Descriptor (Now Fixed)",
+    "disputeRateBySku": [
+      {
+        "sku": "Enterprise Dedicated GPU",
+        "rate": "0.00%",
+        "risk": "low"
+      },
+      {
+        "sku": "Pro Developer Annual",
+        "rate": "0.01%",
+        "risk": "low"
+      },
+      {
+        "sku": "Trial Subscription Drop-Off",
+        "rate": "0.08%",
+        "risk": "mitigated"
+      }
+    ],
+    "preventedLosses": ",900.00 USD"
+  },
+  "disputeRebuttals": [
+    {
+      "id": "reb_kodo_781",
+      "disputeId": "disp_001_fraudulent",
+      "amount": ".00 USD",
+      "reason": "Fraudulent Transaction (Claimed Unauthorized)",
+      "evidenceCompiled": [
+        "IP Geolocation Match (98.4% Confidence)",
+        "Verified 3DSv2 Biometric Fingerprint (ECI 05)",
+        "Server Access API Logs (42 API calls post-purchase)",
+        "Digital Contract E-Sign Hash Verified"
+      ],
+      "winRatePrediction": "94.2%",
+      "status": "submitted_to_bank",
+      "generatedAt": "2026-08-30"
+    }
+  ],
+  "spendLimits": [
+    {
+      "id": "sp_lim_01",
+      "customerName": "Synthetix AI Corp",
+      "monthlyBudget": 5000,
+      "currentSpend": 3420,
+      "softCapPercentage": "80%",
+      "actionOnCap": "Email Alert & Slack Webhook Trigger",
+      "status": "active"
+    }
+  ],
+  "purchaseOrders": [
+    {
+      "id": "po_inv_9901",
+      "poNumber": "PO-ENTERPRISE-2026-8812",
+      "enterpriseClient": "Deloitte Global Tax & Advisory Ltd",
+      "amount": ",000.00 USD",
+      "terms": "Net-30 Days",
+      "dueDate": "2026-09-28",
+      "status": "pending_wire_settlement"
+    }
+  ],
+  "revenueLeakages": [
+    {
+      "id": "leak_01",
+      "source": "Orphaned Webhook Failures on Plan Upgrades",
+      "estimatedLostMrr": ",450.00 / mo",
+      "affectedAccounts": 12,
+      "patchStatus": "auto_recovered",
+      "lastAudited": "2026-08-31"
+    }
+  ],
+  "fxHedges": [
+    {
+      "id": "hdg_eur_01",
+      "pair": "EUR / USD",
+      "lockedRate": "1.0920",
+      "forwardVolume": "€250,000.00 EUR",
+      "duration": "90 Days Forward",
+      "expiresAt": "2026-11-25",
+      "status": "locked_active"
+    }
+  ],
+  "pausedSubscriptions": [
+    {
+      "id": "sub_pause_01",
+      "customerName": "Alexander Wright",
+      "plan": "Pro Developer (/mo)",
+      "pausedUntil": "2026-10-01",
+      "pauseDuration": "2 Billing Cycles",
+      "churnDeflected": true,
+      "status": "temporarily_paused"
+    }
+  ],
+  "volumeTiers": [
+    {
+      "seats": "1 - 9 Seats",
+      "discount": "0% (Standard)",
+      "unitPrice": ".00 / seat"
+    },
+    {
+      "seats": "10 - 49 Seats",
+      "discount": "15% Off",
+      "unitPrice": ".65 / seat"
+    },
+    {
+      "seats": "50 - 99 Seats",
+      "discount": "25% Off",
+      "unitPrice": ".75 / seat"
+    },
+    {
+      "seats": "100+ Seats",
+      "discount": "35% Off (Enterprise)",
+      "unitPrice": ".85 / seat"
+    }
+  ],
+  "sowProposals": [
+    {
+      "id": "sow_prop_991",
+      "enterpriseClient": "Synthetix Cloud Infra Corp",
+      "expansionValue": ",400.00 / yr",
+      "proposedSeats": "150 Dedicated Cluster Nodes",
+      "generatedAt": "2026-08-31",
+      "status": "ready_for_procurement_signoff"
+    }
+  ],
+  "smart3DS": {
+    "totalFrictionlessRate": "79.4%",
+    "traExemptionsGranted": 1420,
+    "lowValueExemptions": 3810,
+    "avgCheckoutSpeed": "1.1s (Frictionless 1-Click)"
+  },
+  "nrrMetrics": {
+    "nrr": "118.4%",
+    "grossRetention": "96.2%",
+    "expansionMrr": "+,200.00 / mo",
+    "contractionMrr": "-,850.00 / mo",
+    "churnedMrr": "-,100.00 / mo",
+    "quickRatio": "4.2x"
+  },
+  "taxCertificates": [
+    {
+      "id": "tax_cert_vies_881",
+      "buyerCompany": "München AI Systems GmbH",
+      "vatId": "DE301928471",
+      "databaseValidated": "European Commission VIES",
+      "reverseChargeApplied": true,
+      "auditTimestamp": "2026-08-28 14:22:01 UTC",
+      "status": "statutory_proof_verified"
+    }
+  ],
+  "invoiceBatches": [
+    {
+      "id": "batch_2026_q2_all",
+      "period": "2026 Q2 Full Quarter",
+      "invoiceCount": 1240,
+      "totalVolume": ",500.00 USD",
+      "format": "ZIP Archive (1,240 Validated PDFs)",
+      "downloadStatus": "ready_to_export"
+    }
+  ],
+  "networkTokens": [
+    {
+      "id": "tok_vau_9901",
+      "last4": "4242",
+      "brand": "Visa Signature (Chase)",
+      "accountUpdaterStatus": "card_auto_updated_2028",
+      "networkToken": "dpan_4921980019284242",
+      "authLift": "+3.8%",
+      "updatedAt": "2026-08-30"
+    }
+  ],
+  "vendorTaxForms": [
+    {
+      "id": "tax_w9_01",
+      "vendorName": "TechStream Media LLC",
+      "formType": "IRS Form W-9 (US Entity)",
+      "tinMatchStatus": "irs_tin_matched_valid",
+      "backupWithholding": "0.00% (Exempt)",
+      "signedDate": "2026-08-25",
+      "status": "verified_active"
+    },
+    {
+      "id": "tax_w8_01",
+      "vendorName": "Hiroshi Tanaka (Tokyo)",
+      "formType": "IRS Form W-8BEN (Foreign Individual)",
+      "tinMatchStatus": "foreign_tin_verified",
+      "backupWithholding": "10.00% (Tax Treaty)",
+      "signedDate": "2026-08-29",
+      "status": "verified_active"
+    }
+  ],
+  "onePassUsers": {
+    "totalRegisteredShoppers": "14,280,000+",
+    "networkConversionUplift": "+31.4%",
+    "avgCheckoutTime": "0.84s (FaceID Passkey)",
+    "activeKodoMerchants": 5420
+  },
+  "slaCredits": [
+    {
+      "id": "sla_cred_901",
+      "enterpriseClient": "Deloitte Cloud Advisory",
+      "guaranteedUptime": "99.99%",
+      "actualMonthlyUptime": "99.94% (26 min incident)",
+      "creditPercentage": "10.00% Invoice Credit",
+      "creditAmount": ",500.00 USD",
+      "appliedToInvoice": "inv_deloitte_aug_2026",
+      "status": "auto_credited"
+    }
+  ],
+  "preDisputeAlerts": [
+    {
+      "id": "alt_ethoca_882",
+      "network": "Mastercard Ethoca Alert",
+      "cardLast4": "8841",
+      "amount": ".00 USD",
+      "issuerBank": "Barclays UK",
+      "actionTaken": "auto_refunded_within_3m",
+      "chargebackAvoided": true,
+      "timestamp": "2026-08-30 18:14:02"
+    },
+    {
+      "id": "alt_verifi_991",
+      "network": "Visa Verifi CDRN",
+      "cardLast4": "1120",
+      "amount": ".00 USD",
+      "issuerBank": "JPMorgan Chase",
+      "actionTaken": "auto_refunded_within_2m",
+      "chargebackAvoided": true,
+      "timestamp": "2026-08-31 02:40:11"
+    }
+  ],
+  "milestoneEscrows": [
+    {
+      "id": "esc_deal_401",
+      "clientName": "Palantir Solutions Group",
+      "totalContract": ",000.00 USD",
+      "heldInEscrow": ",000.00 USD",
+      "nextMilestone": "Phase 2 API Integration Signoff",
+      "milestoneAmount": ",000.00 USD",
+      "status": "milestone_ready_to_release"
+    }
+  ],
+  "winBackOffers": [
+    {
+      "id": "wb_off_101",
+      "customerName": "Marcus Sterling",
+      "originalPlan": "Enterprise Scale (/mo)",
+      "downsellOffer": "Pro Growth (/mo for 6 months)",
+      "retainedMrr": ".00 / mo",
+      "acceptedAt": "2026-08-29",
+      "status": "successfully_retained"
+    }
+  ],
+  "carbonOffsets": {
+    "totalCo2RemovedTons": "142.8 Tons CO2",
+    "totalMerchantContribution": ",450.00 USD",
+    "activeProjects": "Frontier Biochar & Direct Air Capture (DAC)",
+    "greenBadgeParticipationRate": "84.2%"
+  },
+  "upiAutoPayMandates": [
+    {
+      "id": "umn_upi_99482910",
+      "customerVpa": "rahul.sharma@okhdfcbank",
+      "app": "Google Pay (GPay)",
+      "amount": "₹2,499.00 / mo",
+      "frequency": "Monthly Recurring",
+      "rbiPreDebitAlert": "Sent (24h prior via SMS & Email)",
+      "mandateStatus": "active_authorized",
+      "createdAt": "2026-08-30"
+    },
+    {
+      "id": "umn_upi_77381920",
+      "customerVpa": "priya.nair@ybl",
+      "app": "PhonePe",
+      "amount": "₹999.00 / mo",
+      "frequency": "Monthly Recurring",
+      "rbiPreDebitAlert": "Sent (24h prior via SMS & Email)",
+      "mandateStatus": "active_authorized",
+      "createdAt": "2026-08-31"
+    }
+  ],
+  "indianGstFilings": [
+    {
+      "id": "gst_inv_2026_8891",
+      "buyerGstin": "27AABCK1234F1Z8 (Reliance Cloud Infra)",
+      "stateCode": "27 - Maharashtra (Intra-State)",
+      "taxableAmount": "₹85,000.00",
+      "taxBreakup": "CGST (9%): ₹7,650.00 | SGST (9%): ₹7,650.00",
+      "totalWithGst": "₹1,00,300.00",
+      "irnHash": "a3f98c194b8e0129f8c...64char",
+      "status": "irn_generated_nic_verified"
+    }
+  ],
+  "tdsWithholdings": [
+    {
+      "id": "tds_rec_001",
+      "vendorName": "Bengaluru AI Studio Pvt Ltd",
+      "pan": "AABCB1234D (NSDL Verified)",
+      "grossPayout": "₹4,50,000.00",
+      "tdsRate": "1.00% (Section 194-O Marketplace)",
+      "tdsDeducted": "₹4,500.00",
+      "netDisbursed": "₹4,45,500.00",
+      "form16A": "Generated (Ready for Q2 Download)"
+    }
+  ],
+  "pennyDropKycs": [
+    {
+      "id": "pny_kyc_8819",
+      "accountNumber": "•••• •••• 9812",
+      "ifsc": "HDFC0000240 (HDFC Bank, Koramangala)",
+      "bankBeneficiaryName": "KODO LABS TECHNOLOGIES INDIA PVT LTD",
+      "pennyCreditStatus": "₹1.00 Credited via IMPS",
+      "nameMatchScore": "100% Exact Match",
+      "kycStatus": "verified_active"
+    }
+  ],
+  "rupayTokens": {
+    "totalRuPayVolume": "₹1.48 Crore INR",
+    "zeroMdrSub2kCount": "3,840 Transactions (0% Fee)",
+    "rbiCoftVaultStatus": "100% Tokenized via NSDL / NPCI",
+    "creditOnUpiAuthRate": "98.6%"
+  },
+  "enachMandates": [
+    {
+      "id": "enach_mnd_5501",
+      "corporateEntity": "Infosys Cloud Operations",
+      "bank": "State Bank of India (SBI)",
+      "maxLimit": "₹10,00,000.00 INR",
+      "npciUmrn": "UMRN99881122334455",
+      "debitMode": "NetBanking / Aadhaar e-Sign",
+      "status": "npci_registered_active"
+    }
+  ],
+  "bbpsInvoices": [
+    {
+      "id": "bbps_bill_9921",
+      "consumerNumber": "KODO-SaaS-90812",
+      "billerCategory": "SaaS & IT Cloud Subscriptions",
+      "customerName": "Vikram Mehra",
+      "billAmount": "₹4,999.00 INR",
+      "dueDate": "2026-09-05",
+      "paymentChannel": "PhonePe BBPS Hub",
+      "status": "bill_fetched_ready_to_pay"
+    }
+  ],
+  "eWayBills": [
+    {
+      "id": "ewb_nic_881902",
+      "invoiceRef": "gst_inv_2026_8891",
+      "consignee": "Tata Consultancy Cloud Hub (Pune)",
+      "consigneeGstin": "27AAACT2727Q1ZW",
+      "distanceKm": "145 KM",
+      "transporter": "BlueDart Express (ID: 27AABCB0011D1ZZ)",
+      "vehicleNumber": "MH-12-RN-9821",
+      "ewayBillNumber": "2418 9012 8841",
+      "validUntil": "2026-09-02 23:59:00",
+      "status": "nic_active_in_transit"
+    }
+  ],
+  "accountAggregatorCredits": [
+    {
+      "id": "aa_loan_301",
+      "merchantName": "FreshMatrix SaaS India Pvt Ltd",
+      "aaFiuConsent": "Setu AA Consent Approved (HDFC & ICICI)",
+      "monthlyBankFlow": "₹18,50,000.00 / mo",
+      "preApprovedCredit": "₹25,00,000.00 INR",
+      "interestRate": "1.15% / month (RBF Split)",
+      "status": "credit_line_ready_to_disburse"
+    }
+  ],
+  "lrsTcsFilings": [
+    {
+      "id": "lrs_remit_441",
+      "purpose": "Foreign Cloud Infra (AWS / OpenAI US)",
+      "remittanceUsd": ",500.00 USD",
+      "equivalentInr": "₹10,43,750.00 INR",
+      "tcsCollected": "₹52,187.50 INR (5.00% TCS under Sec 206C)",
+      "formA2Status": "Form A2 & 15CB Generated via Authorized Dealer (AD)",
+      "status": "rbi_compliant_remitted"
+    }
+  ],
+  "ondcOrders": [
+    {
+      "id": "ondc_ord_9901",
+      "buyerApp": "Paytm Mall (ONDC Network)",
+      "catalogItem": "KODO Pro SaaS 1-Year License Key",
+      "orderAmount": "₹4,999.00 INR",
+      "settlementType": "Instant RSP Protocol (T+0)",
+      "networkTxId": "beckn_tx_881902847190",
+      "status": "ondc_fulfilled_settled"
+    }
+  ],
+  "digitalRupeeTokens": [
+    {
+      "id": "cbdc_tok_5501",
+      "walletAddress": "erupee_rbi_hdfc_881920",
+      "tokenAmount": "e₹ 10,000.00 Digital Rupee",
+      "denominationBreakup": "5x e₹2000 | 10x e₹500",
+      "rbiSigningKeyVerified": true,
+      "feeCharged": "₹0.00 (Zero Interchange)",
+      "status": "sovereign_settled_in_wallet"
+    }
+  ],
+  "whatsAppCheckouts": [
+    {
+      "id": "wa_ord_301",
+      "customerPhone": "+91 98765 43210",
+      "intentInitiated": "Interactive WhatsApp Catalog Message",
+      "selectedPlan": "AI Copilot Ultra (₹1,499/mo)",
+      "paymentAction": "1-Click UPI Intent (GPay / PhonePe in WhatsApp)",
+      "timeToCheckout": "12.4 Seconds",
+      "status": "completed_active"
+    }
+  ],
+  "mcaFilings": [
+    {
+      "id": "mca_roc_2026_01",
+      "companyCin": "U72900KA2024PTC189021",
+      "companyName": "KODO LABS TECHNOLOGIES INDIA PVT LTD",
+      "formType": "AOC-4 (Annual Financial Statements) & MGT-7",
+      "directorDin": "DIN 09817263 (DSC Signed)",
+      "rocRoStatus": "MCA21 V3 Verified & Filed",
+      "status": "statutory_compliance_active"
+    }
+  ],
+  "upiLiteTxns": {
+    "totalSub500Volume": "₹48,20,000.00 INR",
+    "zeroPinTransactions": "124,500 Micro-Payments",
+    "bankUptimeReliability": "99.99% (On-Device Offline Wallet)",
+    "avgLatency": "0.38 Seconds"
+  },
+  "gstr2bRecons": [
+    {
+      "id": "gstr2b_match_701",
+      "vendorName": "Tata Communications Cloud Services",
+      "vendorGstin": "27AAACT2727Q1ZW",
+      "portalItcAmount": "₹15,300.00 IGST",
+      "purchaseRegisterAmount": "₹15,300.00 IGST",
+      "matchScore": "100% Perfect Match",
+      "itcClaimStatus": "ready_for_gstr3b_offset"
+    }
+  ],
+  "creatorSplits": [
+    {
+      "id": "spl_cr_9901",
+      "creatorName": "Tanmay Bhatt Tech Reviews",
+      "vpa": "tanmay@paytm",
+      "grossCourseRevenue": "₹1,50,000.00 INR",
+      "platformFeeSplit": "20% (₹30,000.00)",
+      "creatorTakeHome": "80% (₹1,20,000.00)",
+      "tdsDeducted194O": "₹1,200.00 (1%)",
+      "payoutChannel": "Instant 24x7 IMPS (T+0)",
+      "status": "instant_disbursed"
+    }
+  ],
+  "startupIndiaTax": {
+    "dpiitRecognitionNumber": "DIPP98102",
+    "section80IACStatus": "3-Year 100% Tax Holiday Approved",
+    "angelTaxSection56": "Exempt under CBDT Notification 2019",
+    "patentsFastTracked": "3 FinTech Software Patents Filed"
+  },
+  "ckycRecords": [
+    {
+      "id": "ckyc_rec_8819",
+      "directorName": "Rajesh Vardhan Rao",
+      "ckycNumber": "40019284719281",
+      "panNumber": "AAACR9821K",
+      "digiLockerStatus": "DigiLocker Aadhaar XML Verified",
+      "cersaiRegistryStatus": "CERSAI Active Validated",
+      "status": "kyc_cleared_for_onboarding"
+    }
+  ],
+  "fastagFleetTxns": [
+    {
+      "id": "ftg_tx_90182",
+      "vehicleRegNumber": "KA-01-MJ-8821",
+      "tollPlaza": "KIAL Expressway Toll Plaza (Bengaluru)",
+      "tollAmount": "₹110.00 INR",
+      "fastagTagId": "34161FA82039182",
+      "npciNetcStatus": "NPCI NETC Settled via Fastag Wallet",
+      "itcEligible": "GST Tax Invoice Generated"
+    }
+  ],
+  "sezLutInvoices": [
+    {
+      "id": "sez_inv_2026_11",
+      "sezClient": "Microsoft India (R&D) Pvt Ltd (Manyata SEZ)",
+      "sezGstin": "29AAACM2212M1ZY",
+      "lutArnNumber": "AD290324009821L (Valid FY 2026-27)",
+      "invoiceValue": "₹14,50,000.00 INR",
+      "gstApplied": "0.00% (Zero-Rated Supply to SEZ under LUT)",
+      "status": "sez_customs_endorsed"
+    }
+  ],
+  "giftCitySettlements": [
+    {
+      "id": "ifsc_tx_7701",
+      "ifscEntity": "KODO Global FinTech IFSC Unit (GIFT City Gandhinagar)",
+      "ifscaLicenseNo": "IFSCA/BF/2026/0091",
+      "settlementCurrency": "USD (,500.00 USD)",
+      "inrEquivalent": "₹40,49,750.00 INR",
+      "withholdingTax": "0.00% (Tax-Free Export under Section 80LA)",
+      "nostroBank": "Standard Chartered Bank IFSC Branch",
+      "status": "settled_in_ifsc_nostro"
+    }
+  ],
+  "tredsAuctions": [
+    {
+      "id": "treds_fact_881",
+      "exchange": "RXIL (Receivables Exchange of India Ltd)",
+      "buyerEnterprise": "Bharat Petroleum Corporation Ltd (BPCL)",
+      "invoiceAmount": "₹8,50,000.00 INR",
+      "discountedCash": "₹8,39,800.00 INR (1.2% Factoring Discount)",
+      "financierBank": "State Bank of India (SBI Factoring Desk)",
+      "settlementSpeed": "T+1 Instant Disbursed",
+      "status": "factored_settled"
+    }
+  ],
+  "gemContracts": [
+    {
+      "id": "gem_cntr_2026_901",
+      "buyerMinistry": "Ministry of Electronics & Information Technology (MeitY)",
+      "contractNumber": "GEMC-51168772910819",
+      "cracStatus": "CRAC (Acceptance Certificate) Signed",
+      "invoiceValue": "₹24,00,000.00 INR",
+      "pfmsStatus": "PFMS Treasury Sanction # 9817263",
+      "status": "pfms_disbursed_to_bank"
+    }
+  ],
+  "epfoChallans": [
+    {
+      "id": "epfo_ecr_2026_08",
+      "wageMonth": "August 2026",
+      "headCount": "42 Tech Engineers & Operations",
+      "totalEpfoDeduction": "₹2,52,000.00 INR",
+      "totalEsicDeduction": "₹48,300.00 INR",
+      "trrnNumber": "TRRN-8819028471928",
+      "sbiEChequeStatus": "Electronic Challan Receipt Generated",
+      "status": "epfo_statutory_cleared"
+    }
+  ],
+  "traiDltTemplates": [
+    {
+      "id": "dlt_tmpl_88190",
+      "principalEntityId": "PE-110198271629",
+      "headerSenderId": "KODOPY (Transactional)",
+      "templateType": "Transactional Mandate & OTP Alerts",
+      "contentHash": "0x88f1a2c891b0...",
+      "carrierSync": "Jio, Airtel, Vi, BSNL DLT Verified",
+      "deliverySuccess": "99.98% Scrubbing Pass Rate"
+    }
+  ],
+  "ocenCreditLoans": [
+    {
+      "id": "ocen_loan_991",
+      "borrowerEntity": "Zensight Analytics SaaS",
+      "ocenLspPartner": "Bajaj Finserv & IDFC First Bank",
+      "creditFacility": "₹15,00,000.00 Revolving SaaS Credit",
+      "drawdownInterest": "1.08% / month on utilized capital",
+      "repaymentTrigger": "Auto-debit on monthly MRR receipts",
+      "status": "ocen_active_disbursed"
+    }
+  ],
+  "cloudHsmDscSignatures": [
+    {
+      "id": "dsc_sig_88201",
+      "documentTitle": "Enterprise MSA & SLA Contract (Infosys BPM)",
+      "certifyingAuthority": "eMudhra / NSDL Class-3 Cloud HSM",
+      "signerName": "Aakash Sharma (Director - DIN 08918273)",
+      "timestamp": "2026-08-31 11:45:12 IST",
+      "cryptoHash": "SHA-256 (0x77c29e18a901...) Verified",
+      "status": "it_act_2000_legally_binding"
+    }
+  ],
+  "advanceTaxFilings": [
+    {
+      "id": "adv_tax_q2_2026",
+      "installmentQuarter": "Q2 (September 15, 2026 - 45% Cumulative)",
+      "estimatedGrossRevenue": "₹1,20,00,000.00 INR",
+      "calculatedTaxLiability": "₹13,50,000.00 INR",
+      "form26ASTdsOffset": "-₹3,20,000.00 (Sec 194-J / 194-O Credits in AIS/TIS)",
+      "netChallanPayable": "₹10,30,000.00 (Challan ITNS 280 Ready)",
+      "status": "on_schedule_zero_interest"
+    }
+  ],
+  "b2cDynamicQrCodes": [
+    {
+      "id": "b2c_qr_99018",
+      "invoiceNumber": "INV-2026-B2C-8819",
+      "consumerName": "Ananya Deshmukh",
+      "invoiceTotal": "₹1,768.82 INR (incl. 18% GST)",
+      "upiIntentPayload": "upi://pay?pa=kodopayments@icici&pn=KodoPayments&am=1768.82&tr=INV8819",
+      "cbicCompliance": "CBIC Notification 14/2020 Compliant Dynamic QR",
+      "status": "scanned_and_settled"
+    }
+  ],
+  "dpdpConsents": [
+    {
+      "id": "dpdp_cns_8819",
+      "dataPrincipal": "Rahul V. Sharma",
+      "consentArtifactId": "sahamati_cns_99018271",
+      "purpose": "Real-Time Financial Telemetry for SaaS Working Capital",
+      "validUntil": "2027-08-31",
+      "cryptoPurgeStatus": "Zero Leftover Trace / SHA-256 Verified",
+      "status": "active_consent_granted"
+    }
+  ],
+  "icegateBoEs": [
+    {
+      "id": "boe_ice_99182",
+      "portLocation": "Nhava Sheva Port (INNSA1)",
+      "billOfEntryNo": "BOE-88192019",
+      "importedGoods": "NVIDIA H100 AI Compute Hardware Servers",
+      "customsDutyPaid": "₹4,80,000.00 BCD + AIDC",
+      "igstInputCredit": "₹18,50,000.00 IGST (Credited to GSTR-2B)",
+      "icegateStatus": "customs_out_of_charge_cleared"
+    }
+  ],
+  "upmsMandates": [
+    {
+      "id": "upms_mnd_5501",
+      "billerCategory": "Enterprise B2B Cloud Infrastructure",
+      "corporateCustomer": "HCL Digital Solutions",
+      "presentmentAmount": "₹85,000.00 / month",
+      "channelDispatched": "Auto-Presented on HDFC NetBanking & WhatsApp Intent",
+      "customerApprovalTime": "4.2 Seconds (Instant OTP Authorize)",
+      "status": "upms_auto_presented_paid"
+    }
+  ],
+  "ncltScreenings": [
+    {
+      "id": "nclt_chk_901",
+      "entityName": "Apex Horizon Infrastructure Ltd",
+      "mcaCin": "L45200MH2012PLC182901",
+      "ncltBench": "NCLT Mumbai Bench (CIRP Case # CP(IB) 881/2026)",
+      "rbiDefaulterMatch": "Clean (No RBI Wilful Tag)",
+      "mcaDirectorDisqualification": "Clean DIN Status (No Sec 164(2) Defaults)",
+      "riskRecommendation": "HIGH RISK - Require 100% Upfront Payment / Freeze Net-30",
+      "status": "flagged_risk_intercepted"
+    }
+  ],
+  "equalisationLevies": [
+    {
+      "id": "eq_lvy_2026_02",
+      "operatorName": "Non-Resident SaaS Seller Inc (US)",
+      "grossIndianSales": "₹75,00,000.00 INR",
+      "levyRate": "2.00% (Finance Act 2016 Chapter VIII)",
+      "levyAmountPayable": "₹1,50,000.00 INR",
+      "challanStatus": "Challan ITNS 280 Remitted to Reserve Bank of India",
+      "status": "cbdt_form_1_compliant"
+    }
+  ],
+  "pacbInwardRealizations": [
+    {
+      "id": "pacb_ebrc_9901",
+      "foreignBuyer": "Vortex Global Labs LLC (California)",
+      "inwardRemittanceUsd": ",500.00 USD",
+      "inrRealized": "₹20,45,750.00 INR",
+      "eBrcNumber": "DGFT-EBRC-881920198",
+      "fircCertNo": "SCB-FIRC-2026-99018",
+      "dgftPortalStatus": "DGFT Export EDPMS Realized",
+      "status": "rbi_pacb_fully_realized"
+    }
+  ],
+  "corporateCsrAllocations": [
+    {
+      "id": "csr_all_2026_01",
+      "statutoryYear": "FY 2026-27 (Section 135 Companies Act)",
+      "netProfitAverage": "₹1,80,00,000.00 (3-Year Avg Net Profit)",
+      "statutory2PercentAllocation": "₹3,60,000.00 INR",
+      "impactPartner": "Pratham Digital Tech Education NGO (Reg # CSR000182)",
+      "ngo80GStatus": "Form 10A & 80G Tax Exemption Verified",
+      "mcaFormStatus": "Form CSR-1 & CSR-2 Pre-Compiled for Board Approval",
+      "status": "csr_mandate_fulfilled"
+    }
+  ],
+  "dataResidencyAudits": {
+    "rbiDataResidencyCircular": "100% On-Soil Payment Storage (April 2018 Mandate)",
+    "primaryCloudDataCenter": "CtrlS Tier-4 Datacenter (Mumbai, Maharashtra)",
+    "disasterRecoveryDataCenter": "Yotta NM1 Sovereign Datacenter (Navi Mumbai)",
+    "certInSecurityAudit": "CERT-In Empaneled Auditor Signed & Sealed",
+    "crossBorderMirroring": "0% Overseas Mirrored - End-to-End Encrypted",
+    "status": "rbi_meity_air_gapped_secure"
+  },
+  "nlpMarineCargoes": [
+    {
+      "id": "nlp_bl_88201",
+      "consignee": "AeroTech Dynamics India Pvt Ltd",
+      "billOfLadingNo": "MAEU-88192019",
+      "originPort": "Port of Hamburg (DEHAM)",
+      "dischargePort": "JNPT Nhava Sheva (INNSA1)",
+      "marineInsuranceCover": "₹1,50,00,000.00 (ICICI Lombard Marine All-Risk)",
+      "escrowStatus": "Customs Out-of-Charge Escrow Released",
+      "status": "nlp_marine_verified"
+    }
+  ],
+  "sebiAifDrawdowns": [
+    {
+      "id": "aif_drw_2026_09",
+      "aifFundName": "Bharat DeepTech Ventures (SEBI Cat-II AIF)",
+      "capitalCallAmount": "₹5,00,00,000.00 INR",
+      "investorParticipation": "24 Limited Partners (DigiLocker Accredited)",
+      "tdsWithholdingSec194LBB": "₹50,00,000.00 (10% TDS Deposited)",
+      "netPortfolioDeployment": "₹4,50,00,000.00 INR Disbursed to Target Startups",
+      "status": "sebi_aif_compliant_executed"
+    }
+  ],
+  "enamMandiTrades": [
+    {
+      "id": "enam_trd_99018",
+      "farmerBeneficiary": "Rameshwar Patidar (Kisan ID: MP-88192)",
+      "commodity": "Grade-A Sharbati Wheat (50 Metric Tonnes)",
+      "assayingGrade": "99.4% Moisture & Quality Assayed (e-NWR # 99182)",
+      "grossSaleValue": "₹14,50,000.00 INR",
+      "apmcMandiCess": "-₹29,000.00 (2% Mandi Shulk Deducted)",
+      "netFarmerPayout": "₹14,21,000.00 (Instant Direct DBT Payout)",
+      "status": "enam_mandi_settled"
+    }
+  ],
+  "quantumSafeTokens": [
+    {
+      "id": "qst_token_9901",
+      "primaryAccountReference": "NPCI RuPay Token **** 8829",
+      "latticeAlgorithm": "Crystals-Kyber-1024 (NIST Round 3 PQC)",
+      "signatureScheme": "Dilithium-5 Post-Quantum Digital Signature",
+      "quantumSecurityLevel": "Category 5 (AES-256 Equivalent Quantum Resistance)",
+      "status": "post_quantum_shield_active"
+    }
+  ],
+  "cashfreeSplitTransactions": [
+    {
+      "id": "cf_split_99201",
+      "orderId": "order_kodo_in_881920",
+      "customerName": "Vikramaditya Singhal (Bangalore)",
+      "paymentMode": "UPI (GPay / vpa: vikram@okhdfcbank)",
+      "grossAmount": "₹10,000.00 INR",
+      "cashfreePgFee": "₹0.00 (RuPay/UPI 0% MDR)",
+      "easySplit": {
+        "merchantVendorId": "MERCHANT_KODO_IND_0981",
+        "merchantShare": "₹9,700.00 INR (97.0%)",
+        "kodoPlatformFee": "₹300.00 INR (3.0%)",
+        "gstOnKodoFee": "₹54.00 (18% GST)",
+        "tds194OWithholding": "-₹100.00 (1% TDS deducted to Govt)",
+        "netMerchantSettled": "₹9,600.00 INR"
+      },
+      "merchantBankAccount": "HDFC Bank (A/C **** 4829, IFSC HDFC0000060)",
+      "payoutStatus": "IMPS T+0 Instant Payout Dispatched",
+      "bankUtr": "UTR4829108492019",
+      "status": "settled_instantly"
+    },
+    {
+      "id": "cf_split_99202",
+      "orderId": "order_kodo_in_881921",
+      "customerName": "Pooja Agarwal (Mumbai)",
+      "paymentMode": "RuPay Credit Card on UPI",
+      "grossAmount": "₹25,000.00 INR",
+      "cashfreePgFee": "₹0.00 (Sub-₹2000 0% MDR / CoFT)",
+      "easySplit": {
+        "merchantVendorId": "MERCHANT_KODO_IND_0981",
+        "merchantShare": "₹24,250.00 INR (97.0%)",
+        "kodoPlatformFee": "₹750.00 INR (3.0%)",
+        "gstOnKodoFee": "₹135.00 (18% GST)",
+        "tds194OWithholding": "-₹250.00 (1% TDS deducted to Govt)",
+        "netMerchantSettled": "₹24,000.00 INR"
+      },
+      "merchantBankAccount": "ICICI Bank (A/C **** 9102, IFSC ICIC0000104)",
+      "payoutStatus": "IMPS T+0 Instant Payout Dispatched",
+      "bankUtr": "UTR9102837482910",
+      "status": "settled_instantly"
+    }
+  ],
+  "upiCircleDelegations": [
+    {
+      "id": "upic_del_99018",
+      "primaryUser": "Arjun Mehta (VP Engineering)",
+      "secondaryDelegate": "Sneha Rao (DevOps Lead)",
+      "monthlySpendCap": "₹25,000.00 / month",
+      "currentMonthUtilized": "₹8,420.00 INR (AWS & Cloudflare sub-bills)",
+      "approvalMode": "Zero-PIN Full Delegation (Auto-approved)",
+      "status": "upi_circle_active"
+    }
+  ],
+  "rbiCimsFilings": [
+    {
+      "id": "cims_flg_2026_q2",
+      "filingCategory": "Payment Aggregator (PA) Statutory Returns",
+      "reportingQuarter": "Q2 FY 2026-27 (XBRL Taxonomy v4.2)",
+      "escrowBalanceAudited": "₹142,50,00,000.00 INR (100% Capital Adequacy)",
+      "crossBorderInflowUsd": ",450,000.00 USD Realized",
+      "cimsFilingStatus": "Digitally Signed & Validated with RBI CIMS Portal",
+      "status": "rbi_cims_acknowledged"
+    }
+  ],
+  "mfiShgCollections": [
+    {
+      "id": "mfi_shg_88192",
+      "shgGroupName": "Gramin Mahila Swayam Sahayata Samiti (Wardha)",
+      "kistAmountCollected": "₹48,000.00 INR (12 Members x ₹4,000)",
+      "collectionChannel": "AEPS Biometric + UPI 123PAY Soundbox",
+      "nabardPslCreditScore": "98.5% Repayment Track Record",
+      "status": "kist_auto_reconciled"
+    }
+  ],
+  "pmEDriveSubsidies": [
+    {
+      "id": "pmedr_sub_99182",
+      "evFleetOperator": "BluSmart Mobility Fleet Depot #14 (Gurgaon)",
+      "aadhaarVoucherCode": "PM-EDRIVE-EV8819201",
+      "kwhPowerDispensed": "4,500 kWh (Direct DC Fast Charging)",
+      "subsidyCredited": "₹18,000.00 INR (MHI Direct Subsidy Offset)",
+      "carbonOffsetCo2": "3.82 Metric Tonnes CO2 Saved",
+      "status": "subsidy_disbursed_to_fleet"
+    }
+  ],
+  "inspacePayloads": [
+    {
+      "id": "insp_ld_99018",
+      "satelliteMission": "NavSat-3B Synthetic Aperture Radar (SAR)",
+      "spaceStartup": "SkyOrbital Technologies India Pvt Ltd",
+      "inspaceAuthNumber": "IN-SPACE/AUTH/2026/0918",
+      "launchVehicle": "ISRO SSLV-D4 (Sriharikota SHAR)",
+      "payloadEscrowValue": "₹12,50,00,000.00 INR",
+      "milestoneStatus": "Orbital Insertion 550km LEO Verified",
+      "status": "inspace_escrow_released"
+    }
+  ],
+  "idexDefenseGrants": [
+    {
+      "id": "idex_grt_88192",
+      "defenseProject": "AI-Powered Autonomous Counter-UAS Radar",
+      "defenseVendor": "Garuda Shield Defence Systems Ltd",
+      "modIdexGrantNo": "MOD/IDEX/DISC-9/2026-881",
+      "milestoneGrantAmount": "₹1,50,00,000.00 INR (Phase-2 Field Trials)",
+      "dgqaInspectionSignOff": "DGQA Certified & Cleared for Indian Army Deployment",
+      "status": "mod_escrow_disbursed"
+    }
+  ],
+  "patentBoxRoyalties": [
+    {
+      "id": "ptb_roy_2026_01",
+      "patentNumber": "IN-PAT-382901 (Deep Learning Encryption Engine)",
+      "patentHolder": "KODO Labs Technologies India Pvt Ltd",
+      "grossGlobalRoyalty": "₹85,00,000.00 INR",
+      "statutoryNormalTaxRate": "25.0% Corporate Tax",
+      "concessionalSec115BBFRate": "10.0% Concessional Patent Box Rate",
+      "taxSavedVia115BBF": "₹12,75,000.00 Saved",
+      "status": "form_3cfa_filed"
+    }
+  ],
+  "semiconductorDlis": [
+    {
+      "id": "ism_dli_99201",
+      "chipDesignProject": "Indus-AI RISC-V Neural Accelerator SoC (12nm)",
+      "fablessStartup": "SiliconBharat Microelectronics Pvt Ltd",
+      "meityIsmSanctionOrder": "MEITY/ISM/DLI/2026-081",
+      "mpwTapeoutCost": "₹8,00,00,000.00 INR (TSMC Multi-Project Wafer)",
+      "dliSubsidySanctioned": "₹4,00,00,000.00 INR (50% MeitY DLI Grant Disbursed)",
+      "status": "tapeout_milestone_cleared"
+    }
+  ],
+  "indiaAiComputeTokens": [
+    {
+      "id": "iai_tok_99182",
+      "aiResearchLab": "Sarvam AI / BharatGen Indic Foundation Model",
+      "gpuClusterType": "512x NVIDIA H100 SXM5 Sovereign Cluster (Yotta NM1)",
+      "grossComputeCost": "₹24,00,000.00 INR (120 GPU Hours)",
+      "indiaAiSubsidyOffset": "-₹12,00,00,000.00 (50% MeitY IndiaAI Voucher # MEITY-IAI-8819)",
+      "netBilledAmount": "₹12,00,000.00 INR (Instant RuPay / e-NACH)",
+      "status": "sovereign_compute_allocated"
+    }
+  ],
+  "railFreightInvoices": [
+    {
+      "id": "fois_rr_882901",
+      "consignorEntity": "Tata Steel Ltd (Jamshedpur Works)",
+      "originStation": "Tatanagar Jn (TATA / South Eastern Railway)",
+      "destinationStation": "JNPT Nhava Sheva (INNSA / Central Railway)",
+      "railwayReceiptNo": "RR-CRIS-2026-9901827",
+      "freightChargesPaid": "₹42,50,000.00 INR",
+      "freightGst5Percent": "₹2,12,500.00 (Credited to GSTN GSTR-2B)",
+      "foisStatus": "cris_fois_epayment_confirmed"
+    }
+  ],
+  "minesKhanijRoyalty": [
+    {
+      "id": "khn_pass_2026_09",
+      "miningLessee": "Vedanta Sesa Iron Ore Division (Odisha)",
+      "khanijETransitPass": "OD-KHANIJ-ETP-8819201",
+      "mineralGrade": "High-Grade Iron Ore Lump (64% Fe)",
+      "statutoryStateRoyalty": "₹15,00,000.00 (15% Ad-valorem)",
+      "dmfCess30Percent": "₹4,50,000.00 (District Mineral Foundation)",
+      "nmetCess2Percent": "₹30,000.00 (National Mineral Exploration Trust)",
+      "netTreasuryChallan": "₹19,80,000.00 (e-Treasury Challan Remitted)",
+      "status": "khanij_pass_active_valid"
+    }
+  ],
+  "abdmHealthClaims": [
+    {
+      "id": "abdm_clm_99018",
+      "patientName": "Sunita Devi (ABHA ID: 91-8819-2019-4829)",
+      "healthcareProvider": "AIIMS New Delhi (Ayush Grid Centre)",
+      "treatmentPackage": "Advanced Cardiology Day Care (NHA PMJAY Code: MC001)",
+      "grossClaimValue": "₹45,000.00 INR",
+      "abdmEClaimApproval": "100% Cashless Adjudicated via NHA Gateway",
+      "disbursementLatency": "1.8 Seconds (Instant NPCI IMPS Payout)",
+      "status": "cashless_claim_settled"
+    }
+  ],
+  "beeCarbonTrades": [
+    {
+      "id": "ccts_ccc_881920",
+      "carbonCreditEntity": "Adani Green Energy Ltd (Khavda Solar Park)",
+      "cccRegistrySerialNumber": "BEE/CCTS/CCC/2026/09182",
+      "carbonCreditsTraded": "25,000 CCC Units (25,000 tCO2e)",
+      "grossTradeValue": "₹4,75,00,000.00 INR (₹1,900/CCC)",
+      "cctsSettlementStatus": "Registry Ownership Transferred & Funds Escrow Cleared",
+      "status": "ccc_escrow_settled"
+    }
+  ],
+  "digitalBharatNidhiEscrows": [
+    {
+      "id": "dbn_usof_99018",
+      "telecomInfraProvider": "Indus Towers Ltd (North-East Circle-2)",
+      "dotSchemeName": "Digital Bharat Nidhi 4G/5G Saturation in Unconnected Villages",
+      "milestoneTowersErected": "140 Solar-Powered 5G Small Cell Sites",
+      "dotCapitalSubsidyDisbursed": "₹28,00,00,000.00 INR (DoT Approved)",
+      "status": "usof_grant_disbursed"
+    }
+  ],
+  "digiYatraAirportCheckouts": [
+    {
+      "id": "dgy_chk_2026_88",
+      "passengerIdentity": "Rajesh Sharma (DigiYatra ID: DY-DEL-99182)",
+      "airportTerminal": "Indira Gandhi International Airport (DEL T3)",
+      "merchantOutlet": "Delhi Duty Free / Starbucks Departure Concourse",
+      "biometricAuthMode": "1:1 DigiYatra Face-Pay (Zero-Card / Zero-Phone)",
+      "transactionAmount": "₹8,450.00 INR",
+      "aaiUdfFeeShare": "₹350.00 (Auto-split to Airports Authority of India)",
+      "status": "face_pay_success"
+    }
+  ],
+  "jjmWaterInvoices": [
+    {
+      "id": "jjm_wt_882910",
+      "gramPanchayat": "Ralegan Siddhi Gram Panchayat (Ahmednagar)",
+      "iotSensorNetwork": "Ministry of Jal Shakti IoT Water Flow Node # 491",
+      "monthlyLitersPumped": "4,500,000 Litres (FHTC Pure Tap Water)",
+      "userTariffCollected": "₹1,35,000.00 INR via Bharat BillPay (BBPS)",
+      "centralJjmPerformanceGrant": "₹5,00,000.00 Incentive Drawdown Released",
+      "status": "jjm_grant_disbursed"
+    }
+  ],
+  "cashfreeConfig": {
+    "appId": "TEST110559449949df01b9dff3b901f544955011",
+    "secretKey": "SET_CASHFREE_SECRET_IN_SETTINGS_OR_ENV",
+    "environment": "SANDBOX",
+    "status": "connected",
+    "lastVerifiedAt": "2026-08-31T07:36:53.086Z"
+  }
+}

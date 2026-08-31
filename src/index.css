@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 98%;
+    --foreground: 220 20% 6%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 6%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 6%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 240 6% 94%;
+    --secondary-foreground: 220 20% 6%;
+    --muted: 240 6% 94%;
+    --muted-foreground: 220 10% 46%;
+    --accent: 240 6% 94%;
+    --accent-foreground: 220 20% 6%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 221 83% 53%;
+    --radius: 1.5rem;
+  }
+
+  body {
+    background-color: #FAFAFC;
+    color: #0A0D14;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Plus Jakarta Sans', 'Syne', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.04em;
+    font-weight: 800;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'DM Mono', 'Fragment Mono', monospace;
+  }
+}
+
+/* OPP Signature Components */
+.opp-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(10, 13, 20, 0.07);
+  border-radius: 28px;
+  box-shadow: 0 4px 20px -4px rgba(10, 13, 20, 0.04), 0 2px 6px -2px rgba(10, 13, 20, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.opp-card:hover {
+  border-color: rgba(10, 13, 20, 0.14);
+  box-shadow: 0 12px 32px -8px rgba(10, 13, 20, 0.08);
+}
+
+.opp-card-subtle {
+  background: #F4F5F8;
+  border: 1px solid rgba(10, 13, 20, 0.05);
+  border-radius: 24px;
+}
+
+.opp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  border: 1px solid rgba(10, 13, 20, 0.08);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: #0A0D14;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.opp-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  background: #0A0D14;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(10, 13, 20, 0.12);
+}
+
+.opp-btn-primary:hover {
+  background: #202430;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(10, 13, 20, 0.16);
+}
+
+.opp-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  color: #0A0D14;
+  border: 1px solid rgba(10, 13, 20, 0.12);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.opp-btn-secondary:hover {
+  background: #F4F5F8;
+  border-color: rgba(10, 13, 20, 0.2);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}

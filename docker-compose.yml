@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  kodo-payments:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kodo-payments-app
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - CASHFREE_APP_ID=${CASHFREE_APP_ID:-TEST110559449949df01b9dff3b901f544955011}
+      - CASHFREE_SECRET_KEY=${CASHFREE_SECRET_KEY}
+      - CASHFREE_ENV=${CASHFREE_ENV:-TEST}
+      - KODO_WEBHOOK_SECRET=${KODO_WEBHOOK_SECRET:-whsec_kodo_prod_991820}
+      - HOSTNAME=0.0.0.0
+    volumes:
+      - ./server/db.json:/app/server/db.json
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  default:
+    name: kodo-network
