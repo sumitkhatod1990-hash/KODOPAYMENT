@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import { ensurePaymentStore, recordCashfreeWebhook, recordPaymentOrder } from './neonStore.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,8 +75,10 @@ function readDB() {
 function writeDB(data) {
   try {
     fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    return true;
   } catch (err) {
     console.error('Error writing to db.json', err);
+    return false;
   }
 }
 
@@ -2191,11 +2194,15 @@ app.post('/api/v1/india/cashfree/create-order', async (req, res) => {
   if (!appId || !secretKey || !PUBLIC_URL) {
     return res.status(503).json({ success: false, error: 'Cashfree production credentials and PUBLIC_URL are required' });
   }
-  if (!Number.isFinite(Number(orderAmount)) || Number(orderAmount) <= 0 || !customerEmail || !customerPhone) {
+  const normalizedEmail = String(customerEmail || '').trim().toLowerCase();
+  const normalizedPhone = String(customerPhone || '').replace(/\D/g, '').slice(-10);
+  if (!Number.isFinite(Number(orderAmount)) || Number(orderAmount) <= 0 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || !/^\d{10}$/.test(normalizedPhone)) {
     return res.status(400).json({ success: false, error: 'orderAmount, customerEmail and customerPhone are required' });
   }
 
   try {
+    // Production orders must have durable storage before charging is initiated.
+    if (CASHFREE_ENV === 'PROD' || CASHFREE_ENV === 'PRODUCTION') await ensurePaymentStore();
     const orderId = `qv_cf_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
     const cfResponse = await fetch(`${cashfreeBaseUrl()}/orders`, {
       method: 'POST',
@@ -2211,8 +2218,8 @@ app.post('/api/v1/india/cashfree/create-order', async (req, res) => {
         order_currency: 'INR',
         customer_details: {
           customer_id: `cus_${crypto.randomBytes(4).toString('hex')}`,
-          customer_email: customerEmail,
-          customer_phone: customerPhone
+          customer_email: normalizedEmail,
+          customer_phone: normalizedPhone
         },
         order_meta: {
           return_url: `${PUBLIC_URL}/dashboard?order_id={order_id}`,
@@ -2225,6 +2232,9 @@ app.post('/api/v1/india/cashfree/create-order', async (req, res) => {
     const cfData = await cfResponse.json();
 
     if (cfResponse.ok && cfData.payment_session_id) {
+      if (CASHFREE_ENV === 'PROD' || CASHFREE_ENV === 'PRODUCTION') {
+        await recordPaymentOrder({ orderId, cfOrderId: cfData.cf_order_id, orderAmount: cfData.order_amount, orderCurrency: cfData.order_currency, orderStatus: cfData.order_status, customerEmail: normalizedEmail });
+      }
       return res.json({
         success: true,
         orderId,
@@ -2249,9 +2259,34 @@ app.post('/api/v1/india/cashfree/create-order', async (req, res) => {
   }
 });
 
+// Verify the payment server-to-server after the browser returns from Cashfree.
+// A redirect alone is never treated as proof of payment.
+app.get('/api/v1/india/cashfree/orders/:orderId/status', async (req, res) => {
+  const { appId, secretKey } = cashfreeCredentials();
+  const orderId = String(req.params.orderId || '').trim();
+  if (!appId || !secretKey) return res.status(503).json({ success: false, error: 'Cashfree credentials are not configured' });
+  if (!/^qv_cf_[A-Za-z0-9_-]+$/.test(orderId)) return res.status(400).json({ success: false, error: 'Invalid Cashfree order ID' });
+
+  try {
+    const cfResponse = await fetch(`${cashfreeBaseUrl()}/orders/${encodeURIComponent(orderId)}`, {
+      headers: {
+        'x-api-version': CASHFREE_API_VERSION,
+        'x-client-id': appId,
+        'x-client-secret': secretKey,
+        'Content-Type': 'application/json'
+      }
+    });
+    const cfData = await cfResponse.json();
+    if (!cfResponse.ok) return res.status(cfResponse.status).json({ success: false, error: cfData.message || 'Cashfree order lookup failed' });
+    res.json({ success: true, orderId, orderStatus: cfData.order_status, orderAmount: cfData.order_amount, orderCurrency: cfData.order_currency });
+  } catch (err) {
+    res.status(502).json({ success: false, error: err.message || 'Cashfree order lookup failed' });
+  }
+});
+
 // Cashfree production webhook receiver. The raw body is verified before JSON
 // parsing and every provider delivery is recorded idempotently.
-app.post('/api/v1/webhooks/cashfree', (req, res) => {
+app.post('/api/v1/webhooks/cashfree', async (req, res) => {
   const webhookSecret = process.env.CASHFREE_WEBHOOK_SECRET || process.env.QIVROPAY_WEBHOOK_SECRET || '';
   if (!webhookSecret) {
     return res.status(503).json({ success: false, error: 'Cashfree webhook secret is not configured' });
@@ -2289,8 +2324,18 @@ app.post('/api/v1/webhooks/cashfree', (req, res) => {
   const db = readDB();
   db.webhookEvents = db.webhookEvents || [];
   if (!db.webhookEvents.some(item => item.id === eventId)) {
+    if (process.env.DATABASE_URL || process.env.POSTGRES_URL) {
+      try { await recordCashfreeWebhook(eventId, event); } catch (error) {
+        console.error('Durable webhook storage failed', error);
+        return res.status(503).json({ success: false, error: 'Payment event storage is unavailable; please retry webhook delivery' });
+      }
+    }
     db.webhookEvents.push({ id: eventId, provider: 'cashfree', event, receivedAt: new Date().toISOString() });
-    writeDB(db);
+    // On Vercel the bundled db.json is read-only. Return 5xx so Cashfree
+    // retries instead of losing a successful payment event silently.
+    if (!writeDB(db)) {
+      return res.status(503).json({ success: false, error: 'Payment event storage is unavailable; please retry webhook delivery' });
+    }
   }
 
   res.status(200).json({ success: true, received: true, eventId });
@@ -2340,3 +2385,4 @@ if (process.env.VERCEL !== '1') {
 }
 
 export default app;
+
