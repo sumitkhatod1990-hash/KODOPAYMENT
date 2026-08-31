@@ -5,14 +5,16 @@ import { Link2, Copy, CheckCircle2, ExternalLink } from 'lucide-react';
 export const PaymentLinksTab: React.FC = () => {
   const { createCheckoutSession, setCurrentView } = useApp();
   const [customTitle, setCustomTitle] = useState('Custom AI Payment Link');
-  const [amount, setAmount] = useState<number>(49);
-  const [currency, setCurrency] = useState('USD');
+  const [amount, setAmount] = useState<number>(1);
+  const [currency, setCurrency] = useState('INR');
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsGenerating(true);
     const sessionId = await createCheckoutSession({
       amount,
@@ -24,6 +26,8 @@ export const PaymentLinksTab: React.FC = () => {
     if (sessionId) {
       const fullUrl = `${window.location.origin}/checkout/${sessionId}`;
       setGeneratedLink(fullUrl);
+    } else {
+      setError('Payment link create nahi ho saka. Please retry.');
     }
   };
 
@@ -100,6 +104,7 @@ export const PaymentLinksTab: React.FC = () => {
             <Link2 className="w-4 h-4" />
             {isGenerating ? 'Generating Link...' : 'Create Live Payment Link'}
           </button>
+          {error && <p className="text-xs text-red-600" role="alert">{error}</p>}
         </form>
 
         {generatedLink && (
