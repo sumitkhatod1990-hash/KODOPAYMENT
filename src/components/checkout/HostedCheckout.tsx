@@ -190,7 +190,9 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
         setCashfreePaymentStarted(true);
         const paymentResult = await cashfree.pay({
           paymentMethod: upiQr,
-          paymentSessionId: orderData.paymentSessionId
+          paymentSessionId: orderData.paymentSessionId,
+          redirect: 'if_required',
+          returnUrl: `${window.location.origin}/checkout/${encodeURIComponent(sessionId || '')}`
         });
         if (paymentResult?.error) throw new Error(paymentResult.error.message || 'UPI payment could not be started');
         setIsProcessing(false);
