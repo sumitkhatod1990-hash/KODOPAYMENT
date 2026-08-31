@@ -139,6 +139,10 @@ import { BEECarbonMarketTab } from './BEECarbonMarketTab';
 import { DigitalBharatNidhiEscrowTab } from './DigitalBharatNidhiEscrowTab';
 import { DigiYatraCommerceTab } from './DigiYatraCommerceTab';
 import { JJMSmartWaterTariffTab } from './JJMSmartWaterTariffTab';
+import { WhatsAppCommerceBotTab } from './WhatsAppCommerceBotTab';
+import { CashfreeENACHMandatesTab } from './CashfreeENACHMandatesTab';
+import { SDKPlaygroundTab } from './SDKPlaygroundTab';
+import { MultiGSTINCorporateTab } from './MultiGSTINCorporateTab';
 import { TaxNexusTab } from './TaxNexusTab';
 import { WebhookDLQTab } from './WebhookDLQTab';
 import { NotificationsDrawer } from './NotificationsDrawer';
@@ -256,6 +260,10 @@ export const DashboardLayout: React.FC = () => {
       group: 'BHARAT (INDIA) SOVEREIGN STACK 🇮🇳',
       items: [
         { id: 'india-cashfree-split', label: 'Cashfree PG + Easy Split Rail', icon: Split },
+        { id: 'india-whatsapp-commerce', label: 'WhatsApp 1-Click Pay & Invoice Bot', icon: MessageSquare },
+        { id: 'india-cashfree-enach', label: 'Cashfree e-NACH Bank Mandates', icon: Landmark },
+        { id: 'india-sdk-playground', label: 'Interactive SDK Playground', icon: Code2 },
+        { id: 'india-multi-gstin', label: 'Multi-GSTIN Corporate Rail', icon: Building2 },
         { id: 'india-upi-autopay', label: 'UPI AutoPay 2.0 Mandates', icon: Smartphone },
         { id: 'india-rupay-upi', label: 'RuPay on UPI (0% MDR)', icon: CreditCard },
         { id: 'india-upi-circle', label: 'NPCI UPI Circle Delegation', icon: Users2 },
@@ -630,6 +638,10 @@ export const DashboardLayout: React.FC = () => {
           {dashboardTab === 'localization' && <LocalizationTab />}
           {dashboardTab === 'open-banking' && <OpenBankingTab />}
           {dashboardTab === 'india-cashfree-split' && <CashfreeEasySplitTab />}
+          {dashboardTab === 'india-whatsapp-commerce' && <WhatsAppCommerceBotTab />}
+          {dashboardTab === 'india-cashfree-enach' && <CashfreeENACHMandatesTab />}
+          {dashboardTab === 'india-sdk-playground' && <SDKPlaygroundTab />}
+          {dashboardTab === 'india-multi-gstin' && <MultiGSTINCorporateTab />}
           {dashboardTab === 'india-upi-autopay' && <UPIAutoPayTab />}
           {dashboardTab === 'india-rupay-upi' && <RuPayUPITab />}
           {dashboardTab === 'india-upi-circle' && <UPICircleDelegationTab />}
