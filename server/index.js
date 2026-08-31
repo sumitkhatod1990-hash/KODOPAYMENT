@@ -73,6 +73,9 @@ function readDB() {
 }
 
 function writeDB(data) {
+  // Vercel Functions run from a read-only deployment bundle. Payment
+  // events are persisted in Neon; never attempt to mutate db.json there.
+  if (process.env.VERCEL === '1') return true;
   try {
     fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf-8');
     return true;
@@ -2385,4 +2388,3 @@ if (process.env.VERCEL !== '1') {
 }
 
 export default app;
-
