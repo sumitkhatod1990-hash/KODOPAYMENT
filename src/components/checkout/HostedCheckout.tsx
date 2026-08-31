@@ -82,7 +82,9 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [completedTx, setCompletedTx] = useState<any>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [cashfreePaymentStarted, setCashfreePaymentStarted] = useState(false);
   const cashfreeContainerRef = useRef<HTMLDivElement>(null);
+  const cashfreePaymentMethodRef = useRef<any>(null);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -95,6 +97,8 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
           setSessionData(data.session);
           if (String(data.session.currency || '').toUpperCase() === 'INR') {
             setSelectedCountry('IN');
+            setPaymentCategory('asia_latam');
+            setPaymentRail('upi');
             if (data.session.customerEmail) setCustomerEmail(data.session.customerEmail);
           }
         } else {
@@ -175,15 +179,21 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
         }
         const cashfree = (window as any).Cashfree?.({ mode: 'production' });
         if (!cashfree) throw new Error('Cashfree checkout SDK load nahi hua');
-        // Render Cashfree's PCI-compliant payment UI inside the QivroPay page.
-        // Payment data still goes directly to Cashfree; it never touches us.
         if (!cashfreeContainerRef.current) throw new Error('Payment container could not be opened');
-        const checkoutResult = await cashfree.checkout({
-          paymentSessionId: orderData.paymentSessionId,
-          redirectTarget: cashfreeContainerRef.current,
-          appearance: { width: '100%', height: '700px' }
+        // QivroPay owns the visible checkout. Cashfree only mounts its secure
+        // PCI component (QR/UPI data never touches our server).
+        const upiQr = cashfree.create('upiQr', { values: { size: '260px' } });
+        upiQr.on('loaderror', (data: any) => setPaymentError(data?.error || 'UPI QR load failed'));
+        cashfreeContainerRef.current.id = 'qivropay-upi-qr';
+        upiQr.mount('#qivropay-upi-qr');
+        cashfreePaymentMethodRef.current = upiQr;
+        setCashfreePaymentStarted(true);
+        const paymentResult = await cashfree.pay({
+          paymentMethod: upiQr,
+          paymentSessionId: orderData.paymentSessionId
         });
-        if (checkoutResult?.error) throw new Error(checkoutResult.error.message || 'Cashfree checkout could not be opened');
+        if (paymentResult?.error) throw new Error(paymentResult.error.message || 'UPI payment could not be started');
+        setIsProcessing(false);
       } catch (err: any) {
         setPaymentError(err?.message || 'Live payment start nahi ho saka');
         setIsProcessing(false);
@@ -865,7 +875,12 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                 </button>
 
                 {isInrSession && (
-                  <div ref={cashfreeContainerRef} className="mt-4 min-h-0 overflow-hidden rounded-2xl border border-black/10 bg-white" aria-label="Secure QivroPay payment form" />
+                  <div className="mt-4 rounded-2xl border border-black/10 bg-white p-5 text-center" aria-label="QivroPay secure UPI payment">
+                    <p className="text-sm font-bold text-[#0A0D14]">Scan & pay securely with any UPI app</p>
+                    <p className="mt-1 text-[11px] text-[#8C90A0]">Your payment stays on QivroPay. No redirect.</p>
+                    <div ref={cashfreeContainerRef} className="mx-auto mt-4 min-h-0 w-fit overflow-hidden rounded-xl bg-white" />
+                    {cashfreePaymentStarted && <p className="mt-3 text-xs font-semibold text-emerald-700">Waiting for UPI confirmation…</p>}
+                  </div>
                 )}
 
                 <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] text-[#8C90A0] font-medium pt-2">
