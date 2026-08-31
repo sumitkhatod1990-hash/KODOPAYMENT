@@ -211,6 +211,34 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
         if (paymentResult?.error) console.warn('UPI payment status:', paymentResult.error);
         setPaymentError(null);
         setIsProcessing(false);
+
+        // Keep the branded page open while Cashfree processes the UPI payment,
+        // then verify the final status server-to-server before showing success.
+        let settled = false;
+        for (let attempt = 0; attempt < 20; attempt += 1) {
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          const statusRes = await fetch(`/api/v1/india/cashfree/orders/${encodeURIComponent(orderData.orderId)}/status`);
+          const statusData = await statusRes.json();
+          if (statusData.orderStatus === 'PAID' || statusData.orderStatus === 'SUCCESS') {
+            settled = true;
+            const transaction = {
+              id: orderData.orderId,
+              amount: Number(statusData.orderAmount || finalUsdAmount),
+              currency: statusData.orderCurrency || 'INR',
+              status: 'succeeded',
+              customerEmail,
+              customerName,
+              productName: sessionData?.title || 'QivroPay payment',
+              paymentMethod: 'upi',
+              createdAt: new Date().toISOString()
+            };
+            setCompletedTx(transaction);
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            break;
+          }
+          if (['EXPIRED', 'CANCELLED', 'FAILED'].includes(statusData.orderStatus)) break;
+        }
+        if (!settled) setPaymentError('Payment confirmation pending. Please check your UPI app and try again.');
       } catch (err: any) {
         const qrRendered = Boolean(cashfreeContainerRef.current?.childElementCount);
         setPaymentError(qrRendered ? null : (err?.message || 'Live payment start nahi ho saka'));
