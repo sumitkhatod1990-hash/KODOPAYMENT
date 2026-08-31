@@ -52,6 +52,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   // Checkout Form State
   const [customerName, setCustomerName] = useState('Alex Chen');
   const [customerEmail, setCustomerEmail] = useState('alex.chen@synthflow.ai');
+  const [customerPhone, setCustomerPhone] = useState('9999999999');
   const [paymentRail, setPaymentRail] = useState<PaymentRail>('card');
   const [paymentCategory, setPaymentCategory] = useState<'cards' | 'wallets' | 'bnpl' | 'europe' | 'asia_latam' | 'crypto'>('cards');
   
@@ -80,6 +81,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   const [upsellClaimed, setUpsellClaimed] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [completedTx, setCompletedTx] = useState<any>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -121,7 +123,8 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   const basePrice = sessionData?.amount || 29.00;
   const pppDetails = calculatePPPPrice(basePrice, selectedCountry);
   
-  let finalUsdAmount = enablePPP ? pppDetails.discountedUsd : basePrice;
+  const isInrSession = (sessionData?.currency || '').toUpperCase() === 'INR';
+  let finalUsdAmount = isInrSession ? basePrice : (enablePPP ? pppDetails.discountedUsd : basePrice);
   if (discountApplied) {
     finalUsdAmount = finalUsdAmount * 0.5;
   }
@@ -134,6 +137,33 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
     if (!customerEmail || !customerName) return;
 
     setIsProcessing(true);
+    setPaymentError(null);
+
+    if ((sessionData?.currency || '').toUpperCase() === 'INR') {
+      try {
+        const orderRes = await fetch('/api/v1/india/cashfree/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderAmount: finalUsdAmount,
+            customerEmail,
+            customerPhone,
+            orderNote: sessionData?.title || 'QivroPay payment'
+          })
+        });
+        const orderData = await orderRes.json();
+        if (!orderRes.ok || !orderData.success || !orderData.paymentSessionId) {
+          throw new Error(orderData.error || 'Cashfree order create failed');
+        }
+        const cashfree = (window as any).Cashfree?.({ mode: 'production' });
+        if (!cashfree) throw new Error('Cashfree checkout SDK load nahi hua');
+        await cashfree.checkout({ paymentSessionId: orderData.paymentSessionId, redirectTarget: '_self' });
+      } catch (err: any) {
+        setPaymentError(err?.message || 'Live payment start nahi ho saka');
+        setIsProcessing(false);
+      }
+      return;
+    }
     let cardLast4 = '4242';
     if (paymentRail === 'card') {
       cardLast4 = cardNumber.slice(-4).replace(/\s/g, '') || '4242';
@@ -660,6 +690,18 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                       className="w-full p-3 rounded-xl border border-black/10 bg-[#F4F5F8] text-[#0A0D14] focus:border-[#0055FF] outline-none"
                     />
                   </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-[#0A0D14]">Mobile Number</label>
+                    <input
+                      type="tel"
+                      required
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      placeholder="10-digit mobile number"
+                      className="w-full p-3 rounded-xl border border-black/10 bg-[#F4F5F8] text-[#0A0D14] focus:border-[#0055FF] outline-none"
+                    />
+                  </div>
                 </div>
 
                 {/* 1. Card Form */}
@@ -786,13 +828,14 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                   </div>
                 )}
 
+                {paymentError && <p className="text-xs text-red-600" role="alert">{paymentError}</p>}
                 <button
                   type="submit"
                   disabled={isProcessing}
                   className="opp-btn-primary w-full py-4 text-sm font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95"
                 >
                   <Lock className="w-4 h-4 fill-white" />
-                  {isProcessing ? 'Processing Payment with KODO MoR...' : `Pay $${finalUsdAmount.toFixed(2)} USD via ${paymentRail.toUpperCase().replace('_', ' ')}`}
+                  {isProcessing ? 'Opening secure Cashfree checkout...' : `Pay ${isInrSession ? '₹' : '$'}${finalUsdAmount.toFixed(2)} ${isInrSession ? 'INR' : 'USD'} via ${paymentRail.toUpperCase().replace('_', ' ')}`}
                 </button>
 
                 <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] text-[#8C90A0] font-medium pt-2">
