@@ -194,10 +194,17 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
         // QivroPay owns the visible checkout. Cashfree only mounts its secure
         // PCI component (QR/UPI data never touches our server).
         const upiQr = cashfree.create('upiQr', { values: { size: '260px' } });
-        upiQr.on('loaderror', (data: any) => setPaymentError(data?.error || 'UPI QR load failed'));
+        const qrReady = new Promise<void>((resolve, reject) => {
+          upiQr.on('ready', () => resolve());
+          upiQr.on('loaderror', (data: any) => reject(new Error(data?.error || 'UPI QR load failed')));
+        });
         cashfreeContainerRef.current.id = 'qivropay-upi-qr';
         upiQr.mount('#qivropay-upi-qr');
         cashfreePaymentMethodRef.current = upiQr;
+        await Promise.race([
+          qrReady,
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('UPI QR took too long to load')), 10000))
+        ]);
         setCashfreePaymentStarted(true);
         const paymentResult = await cashfree.pay({
           paymentMethod: upiQr,
