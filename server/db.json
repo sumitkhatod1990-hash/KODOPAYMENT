@@ -2,7 +2,7 @@
   "brands": [
     {
       "id": "brand_qivro_01",
-      "name": "QivroPay Technologies India Pvt Ltd",
+      "name": "QivroPay (by Neocraft LLP)",
       "domain": "qivropay.in",
       "statementDescriptor": "QIVRO*PAY",
       "supportEmail": "billing@qivropay.in",
@@ -1388,7 +1388,7 @@
       "id": "pny_kyc_8819",
       "accountNumber": "•••• •••• 9812",
       "ifsc": "HDFC0000240 (HDFC Bank, Koramangala)",
-      "bankBeneficiaryName": "NEOCRAFT LLP",
+      "bankBeneficiaryName": "QIVROPAY LABS TECHNOLOGIES INDIA PVT LTD",
       "pennyCreditStatus": "₹1.00 Credited via IMPS",
       "nameMatchScore": "100% Exact Match",
       "kycStatus": "verified_active"
@@ -1496,7 +1496,7 @@
     {
       "id": "mca_roc_2026_01",
       "companyCin": "U72900KA2024PTC189021",
-      "companyName": "NEOCRAFT LLP",
+      "companyName": "QIVROPAY LABS TECHNOLOGIES INDIA PVT LTD",
       "formType": "AOC-4 (Annual Financial Statements) & MGT-7",
       "directorDin": "DIN 09817263 (DSC Signed)",
       "rocRoStatus": "MCA21 V3 Verified & Filed",

@@ -118,7 +118,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Banner */}
         <div className="pt-8 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[#86868b]">
           <div className="flex items-center gap-4">
-            <span>© 2026 QivroPay Technologies India Pvt Ltd. All rights reserved.</span>
+            <span>© 2026 QivroPay (by Neocraft LLP). All rights reserved.</span>
             <span>•</span>
             <span>PCI-DSS Level 1</span>
             <span>•</span>
