@@ -70,7 +70,7 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
             <DollarSign className="w-4 h-4 text-[#0071e3]" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ${analytics?.totalVolume.toLocaleString() || '0.00'}
+            ₹{analytics?.totalVolume?.toLocaleString() || '0.00'}
           </div>
           <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
             <TrendingUp className="w-3.5 h-3.5" />
@@ -85,10 +85,10 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
             <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ${analytics?.totalNet.toLocaleString() || '0.00'}
+            ₹{analytics?.totalNet?.toLocaleString() || '0.00'}
           </div>
           <div className="text-xs text-[#86868b]">
-            Total MoR Fees: <strong>₹{analytics?.totalFees || '0.00'}</strong> (4% + 40¢)
+            Total MoR Fees: <strong>₹{analytics?.totalFees || '0.00'}</strong> (3% MoR)
           </div>
         </div>
 
@@ -99,7 +99,7 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
             <CreditCard className="w-4 h-4 text-purple-600" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ${analytics?.mrr.toLocaleString() || '0.00'}
+            ₹{analytics?.mrr?.toLocaleString() || '0.00'}
           </div>
           <div className="text-xs text-[#86868b]">
             <strong>{analytics?.activeSubscriptions || 0}</strong> active subscribers
