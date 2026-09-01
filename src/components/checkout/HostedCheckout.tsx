@@ -236,6 +236,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
               customerEmail,
               customerName,
               productName: sessionData?.title || 'QivroPay payment',
+              credits: Number(sessionData?.credits || 0),
               paymentMethod: 'upi',
               createdAt: new Date().toISOString()
             };
@@ -347,6 +348,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                 <span className="text-[#8C90A0]">Payment Rail:</span>
                 <span className="text-[#0A0D14] font-bold uppercase">{completedTx.paymentMethod.replace('_', ' ')}</span>
               </div>
+              {completedTx.credits > 0 && <div className="flex justify-between"><span className="text-[#8C90A0]">Credits Delivered:</span><span className="text-emerald-700 font-bold">{completedTx.credits.toLocaleString('en-IN')}</span></div>}
               <div className="flex justify-between">
                 <span className="text-[#8C90A0]">Billed To:</span>
                 <span className="text-[#0A0D14]">{completedTx.customerEmail}</span>
