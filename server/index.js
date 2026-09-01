@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
-import { ensurePaymentStore, recordCashfreeWebhook, recordPaymentOrder, getPaymentOrderForSession } from './neonStore.js';
+import { ensurePaymentStore, recordCashfreeWebhook, recordPaymentOrder, getPaymentOrderForSession, ensureAuthStore, createUser, findUserByEmail, checkUserPassword, createAuthSession, getUserForSession, deleteAuthSession } from './neonStore.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,6 +56,98 @@ app.use(express.json());
 // Deployment health check. This must not depend on the database or a payment provider.
 app.get('/api/v1/health', (req, res) => {
   res.json({ success: true, service: 'qivropay-api', environment: process.env.NODE_ENV || 'development' });
+});
+
+function readCookie(req, name) {
+  const cookies = String(req.headers.cookie || '').split(';');
+  const entry = cookies.find((part) => part.trim().startsWith(`${name}=`));
+  return entry ? decodeURIComponent(entry.trim().slice(name.length + 1)) : '';
+}
+
+function authCookieOptions(maxAge) {
+  return `qivropay_session=; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
+}
+
+function publicUser(user) {
+  return user ? { id: user.id, email: user.email, name: user.name, company: user.company, createdAt: user.created_at } : null;
+}
+
+app.get('/api/v1/auth/me', async (req, res) => {
+  try {
+    const user = await getUserForSession(readCookie(req, 'qivropay_session'));
+    res.json({ success: true, user: publicUser(user) });
+  } catch (error) {
+    console.error('Auth lookup failed', error);
+    res.status(503).json({ success: false, error: 'Authentication service is temporarily unavailable' });
+  }
+});
+
+app.post('/api/v1/auth/signup', async (req, res) => {
+  const { email, password, name, company } = req.body || {};
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (!/^\S+@\S+\.\S+$/.test(normalizedEmail) || String(password || '').length < 8 || !String(name || '').trim() || !String(company || '').trim()) {
+    return res.status(400).json({ success: false, error: 'Name, company, valid email and an 8+ character password are required' });
+  }
+  try {
+    const existing = await findUserByEmail(normalizedEmail);
+    if (existing) return res.status(409).json({ success: false, error: 'An account with this email already exists' });
+    const user = await createUser({ email: normalizedEmail, password: String(password), name: String(name).trim(), company: String(company).trim() });
+    const session = await createAuthSession(user.id);
+    res.setHeader('Set-Cookie', authCookieOptions(60 * 60 * 24 * 30).replace('qivropay_session=;', `qivropay_session=${encodeURIComponent(session.token)}`));
+    res.status(201).json({ success: true, user: publicUser(user) });
+  } catch (error) {
+    console.error('Signup failed', error);
+    res.status(503).json({ success: false, error: 'Could not create account. Check your database connection.' });
+  }
+});
+
+app.post('/api/v1/auth/login', async (req, res) => {
+  const normalizedEmail = String(req.body?.email || '').trim().toLowerCase();
+  const password = String(req.body?.password || '');
+  if (!normalizedEmail || !password) return res.status(400).json({ success: false, error: 'Email and password are required' });
+  try {
+    let user = await findUserByEmail(normalizedEmail);
+    // A single fictional account is available for product review. Override
+    // these values in Vercel if you want different demo credentials.
+    const demoEmail = String(process.env.DEMO_ACCOUNT_EMAIL || 'demo@qivropay.com').trim().toLowerCase();
+    const demoPassword = String(process.env.DEMO_ACCOUNT_PASSWORD || 'QivroDemo2026!');
+    if (!user && normalizedEmail === demoEmail && password === demoPassword) {
+      user = await createUser({ email: demoEmail, password: demoPassword, name: 'Demo Merchant', company: 'QivroPay Demo Workspace' });
+    }
+    if (!user || !checkUserPassword(password, user.password_hash)) return res.status(401).json({ success: false, error: 'Invalid email or password' });
+    const session = await createAuthSession(user.id);
+    res.setHeader('Set-Cookie', authCookieOptions(60 * 60 * 24 * 30).replace('qivropay_session=;', `qivropay_session=${encodeURIComponent(session.token)}`));
+    res.json({ success: true, user: publicUser(user) });
+  } catch (error) {
+    console.error('Login failed', error);
+    res.status(503).json({ success: false, error: 'Could not sign in. Check your database connection.' });
+  }
+});
+
+app.post('/api/v1/auth/logout', async (req, res) => {
+  try { await deleteAuthSession(readCookie(req, 'qivropay_session')); } catch (error) { console.error('Logout failed', error); }
+  res.setHeader('Set-Cookie', authCookieOptions(0));
+  res.json({ success: true });
+});
+
+// Merchant dashboard APIs require an authenticated merchant session. Public
+// checkout creation/status and Cashfree webhook callbacks stay accessible.
+app.use('/api/v1', async (req, res, next) => {
+  const publicPaths = [
+    '/health', '/auth/me', '/auth/login', '/auth/signup', '/auth/logout',
+    '/payments/create-session', '/payments/process', '/payments/refund',
+    '/india/cashfree/create-order', '/india/cashfree/session/', '/webhooks/cashfree'
+  ];
+  if (publicPaths.some((pathPrefix) => req.path === pathPrefix || req.path.startsWith(pathPrefix))) return next();
+  try {
+    const user = await getUserForSession(readCookie(req, 'qivropay_session'));
+    if (!user) return res.status(401).json({ success: false, error: 'Authentication required' });
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('Dashboard authentication failed', error);
+    res.status(503).json({ success: false, error: 'Authentication service is temporarily unavailable' });
+  }
 });
 
 // Database Helpers
