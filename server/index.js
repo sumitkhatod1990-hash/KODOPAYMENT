@@ -301,7 +301,9 @@ app.post('/api/v1/meters/track', (req, res) => {
 // 7. PAYMENTS, CHECKOUT & REFUND API
 // -------------------------------------------------------------
 app.post('/api/v1/payments/create-session', (req, res) => {
-  const { productId, amount, currency = 'USD', title, customerEmail } = req.body;
+  const { productId, amount, title, customerEmail } = req.body;
+  // QivroPay is currently India-only; every hosted session is INR.
+  const currency = 'INR';
   const db = readDB();
 
   let product = null;
