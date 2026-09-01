@@ -172,7 +172,8 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
     const markReady = () => { cashfreeCardReadyRef.current = true; };
     number.on('ready', markReady); holder.on('ready', markReady); expiry.on('ready', markReady); cvv.on('ready', markReady);
     return () => {
-      [number, holder, expiry, cvv].forEach((component) => { try { component.unmount(); } catch {} });
+      // Cashfree owns the iframe lifecycle; unmounting during a mode switch
+      // can race its internal DOM cleanup and throw a classList error.
       cashfreeCardReadyRef.current = false;
     };
   }, [checkoutStep, indiaPaymentMode]);
