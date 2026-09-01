@@ -496,7 +496,7 @@ export const DashboardLayout: React.FC = () => {
                   {currentBrand?.name.charAt(0) || 'Q'}
                 </div>
                 <div className="truncate">
-                  <div className="font-bold text-[#1d1d1f] truncate">{currentBrand?.name || 'QivroPay Labs'}</div>
+                  <div className="font-bold text-[#1d1d1f] truncate">{currentBrand?.name || 'QivroPay (by Neocraft LLP)'}</div>
                   <div className="text-[10px] text-[#86868b] font-mono">{currentBrand?.domain || 'qivropay.in'}</div>
                 </div>
               </div>

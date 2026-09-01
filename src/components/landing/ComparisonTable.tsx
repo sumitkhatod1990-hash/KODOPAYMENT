@@ -37,7 +37,7 @@ export const ComparisonTable: React.FC = () => {
               <tr className="border-b border-black/10 bg-[#fafafc] font-mono text-xs uppercase">
                 <th className="p-5 text-[#1d1d1f] font-bold">Feature</th>
                 <th className="p-5 text-[#0071e3] font-black bg-blue-50/60 border-x border-blue-100">
-                  ⚡ QIVROPAY Payments
+                  ⚡ QivroPay (by Neocraft LLP)
                 </th>
                 <th className="p-5 text-[#86868b]">Stripe Stack</th>
                 <th className="p-5 text-[#86868b]">LemonSqueezy</th>

@@ -17,7 +17,7 @@ export const MCARocFilingsTab: React.FC = () => {
     {
       id: 'mca_roc_2026_01',
       companyCin: 'U72900KA2024PTC189021',
-      companyName: 'QIVROPAY LABS TECHNOLOGIES INDIA PVT LTD',
+      companyName: 'NEOCRAFT LLP',
       formType: 'AOC-4 (Annual Financial Statements) & MGT-7',
       directorDin: 'DIN 09817263 (DSC Signed)',
       rocRoStatus: 'MCA21 V3 Verified & Filed',

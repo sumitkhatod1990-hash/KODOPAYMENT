@@ -977,7 +977,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
       )}
 
       <footer className="border-t border-black/[0.06] py-4 text-center text-xs text-[#8C90A0]">
-        Powered by QIVROPAY Payments Inc. • Reseller & Merchant of Record for Digital Products across 220+ Territories
+        Powered by QivroPay (by Neocraft LLP) • Reseller & Merchant of Record for Digital Products across 220+ Territories
       </footer>
 
     </div>

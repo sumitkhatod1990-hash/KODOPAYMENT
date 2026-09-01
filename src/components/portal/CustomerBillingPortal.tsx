@@ -263,7 +263,7 @@ export const CustomerBillingPortal: React.FC = () => {
       </main>
 
       <footer className="border-t border-black/[0.06] py-6 text-center text-xs text-[#8C90A0] font-mono">
-        Secured by QIVROPAY Payments Inc. • 256-bit SSL • Merchant of Record for Digital Software & AI Services
+        Secured by QivroPay (by Neocraft LLP) • 256-bit SSL • Merchant of Record for Digital Software & AI Services
       </footer>
 
     </div>

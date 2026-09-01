@@ -2252,7 +2252,7 @@ app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
           return_url: `${PUBLIC_URL || 'http://localhost:' + PORT}/dashboard?order_id={order_id}`,
           notify_url: `${PUBLIC_URL || 'http://localhost:' + PORT}/api/v1/webhooks/cashfree`
         },
-        order_note: 'QIVROPAY Payments Gateway Verification'
+        order_note: 'QivroPay (by Neocraft LLP) Gateway Verification'
       })
     });
 

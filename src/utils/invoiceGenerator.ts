@@ -20,13 +20,13 @@ export function printOrDownloadInvoice(tx: Transaction, businessName = 'QIVROPAY
   doc.setTextColor(31, 41, 55); doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text('Payment successful', margin, 49);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.text(`Transaction ID: ₹{transactionId}`, margin, 57); doc.setDrawColor(226, 232, 240); doc.line(margin, 64, right, 64);
   doc.setFontSize(9); doc.setTextColor(100, 116, 139); doc.text('BILLED TO', margin, 75); doc.text('SELLER OF RECORD', 112, 75);
-  doc.setTextColor(31, 41, 55); doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text(customer, margin, 83); doc.text('QivroPay Payments Inc.', 112, 83);
+  doc.setTextColor(31, 41, 55); doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text(customer, margin, 83); doc.text('QivroPay (by Neocraft LLP)', 112, 83);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.text(email, margin, 90); doc.text(`Operating reseller for ${businessName}`, 112, 90); doc.text(`Jurisdiction: ₹{country}`, margin, 97); doc.text('Tax handled by Merchant of Record', 112, 97);
   doc.setFillColor(248, 250, 252); doc.roundedRect(margin, 110, pageWidth - margin * 2, 38, 3, 3, 'F');
   doc.setTextColor(100, 116, 139); doc.setFontSize(9); doc.text('DESCRIPTION', margin + 6, 120); doc.text('PAYMENT RAIL', 112, 120); doc.text('AMOUNT', right - 6, 120, { align: 'right' });
   doc.setTextColor(31, 41, 55); doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.text(product, margin + 6, 130); doc.setFont('helvetica', 'normal'); doc.text(paymentRail, 112, 130); doc.setFont('helvetica', 'bold'); doc.text(`₹${amount.toFixed(2)} INR`, right - 6, 130, { align: 'right' });
   doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 116, 139); doc.setFontSize(9); doc.text('Qty 1', margin + 6, 139); doc.text('Status: Settled (Success)', 112, 139);
   doc.setTextColor(31, 41, 55); doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text('Total paid', 112, 170); doc.setFontSize(16); doc.text(`₹${amount.toFixed(2)} INR`, right, 170, { align: 'right' });
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 116, 139); doc.text('This invoice is generated electronically and is valid without signature.', margin, 190); doc.text('QivroPay Payments Inc. • Official Merchant of Record receipt', margin, 197);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 116, 139); doc.text('This invoice is generated electronically and is valid without signature.', margin, 190); doc.text('QivroPay (by Neocraft LLP) • Official Merchant of Record receipt', margin, 197);
   doc.save(`qivropay-invoice-₹{transactionId}.pdf`);
 }

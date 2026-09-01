@@ -20,7 +20,7 @@ export const WallOfLove: React.FC = () => {
       company: "AgentCraft.io"
     },
     {
-      quote: "After trying PayPal, manual wires, and complex Stripe tax registrations, we moved everything to QIVROPAY Payments. The developer experience is on par with Apple products.",
+      quote: "After trying PayPal, manual wires, and complex Stripe tax registrations, we moved everything to QivroPay (by Neocraft LLP). The developer experience is on par with Apple products.",
       name: "Praveen Naik",
       handle: "@p_naix",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80",
