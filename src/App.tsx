@@ -50,11 +50,7 @@ export const App: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  if (currentView === 'dashboard' && authLoading) {
-    return <div className="min-h-screen bg-[#f7f8fb] flex items-center justify-center text-sm text-gray-500">Loading your secure workspace…</div>;
-  }
-
-  if (currentView === 'auth' || (currentView === 'dashboard' && !user)) {
+  if (currentView === 'auth') {
     return <AuthPage />;
   }
 

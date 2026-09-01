@@ -24,7 +24,31 @@ export const AuthPage: React.FC = () => {
         <div className="space-y-3 text-sm text-white/75"><div className="flex gap-3 items-center"><CheckCircle2 className="w-5 h-5 text-emerald-300" /> Secure merchant sessions</div><div className="flex gap-3 items-center"><CheckCircle2 className="w-5 h-5 text-emerald-300" /> INR checkout and webhook verification</div></div>
       </div>
       <div className="p-7 sm:p-12"><div className="lg:hidden mb-10"><Logo onClick={() => setCurrentView('landing')} /></div><div className="flex gap-6 border-b border-black/10"><button onClick={() => setMode('signup')} className={`pb-3 text-sm font-semibold ${mode === 'signup' ? 'text-[#08111f] border-b-2 border-[#08111f]' : 'text-gray-400'}`}>Create account</button><button onClick={() => setMode('login')} className={`pb-3 text-sm font-semibold ${mode === 'login' ? 'text-[#08111f] border-b-2 border-[#08111f]' : 'text-gray-400'}`}>Sign in</button></div><h2 className="mt-9 text-3xl font-semibold tracking-tight">{mode === 'signup' ? 'Start with QivroPay' : 'Welcome back'}</h2><p className="mt-2 text-sm text-gray-500">{mode === 'signup' ? 'Your account and merchant data are stored securely.' : 'Sign in to your merchant dashboard.'}</p>
-        <form onSubmit={submit} className="mt-8 space-y-4">{mode === 'signup' && <><label className="block text-sm font-medium">Full name<input required value={name} onChange={e => setName(e.target.value)} className="mt-2 w-full rounded-xl border border-black/10 px-4 py-3 outline-none focus:border-[#0b6bcb]" placeholder="Aarav Sharma" /></label><label className="block text-sm font-medium">Company / business name<input required value={company} onChange={e => setCompany(e.target.value)} className="mt-2 w-full rounded-xl border border-black/10 px-4 py-3 outline-none focus:border-[#0b6bcb]" placeholder="Neocraft LLP" /></label></>}<label className="block text-sm font-medium">Work email<input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="mt-2 w-full rounded-xl border border-black/10 px-4 py-3 outline-none focus:border-[#0b6bcb]" placeholder="you@company.com" /></label><label className="block text-sm font-medium">Password<input required minLength={8} type="password" value={password} onChange={e => setPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-black/10 px-4 py-3 outline-none focus:border-[#0b6bcb]" placeholder="At least 8 characters" /></label>{error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}<button disabled={busy} className="w-full rounded-xl bg-[#08111f] text-white py-3.5 font-semibold flex items-center justify-center gap-2 disabled:opacity-50">{busy ? 'Please wait…' : mode === 'signup' ? 'Create merchant account' : 'Sign in'} {!busy && <ArrowRight className="w-4 h-4" />}</button></form><div className="mt-7 flex items-center gap-2 text-xs text-gray-500"><LockKeyhole className="w-4 h-4" /> Passwords are encrypted; sessions use secure HttpOnly cookies.</div><div className="mt-3 flex items-center gap-2 text-xs text-gray-500"><ShieldCheck className="w-4 h-4 text-emerald-600" /> Payments remain on Cashfree’s PCI-compliant rails.</div>
+        <form onSubmit={submit} className="mt-8 space-y-4">
+          {mode === 'signup' && (
+            <>
+              <label className="block text-sm font-medium">Full name<input required value={name} onChange={e => setName(e.target.value)} className="mt-2 w-full rounded-xl border border-black/10 px-4 py-3 outline-none focus:border-[#0b6bcb]" placeholder="Aarav Sharma" /></label>
+              <label className="block text-sm font-medium">Company / business name<input required value={company} onChange={e => setCompany(e.target.value)} className="mt-2 w-full rounded-xl border border-black/10 px-4 py-3 outline-none focus:border-[#0b6bcb]" placeholder="Neocraft LLP" /></label>
+            </>
+          )}
+          <label className="block text-sm font-medium">Work email<input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="mt-2 w-full rounded-xl border border-black/10 px-4 py-3 outline-none focus:border-[#0b6bcb]" placeholder="you@company.com" /></label>
+          <label className="block text-sm font-medium">Password<input required minLength={8} type="password" value={password} onChange={e => setPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-black/10 px-4 py-3 outline-none focus:border-[#0b6bcb]" placeholder="At least 8 characters" /></label>
+          {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
+          <button disabled={busy} className="w-full rounded-xl bg-[#08111f] text-white py-3.5 font-semibold flex items-center justify-center gap-2 disabled:opacity-50">
+            {busy ? 'Please wait…' : mode === 'signup' ? 'Create merchant account' : 'Sign in'} {!busy && <ArrowRight className="w-4 h-4" />}
+          </button>
+          <div className="pt-2 text-center">
+            <button
+              type="button"
+              onClick={() => setCurrentView('dashboard')}
+              className="text-xs text-[#0071e3] hover:underline font-semibold"
+            >
+              Skip & Enter Demo Merchant Dashboard &rarr;
+            </button>
+          </div>
+        </form>
+        <div className="mt-7 flex items-center gap-2 text-xs text-gray-500"><LockKeyhole className="w-4 h-4" /> Passwords are encrypted; sessions use secure HttpOnly cookies.</div>
+        <div className="mt-3 flex items-center gap-2 text-xs text-gray-500"><ShieldCheck className="w-4 h-4 text-emerald-600" /> Payments remain on Cashfree’s PCI-compliant rails.</div>
       </div>
     </div>
   </div>;
