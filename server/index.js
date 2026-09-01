@@ -158,7 +158,9 @@ app.use('/api/v1', async (req, res, next) => {
         '/audit-logs': { auditLogs: [] }, '/analytics': {
           analytics: { totalVolume: 0, totalFees: 0, totalNet: 0, mrr: 0,
             activeSubscriptions: 0, activeCustomers: 0, conversionRate: '0%', chargebackRate: '0%' }
-        }
+        }, '/disputes': { disputes: [] }, '/disputes/analytics': { analytics: {} },
+        '/b2b/invoices': { invoices: [] }, '/einvoicing/invoices': { invoices: [] },
+        '/webhooks/dlq': { queue: [] }, '/notifications': { notifications: [] }
       };
       if (empty[req.path]) return res.json({ success: true, ...empty[req.path] });
     }
