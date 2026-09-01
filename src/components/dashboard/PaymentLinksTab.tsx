@@ -46,7 +46,7 @@ export const PaymentLinksTab: React.FC = () => {
           Instant Payment Links Generator
         </h2>
         <p className="text-xs sm:text-sm text-[#86868b]">
-          Generate shareable, multi-currency checkout links for clients, Discord, Twitter, or email invoices.
+          Generate shareable INR checkout links for clients, WhatsApp, email, or invoices.
         </p>
       </div>
 
@@ -81,18 +81,7 @@ export const PaymentLinksTab: React.FC = () => {
 
             <div className="space-y-1.5">
               <label className="font-semibold text-[#1d1d1f]">Default Currency</label>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="w-full p-3 rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] focus:border-[#0071e3] outline-none text-sm font-mono"
-              >
-                <option value="USD">USD ($) - United States</option>
-                <option value="EUR">EUR (€) - Eurozone</option>
-                <option value="GBP">GBP (£) - United Kingdom</option>
-                <option value="INR">INR (₹) - India</option>
-                <option value="JPY">JPY (¥) - Japan</option>
-                <option value="CAD">CAD ($) - Canada</option>
-              </select>
+              <div className="w-full p-3 rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] text-sm font-mono">INR (₹) · India</div>
             </div>
           </div>
 
