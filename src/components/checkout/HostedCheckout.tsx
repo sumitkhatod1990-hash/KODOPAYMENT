@@ -743,21 +743,6 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                     </>
                   )}
 
-                  {paymentCategory === 'asia_latam' && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => setPaymentRail('upi')}
-                        className={`p-2.5 rounded-xl border flex flex-col items-center gap-1 text-xs transition-all ${
-                          paymentRail === 'upi' ? 'border-[#0055FF] bg-blue-50/50 text-[#0055FF] font-bold' : 'border-black/5 bg-[#F4F5F8] text-[#6E717D]'
-                        }`}
-                      >
-                        <QrCode className="w-4 h-4 text-orange-600" />
-                        <span>UPI India 🇮🇳</span>
-                      </button>
-                    </>
-                  )}
-
                   {paymentCategory === 'crypto' && (
                     <button
                       type="button"
