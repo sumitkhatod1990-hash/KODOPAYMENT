@@ -210,7 +210,7 @@ export type DashboardTabType =
   | 'sow-generator'
   | 'gift-cards'
   | 'ab-testing'
-  | 'kodo-elements'
+  | 'qivropay-elements'
   | 'web-component'
   | 'one-pass'
   | 'green-checkout'

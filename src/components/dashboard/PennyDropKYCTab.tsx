@@ -18,7 +18,7 @@ export const PennyDropKYCTab: React.FC = () => {
       id: 'pny_kyc_8819',
       accountNumber: '•••• •••• 9812',
       ifsc: 'HDFC0000240 (HDFC Bank, Koramangala)',
-      bankBeneficiaryName: 'KODO LABS TECHNOLOGIES INDIA PVT LTD',
+      bankBeneficiaryName: 'QIVROPAY LABS TECHNOLOGIES INDIA PVT LTD',
       pennyCreditStatus: '₹1.00 Credited via IMPS',
       nameMatchScore: '100% Exact Match',
       kycStatus: 'verified_active'

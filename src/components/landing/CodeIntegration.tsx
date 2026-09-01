@@ -10,14 +10,14 @@ export const CodeIntegration: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
 
   const codeSamples = {
-    node: `import { Kodo } from '@kodo/payments';
+    node: `import { QivroPay } from '@qivropay/payments';
 
-const kodo = new Kodo({
-  apiKey: process.env.KODO_SECRET_KEY
+const qivropay = new QivroPay({
+  apiKey: process.env.QIVROPAY_SECRET_KEY
 });
 
 // 1. Create instant AI checkout session
-const session = await kodo.checkout.create({
+const session = await qivropay.checkout.create({
   title: "AI Token Starter Pack",
   amount: 29.00,
   currency: "USD",
@@ -35,14 +35,14 @@ const session = await kodo.checkout.create({
 
 console.log("Hosted checkout URL:", session.url);`,
 
-    python: `from kodo import Kodo
+    python: `from qivropay import QivroPay
 import os
 
-kodo = Kodo(api_key=os.environ.get("KODO_SECRET_KEY"))
+qivropay = QivroPay(api_key=os.environ.get("QIVROPAY_SECRET_KEY"))
 
 # Create AI Subscription with localized PPP
-session = kodo.checkout.create(
-    title="KODO Pro Subscription",
+session = qivropay.checkout.create(
+    title="QIVROPAY Pro Subscription",
     amount=79.00,
     currency="USD",
     customer_email="developer@startup.ai",
@@ -57,13 +57,13 @@ print("Checkout URL:", session.url)`,
 import (
 	"fmt"
 	"os"
-	"github.com/kodopayments/kodo-go"
+	"github.com/qivropaypayments/qivropay-go"
 )
 
 func main() {
-	client := kodo.NewClient(os.Getenv("KODO_SECRET_KEY"))
+	client := qivropay.NewClient(os.Getenv("QIVROPAY_SECRET_KEY"))
 
-	session, err := client.Checkout.Create(&kodo.CheckoutParams{
+	session, err := client.Checkout.Create(&qivropay.CheckoutParams{
 		Title:    "Enterprise Inference Tier",
 		Amount:   199.00,
 		Currency: "USD",
@@ -76,8 +76,8 @@ func main() {
 	fmt.Printf("Checkout Link: %s\\n", session.URL)
 }`,
 
-    curl: `curl -X POST https://api.kodo.io/v1/payments/create-session \\
-  -H "Authorization: Bearer kodo_live_9a7d3c5f..." \\
+    curl: `curl -X POST https://api.qivropay.io/v1/payments/create-session \\
+  -H "Authorization: Bearer qivropay_live_9a7d3c5f..." \\
   -H "Content-Type: application/json" \\
   -d '{
     "title": "AI Token Starter Pack",
@@ -141,7 +141,7 @@ func main() {
               <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
               <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
               <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
-              <span className="ml-2 font-sans font-medium text-[#86868b]">kodo-sdk-playground</span>
+              <span className="ml-2 font-sans font-medium text-[#86868b]">qivropay-sdk-playground</span>
             </div>
 
             {/* Language Switcher */}

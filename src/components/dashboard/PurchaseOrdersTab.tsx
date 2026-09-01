@@ -37,7 +37,7 @@ export const PurchaseOrdersTab: React.FC = () => {
             <span>Enterprise Purchase Orders (PO) & Net-Terms Invoicing</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
-            Accept enterprise Purchase Orders (PO #), automated two-way accounts payable matching, and Net-30 / Net-60 wire settlements under KODO Merchant of Record.
+            Accept enterprise Purchase Orders (PO #), automated two-way accounts payable matching, and Net-30 / Net-60 wire settlements under QIVROPAY Merchant of Record.
           </p>
         </div>
 

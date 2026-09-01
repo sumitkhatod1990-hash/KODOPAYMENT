@@ -30,7 +30,7 @@ import { B2BInvoicesTab } from './B2BInvoicesTab';
 import { GiftCardsTab } from './GiftCardsTab';
 import { DynamicPricingTab } from './DynamicPricingTab';
 import { ABTestingTab } from './ABTestingTab';
-import { KodoElementsTab } from './KodoElementsTab';
+import { QivroPayElementsTab } from './QivroPayElementsTab';
 import { ThemeStudioTab } from './ThemeStudioTab';
 import { ProrationTab } from './ProrationTab';
 import { TreasuryTab } from './TreasuryTab';
@@ -373,9 +373,9 @@ export const DashboardLayout: React.FC = () => {
         { id: 'sow-generator', label: 'Enterprise SOW AI', icon: FileSignature },
         { id: 'gift-cards', label: 'Gift Cards & Credits', icon: Gift },
         { id: 'ab-testing', label: 'A/B CRO Studio', icon: Split },
-        { id: 'kodo-elements', label: 'KODO Elements SDK', icon: Layers },
-        { id: 'web-component', label: '<kodo-checkout> Component', icon: Code2 },
-        { id: 'one-pass', label: 'KODO One-Pass (1-Click)', icon: Fingerprint },
+        { id: 'qivropay-elements', label: 'QIVROPAY Elements SDK', icon: Layers },
+        { id: 'web-component', label: '<qivropay-checkout> Component', icon: Code2 },
+        { id: 'one-pass', label: 'QIVROPAY One-Pass (1-Click)', icon: Fingerprint },
         { id: 'green-checkout', label: 'Green Carbon Checkout', icon: Leaf },
         { id: 'localization', label: '32-Language Localization', icon: Languages },
         { id: 'open-banking', label: 'Pay-by-Bank (0% Fees)', icon: Landmark },
@@ -583,7 +583,7 @@ export const DashboardLayout: React.FC = () => {
             className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[#86868b] hover:text-[#1d1d1f] text-xs font-medium transition-colors"
           >
             <ArrowLeft className="w-3 h-3" />
-            <span>KODO Home</span>
+            <span>QIVROPAY Home</span>
           </button>
 
           <button
@@ -607,7 +607,7 @@ export const DashboardLayout: React.FC = () => {
             </h1>
             <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              KODO MoR Active
+              QIVROPAY MoR Active
             </span>
           </div>
 
@@ -683,7 +683,7 @@ export const DashboardLayout: React.FC = () => {
           {dashboardTab === 'sow-generator' && <SOWGeneratorTab />}
           {dashboardTab === 'gift-cards' && <GiftCardsTab />}
           {dashboardTab === 'ab-testing' && <ABTestingTab />}
-          {dashboardTab === 'kodo-elements' && <KodoElementsTab />}
+          {dashboardTab === 'qivropay-elements' && <QivroPayElementsTab />}
           {dashboardTab === 'web-component' && <WebComponentTab />}
           {dashboardTab === 'one-pass' && <OnePassTab />}
           {dashboardTab === 'green-checkout' && <GreenCheckoutTab />}

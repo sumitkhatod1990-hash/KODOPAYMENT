@@ -86,7 +86,7 @@ export const BentoFeatures: React.FC = () => {
                 Zero GST Liability Shield
               </h3>
               <p className="text-sm text-[#6E717D] leading-relaxed">
-                As your legal Merchant of Record, KODO calculates, collects, and files GST across all 28 Indian States & 8 UTs. Zero state registrations or audit hassles.
+                As your legal Merchant of Record, QIVROPAY calculates, collects, and files GST across all 28 Indian States & 8 UTs. Zero state registrations or audit hassles.
               </p>
             </div>
 
@@ -96,7 +96,7 @@ export const BentoFeatures: React.FC = () => {
                 <span>28 States & 8 UTs Managed</span>
               </div>
               <p className="text-[11px] text-emerald-700">
-                Never file GSTR-1 or GSTR-3B manually again. KODO handles 100% of GST remittances under our sovereign tax nexus.
+                Never file GSTR-1 or GSTR-3B manually again. QIVROPAY handles 100% of GST remittances under our sovereign tax nexus.
               </p>
             </div>
           </div>
@@ -136,7 +136,7 @@ export const BentoFeatures: React.FC = () => {
                 AI Token Metering &amp; Cashfree Easy Split
               </h3>
               <p className="text-sm text-[#6E717D] leading-relaxed">
-                Stream token counts, GPU runtime, or API queries. KODO meters usage, deducts 1% Section 194-O TDS, and settles net earnings directly to your bank via instant IMPS.
+                Stream token counts, GPU runtime, or API queries. QIVROPAY meters usage, deducts 1% Section 194-O TDS, and settles net earnings directly to your bank via instant IMPS.
               </p>
             </div>
 
@@ -146,10 +146,10 @@ export const BentoFeatures: React.FC = () => {
                 <span className="text-emerald-400">● 200 OK</span>
               </div>
               <pre className="text-emerald-300 text-[11px] overflow-x-auto">
-{`await kodo.meters.track({
+{`await qivropay.meters.track({
   eventName: "llm_inference_tokens",
   units: 25000,
-  customerId: "cus_kodo_9910"
+  customerId: "cus_qivropay_9910"
 });
 // Instant T+0 IMPS Payout: ₹9,600 (after 3% fee + 1% Sec 194-O TDS)`}
               </pre>

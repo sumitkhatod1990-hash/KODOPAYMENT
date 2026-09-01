@@ -36,7 +36,7 @@ export const NotificationsDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
     {
       id: 'notif_03',
       title: 'Chargeback Defense Won',
-      message: 'Dispute dp_kodo_01 won with 100% MoR protection against Visa network.',
+      message: 'Dispute dp_qivropay_01 won with 100% MoR protection against Visa network.',
       type: 'security',
       read: true,
       createdAt: '2 hours ago'

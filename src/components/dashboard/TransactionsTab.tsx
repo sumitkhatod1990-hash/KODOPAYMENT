@@ -66,7 +66,7 @@ export const TransactionsTab: React.FC = () => {
                 <th className="p-4 font-semibold">Customer</th>
                 <th className="p-4 font-semibold">Product</th>
                 <th className="p-4 font-semibold">Gross</th>
-                <th className="p-4 font-semibold">KODO Fee</th>
+                <th className="p-4 font-semibold">QIVROPAY Fee</th>
                 <th className="p-4 font-semibold">Net Payout</th>
                 <th className="p-4 font-semibold">Payment Method</th>
                 <th className="p-4 font-semibold">Status</th>
@@ -126,7 +126,7 @@ export const TransactionsTab: React.FC = () => {
           <div className="w-full max-w-md rounded-3xl bg-white border border-black/10 shadow-2xl p-6 sm:p-8 space-y-5">
             <div className="flex justify-between items-center pb-3 border-b border-black/5">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-[#1d1d1f] text-base font-sans">KODO MoR Invoice</span>
+                <span className="font-bold text-[#1d1d1f] text-base font-sans">QIVROPAY MoR Invoice</span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">PAID</span>
               </div>
               <button onClick={() => setSelectedTx(null)} className="text-[#86868b] hover:text-[#1d1d1f] text-sm">✕</button>

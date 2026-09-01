@@ -214,7 +214,7 @@ app.post('/api/v1/products', (req, res) => {
 
   const db = readDB();
   const newProduct = {
-    id: `prod_kodo_${crypto.randomBytes(4).toString('hex')}`,
+    id: `prod_qivropay_${crypto.randomBytes(4).toString('hex')}`,
     name,
     description: description || '',
     price: Number(price),
@@ -316,10 +316,10 @@ app.post('/api/v1/licenses/generate', (req, res) => {
   const { productName, customerEmail, maxActivations = 3 } = req.body;
   const db = readDB();
 
-  const key = `KODO-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(1).toString('hex').toUpperCase()}`;
+  const key = `QIVROPAY-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(1).toString('hex').toUpperCase()}`;
   const newLicense = {
-    id: `lic_kodo_${crypto.randomBytes(3).toString('hex')}`,
-    productName: productName || 'KODO Desktop Agent Pro License',
+    id: `lic_qivropay_${crypto.randomBytes(3).toString('hex')}`,
+    productName: productName || 'QIVROPAY Desktop Agent Pro License',
     customerEmail: customerEmail || 'customer@company.com',
     key,
     activations: 0,
@@ -360,7 +360,7 @@ app.post('/api/v1/payouts/request', (req, res) => {
   const db = readDB();
 
   const newPayout = {
-    id: `po_kodo_${crypto.randomBytes(3).toString('hex')}`,
+    id: `po_qivropay_${crypto.randomBytes(3).toString('hex')}`,
     amount: Number(amount) || 1000,
     currency: 'USD',
     status: 'in_transit',
@@ -394,7 +394,7 @@ app.post('/api/v1/meters/track', (req, res) => {
     meter.updatedAt = new Date().toISOString();
   } else {
     meter = {
-      id: `mtr_kodo_${crypto.randomBytes(3).toString('hex')}`,
+      id: `mtr_qivropay_${crypto.randomBytes(3).toString('hex')}`,
       name: eventName,
       eventName,
       aggregation: 'sum',
@@ -426,7 +426,7 @@ app.post('/api/v1/payments/create-session', (req, res) => {
 
   const finalAmount = amount || (product ? product.price : 29.00);
   const finalTitle = title || (product ? product.name : 'AI Credits Pack');
-  const sessionId = `cs_kodo_${crypto.randomBytes(12).toString('hex')}`;
+  const sessionId = `cs_qivropay_${crypto.randomBytes(12).toString('hex')}`;
 
   db.sessions = db.sessions || {};
   db.sessions[sessionId] = {
@@ -484,13 +484,13 @@ app.post('/api/v1/payments/process', (req, res) => {
   const fee = Number(((grossAmount * 0.04) + 0.40).toFixed(2));
   const net = Number((grossAmount - fee).toFixed(2));
 
-  const transactionId = `tx_kodo_${crypto.randomBytes(4).toString('hex')}`;
+  const transactionId = `tx_qivropay_${crypto.randomBytes(4).toString('hex')}`;
   const transaction = {
     id: transactionId,
     amount: grossAmount,
     currency: session.currency || 'USD',
     status: 'succeeded',
-    customerEmail: customerEmail || 'developer@kodo.io',
+    customerEmail: customerEmail || 'developer@qivropay.io',
     customerName: customerName || 'Alex Chen',
     productName: session.title || 'AI Credits Pack',
     paymentMethod,
@@ -512,7 +512,7 @@ app.post('/api/v1/payments/process', (req, res) => {
     customer.lastActive = new Date().toISOString();
   } else {
     customer = {
-      id: `cus_kodo_${crypto.randomBytes(3).toString('hex')}`,
+      id: `cus_qivropay_${crypto.randomBytes(3).toString('hex')}`,
       name: customerName || 'Customer',
       email: customerEmail,
       country,
@@ -527,7 +527,7 @@ app.post('/api/v1/payments/process', (req, res) => {
   if (session.type === 'subscription') {
     db.subscriptions = db.subscriptions || [];
     db.subscriptions.unshift({
-      id: `sub_kodo_${crypto.randomBytes(3).toString('hex')}`,
+      id: `sub_qivropay_${crypto.randomBytes(3).toString('hex')}`,
       customerName: customerName || 'Customer',
       customerEmail: customerEmail,
       planName: session.title,
@@ -545,10 +545,10 @@ app.post('/api/v1/payments/process', (req, res) => {
   if (session.type === 'license_key') {
     db.licenses = db.licenses || [];
     db.licenses.unshift({
-      id: `lic_kodo_${crypto.randomBytes(3).toString('hex')}`,
+      id: `lic_qivropay_${crypto.randomBytes(3).toString('hex')}`,
       productName: session.title,
       customerEmail: customerEmail,
-      key: `KODO-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`,
+      key: `QIVROPAY-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`,
       activations: 0,
       maxActivations: 3,
       status: 'active',
@@ -561,7 +561,7 @@ app.post('/api/v1/payments/process', (req, res) => {
   res.json({
     success: true,
     transaction,
-    message: 'Payment settled instantly via KODO Merchant of Record'
+    message: 'Payment settled instantly via QIVROPAY Merchant of Record'
   });
 });
 
@@ -600,12 +600,12 @@ app.post('/api/v1/keys/generate', (req, res) => {
   const db = readDB();
 
   const secretHex = crypto.randomBytes(16).toString('hex');
-  const fullKey = `kodo_${environment}_${secretHex}`;
+  const fullKey = `qivropay_${environment}_${secretHex}`;
   const newKey = {
-    id: `key_kodo_${crypto.randomBytes(3).toString('hex')}`,
+    id: `key_qivropay_${crypto.randomBytes(3).toString('hex')}`,
     name,
     key: fullKey,
-    prefix: `kodo_${environment}_${secretHex.slice(0, 4)}...`,
+    prefix: `qivropay_${environment}_${secretHex.slice(0, 4)}...`,
     environment,
     createdAt: new Date().toISOString(),
     lastUsed: 'Just now'
@@ -635,12 +635,12 @@ app.post('/api/v1/webhooks/test', (req, res) => {
   res.json({
     success: true,
     event: {
-      id: `evt_kodo_${crypto.randomBytes(6).toString('hex')}`,
+      id: `evt_qivropay_${crypto.randomBytes(6).toString('hex')}`,
       type: eventType,
       created: Math.floor(Date.now() / 1000),
       data: {
         object: {
-          id: 'tx_kodo_demo_test',
+          id: 'tx_qivropay_demo_test',
           amount: 2900,
           currency: 'usd',
           customerEmail: 'developer@ai.com',
@@ -668,7 +668,7 @@ app.post('/api/v1/affiliates/create', (req, res) => {
   const { name, email, referralCode, commissionRate = 20 } = req.body;
   const db = readDB();
   const newAffiliate = {
-    id: `aff_kodo_${crypto.randomBytes(3).toString('hex')}`,
+    id: `aff_qivropay_${crypto.randomBytes(3).toString('hex')}`,
     name,
     email,
     referralCode: (referralCode || name.toLowerCase().replace(/\s+/g, '')).toLowerCase(),
@@ -785,10 +785,10 @@ app.get('/api/v1/audit-logs', (req, res) => {
 app.post('/api/v1/proxy/chat/completions', (req, res) => {
   const authHeader = req.headers['authorization'];
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Missing or invalid KODO Bearer API key' });
+    return res.status(401).json({ error: 'Missing or invalid QIVROPAY Bearer API key' });
   }
 
-  const { model = 'gpt-4o', messages = [], customerId = 'cus_kodo_9910' } = req.body;
+  const { model = 'gpt-4o', messages = [], customerId = 'cus_qivropay_9910' } = req.body;
   const db = readDB();
 
   // Deduct fractional micro-fee ($0.002) and record telemetry
@@ -805,7 +805,7 @@ app.post('/api/v1/proxy/chat/completions', (req, res) => {
   writeDB(db);
 
   res.json({
-    id: `chatcmpl_kodo_${crypto.randomBytes(8).toString('hex')}`,
+    id: `chatcmpl_qivropay_${crypto.randomBytes(8).toString('hex')}`,
     object: 'chat.completion',
     created: Math.floor(Date.now() / 1000),
     model,
@@ -814,7 +814,7 @@ app.post('/api/v1/proxy/chat/completions', (req, res) => {
         index: 0,
         message: {
           role: 'assistant',
-          content: 'Hello! I am your AI assistant running seamlessly behind the KODO Pay-Per-Inference Zero-Code Gateway. Your request was authenticated, metered, and settled in 8ms.'
+          content: 'Hello! I am your AI assistant running seamlessly behind the QIVROPAY Pay-Per-Inference Zero-Code Gateway. Your request was authenticated, metered, and settled in 8ms.'
         },
         finish_reason: 'stop'
       }
@@ -824,7 +824,7 @@ app.post('/api/v1/proxy/chat/completions', (req, res) => {
       completion_tokens: completionTokens,
       total_tokens: promptTokens + completionTokens
     },
-    kodo_settlement: {
+    qivropay_settlement: {
       micro_charge_usd: microCost,
       currency: 'USD',
       status: 'debited_from_meter',
@@ -936,7 +936,7 @@ app.post('/api/v1/marketplace/create-vendor', (req, res) => {
   const { name, email, platformFeePercent = 15, payoutMethod = 'US Bank (••••4190)' } = req.body;
   const db = readDB();
   const newVendor = {
-    id: `ven_kodo_${crypto.randomBytes(3).toString('hex')}`,
+    id: `ven_qivropay_${crypto.randomBytes(3).toString('hex')}`,
     name,
     email,
     platformFeePercent: Number(platformFeePercent),
@@ -1027,7 +1027,7 @@ app.post('/api/v1/copilot/generate', (req, res) => {
   writeDB(db);
 
   const checkoutUrl = `http://localhost:4000/checkout/${newProd.id}`;
-  const embedSnippet = `<script src="http://localhost:4000/checkout.js"></script>\n<button onclick="Kodo.openCheckout('${newProd.id}')">Pay $${price} USD</button>`;
+  const embedSnippet = `<script src="http://localhost:4000/checkout.js"></script>\n<button onclick="QivroPay.openCheckout('${newProd.id}')">Pay $${price} USD</button>`;
 
   res.json({
     success: true,
@@ -1056,7 +1056,7 @@ app.post('/api/v1/disputes/submit-evidence', (req, res) => {
     writeDB(db);
     return res.json({ 
       success: true, 
-      message: 'AI Evidence Package submitted to Visa/Mastercard network. 100% Insulated by KODO MoR.' 
+      message: 'AI Evidence Package submitted to Visa/Mastercard network. 100% Insulated by QIVROPAY MoR.' 
     });
   }
   res.status(404).json({ error: 'Dispute not found' });
@@ -1082,7 +1082,7 @@ app.post('/api/v1/b2b/create-invoice', (req, res) => {
     terms,
     status: 'sent',
     dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
-    virtualIban: `US84 KODO 0192 ${crypto.randomBytes(4).toString('hex').toUpperCase()}`,
+    virtualIban: `US84 QIVROPAY 0192 ${crypto.randomBytes(4).toString('hex').toUpperCase()}`,
     items: items.length > 0 ? items : ['Enterprise Software License', '24/7 SLA Support']
   };
   db.b2bInvoices = db.b2bInvoices || [];
@@ -1103,8 +1103,8 @@ app.post('/api/v1/gift-cards/create', (req, res) => {
   const { initialAmount = 50, recipientEmail, senderName = 'Merchant' } = req.body;
   const db = readDB();
   const newCard = {
-    id: `gc_kodo_${crypto.randomBytes(3).toString('hex')}`,
-    code: `GIFT-KODO-${crypto.randomBytes(2).toString('hex').toUpperCase()}-VIP`,
+    id: `gc_qivropay_${crypto.randomBytes(3).toString('hex')}`,
+    code: `GIFT-QIVROPAY-${crypto.randomBytes(2).toString('hex').toUpperCase()}-VIP`,
     initialAmount: Number(initialAmount),
     currentBalance: Number(initialAmount),
     currency: 'USD',
@@ -1284,7 +1284,7 @@ app.post('/api/v1/tax-exemptions/upload', (req, res) => {
   const { organizationName, type, certificateNumber, jurisdiction } = req.body;
   const db = readDB();
   const newExemption = {
-    id: `exm_kodo_${crypto.randomBytes(3).toString('hex')}`,
+    id: `exm_qivropay_${crypto.randomBytes(3).toString('hex')}`,
     organizationName,
     type: type || '501(c)(3) Non-Profit Charity',
     certificateNumber,
@@ -1342,8 +1342,8 @@ app.post('/api/v1/credit-notes/issue', (req, res) => {
   const { customerEmail, originalInvoiceId, adjustmentAmount, reason, taxId } = req.body;
   const db = readDB();
   const newNote = {
-    id: `cn_kodo_${crypto.randomBytes(3).toString('hex')}`,
-    originalInvoiceId: originalInvoiceId || 'inv_kodo_9881',
+    id: `cn_qivropay_${crypto.randomBytes(3).toString('hex')}`,
+    originalInvoiceId: originalInvoiceId || 'inv_qivropay_9881',
     customerEmail,
     taxId: taxId || 'EU-VAT-VERIFIED',
     amount: 49.00,
@@ -1393,9 +1393,9 @@ app.post('/api/v1/domains/verify', (req, res) => {
   const { domain } = req.body;
   const db = readDB();
   const newDomain = {
-    id: `dom_kodo_${crypto.randomBytes(3).toString('hex')}`,
+    id: `dom_qivropay_${crypto.randomBytes(3).toString('hex')}`,
     domain,
-    targetCname: 'custom.kodo.io',
+    targetCname: 'custom.qivropay.io',
     sslStatus: 'issued_active',
     dnsStatus: 'verified',
     createdAt: new Date().toISOString().slice(0, 10)
@@ -1426,7 +1426,7 @@ app.post('/api/v1/contracts/sign', (req, res) => {
   const { title, clientName, contractValue, signerEmail } = req.body;
   const db = readDB();
   const newContract = {
-    id: `cnt_kodo_${crypto.randomBytes(3).toString('hex')}`,
+    id: `cnt_qivropay_${crypto.randomBytes(3).toString('hex')}`,
     title: title || 'Enterprise Master Services Agreement (MSA) & 99.99% SLA',
     clientName,
     contractValue: contractValue || '$120,000.00 / yr',
@@ -1453,7 +1453,7 @@ app.post('/api/v1/cards/issue', (req, res) => {
   const { cardholderName, spendLimitMonthly, brand = 'Visa Business Corporate' } = req.body;
   const db = readDB();
   const newCard = {
-    id: `crd_kodo_${crypto.randomBytes(3).toString('hex')}`,
+    id: `crd_qivropay_${crypto.randomBytes(3).toString('hex')}`,
     cardholderName,
     last4: Math.floor(1000 + Math.random() * 9000).toString(),
     exp: '12/29',
@@ -1695,7 +1695,7 @@ app.get('/api/v1/tax-forms/vendors', (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 64. KODO ONE-PASS UNIVERSAL BIOMETRIC IDENTITY API
+// 64. QIVROPAY ONE-PASS UNIVERSAL BIOMETRIC IDENTITY API
 // -------------------------------------------------------------
 app.get('/api/v1/one-pass/status', (req, res) => {
   const db = readDB();
@@ -2244,15 +2244,15 @@ app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
         order_amount: 1.00,
         order_currency: 'INR',
         customer_details: {
-          customer_id: 'cus_kodo_verify',
-          customer_email: 'support@kodo.in',
+          customer_id: 'cus_qivropay_verify',
+          customer_email: 'support@qivropay.in',
           customer_phone: '9876543210'
         },
         order_meta: {
           return_url: `${PUBLIC_URL || 'http://localhost:' + PORT}/dashboard?order_id={order_id}`,
           notify_url: `${PUBLIC_URL || 'http://localhost:' + PORT}/api/v1/webhooks/cashfree`
         },
-        order_note: 'KODO Payments Gateway Verification'
+        order_note: 'QIVROPAY Payments Gateway Verification'
       })
     });
 
@@ -2277,7 +2277,7 @@ app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
         livePaymentSessionId: cfData.payment_session_id,
         splitConfig: {
           merchantBaseRate: '97.0%',
-          kodoPlatformFee: '3.0%',
+          qivropayPlatformFee: '3.0%',
           gstOnFee: '18.0%',
           statutoryTdsSec194O: '1.0%',
           settlementRail: 'Instant T+0 IMPS (24x7 Direct-to-Bank)'

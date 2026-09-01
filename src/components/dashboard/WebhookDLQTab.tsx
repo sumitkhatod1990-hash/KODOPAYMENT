@@ -16,10 +16,10 @@ import confetti from 'canvas-confetti';
 export const WebhookDLQTab: React.FC = () => {
   const [dlqItems, setDlqItems] = useState([
     {
-      id: 'dlq_kodo_991',
-      eventId: 'evt_kodo_7718a2',
+      id: 'dlq_qivropay_991',
+      eventId: 'evt_qivropay_7718a2',
       eventType: 'payment.succeeded',
-      targetUrl: 'https://api.synthflow.ai/webhooks/kodo',
+      targetUrl: 'https://api.synthflow.ai/webhooks/qivropay',
       lastAttempt: '10 mins ago',
       failureReason: 'HTTP 504 Gateway Timeout',
       retryCount: 3,
@@ -27,8 +27,8 @@ export const WebhookDLQTab: React.FC = () => {
       status: 'quarantined'
     },
     {
-      id: 'dlq_kodo_992',
-      eventId: 'evt_kodo_8819b4',
+      id: 'dlq_qivropay_992',
+      eventId: 'evt_qivropay_8819b4',
       eventType: 'subscription.canceled',
       targetUrl: 'https://api.nordicai.io/billing-events',
       lastAttempt: '2 hours ago',

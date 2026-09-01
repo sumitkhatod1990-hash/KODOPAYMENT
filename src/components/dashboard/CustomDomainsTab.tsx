@@ -17,9 +17,9 @@ import confetti from 'canvas-confetti';
 export const CustomDomainsTab: React.FC = () => {
   const [domains, setDomains] = useState([
     {
-      id: 'dom_kodo_01',
+      id: 'dom_qivropay_01',
       domain: 'billing.synthflow.ai',
-      targetCname: 'custom.kodo.io',
+      targetCname: 'custom.qivropay.io',
       sslStatus: 'issued_active',
       dnsStatus: 'verified',
       createdAt: 'Aug 25, 2026'
@@ -38,9 +38,9 @@ export const CustomDomainsTab: React.FC = () => {
     setVerifying(true);
     setTimeout(() => {
       const added = {
-        id: `dom_kodo_${Date.now().toString().slice(-3)}`,
+        id: `dom_qivropay_${Date.now().toString().slice(-3)}`,
         domain: newDomain,
-        targetCname: 'custom.kodo.io',
+        targetCname: 'custom.qivropay.io',
         sslStatus: 'issued_active',
         dnsStatus: 'verified',
         createdAt: 'Today'
@@ -54,7 +54,7 @@ export const CustomDomainsTab: React.FC = () => {
   };
 
   const copyCname = () => {
-    navigator.clipboard.writeText('custom.kodo.io');
+    navigator.clipboard.writeText('custom.qivropay.io');
     setCopiedTarget(true);
     setTimeout(() => setCopiedTarget(false), 2000);
   };
@@ -102,7 +102,7 @@ export const CustomDomainsTab: React.FC = () => {
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">White-Label URL Redirection</div>
           <div className="text-2xl font-bold font-mono text-[#0055FF]">Active</div>
-          <div className="text-[11px] text-purple-700 font-mono">Zero KODO branding in URL bar</div>
+          <div className="text-[11px] text-purple-700 font-mono">Zero QIVROPAY branding in URL bar</div>
         </div>
       </div>
 
@@ -185,7 +185,7 @@ export const CustomDomainsTab: React.FC = () => {
               <div className="p-3 rounded-2xl bg-[#FAFBFD] border border-black/5 space-y-2 text-xs">
                 <div className="font-semibold text-[#0A0D14]">DNS Instructions:</div>
                 <p className="text-[#6E717D] text-[11px] leading-relaxed">
-                  Create a <code className="font-mono font-bold text-[#0055FF]">CNAME</code> record in Cloudflare / AWS Route53 pointing your subdomain to <code className="font-mono font-bold text-[#0055FF]">custom.kodo.io</code>.
+                  Create a <code className="font-mono font-bold text-[#0055FF]">CNAME</code> record in Cloudflare / AWS Route53 pointing your subdomain to <code className="font-mono font-bold text-[#0055FF]">custom.qivropay.io</code>.
                 </p>
               </div>
 

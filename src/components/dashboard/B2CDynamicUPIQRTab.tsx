@@ -19,7 +19,7 @@ export const B2CDynamicUPIQRTab: React.FC = () => {
       invoiceNumber: 'INV-2026-B2C-8819',
       consumerName: 'Ananya Deshmukh',
       invoiceTotal: '₹1,768.82 INR (incl. 18% GST)',
-      upiIntentPayload: 'upi://pay?pa=kodopayments@icici&pn=KodoPayments&am=1768.82&tr=INV8819',
+      upiIntentPayload: 'upi://pay?pa=qivropaypayments@icici&pn=QivroPayPayments&am=1768.82&tr=INV8819',
       cbicCompliance: 'CBIC Notification 14/2020 Compliant Dynamic QR',
       status: 'scanned_and_settled'
     }

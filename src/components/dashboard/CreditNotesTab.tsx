@@ -16,8 +16,8 @@ import confetti from 'canvas-confetti';
 export const CreditNotesTab: React.FC = () => {
   const [creditNotes, setCreditNotes] = useState([
     {
-      id: 'cn_kodo_701',
-      originalInvoiceId: 'inv_kodo_9881',
+      id: 'cn_qivropay_701',
+      originalInvoiceId: 'inv_qivropay_9881',
       customerEmail: 'elena.tech@berlin-ai.de',
       taxId: 'DE391029482',
       amount: 49.00,
@@ -30,7 +30,7 @@ export const CreditNotesTab: React.FC = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [customerEmail, setCustomerEmail] = useState('');
-  const [invoiceId, setInvoiceId] = useState('inv_kodo_9881');
+  const [invoiceId, setInvoiceId] = useState('inv_qivropay_9881');
   const [taxId, setTaxId] = useState('DE391029482');
   const [adjustmentAmount, setAdjustmentAmount] = useState(9.31);
   const [reason, setReason] = useState('Retroactive Corporate Tax ID Verification');
@@ -40,7 +40,7 @@ export const CreditNotesTab: React.FC = () => {
     if (!customerEmail) return;
 
     const newNote = {
-      id: `cn_kodo_${Date.now().toString().slice(-3)}`,
+      id: `cn_qivropay_${Date.now().toString().slice(-3)}`,
       originalInvoiceId: invoiceId,
       customerEmail,
       taxId,
@@ -100,7 +100,7 @@ export const CreditNotesTab: React.FC = () => {
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">MoR Legal Status</div>
           <div className="text-2xl font-bold font-mono text-emerald-700">Audit-Ready</div>
-          <div className="text-[11px] text-purple-700 font-mono">PDFs archived in KODO vault</div>
+          <div className="text-[11px] text-purple-700 font-mono">PDFs archived in QIVROPAY vault</div>
         </div>
       </div>
 

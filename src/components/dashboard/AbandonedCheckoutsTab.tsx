@@ -17,7 +17,7 @@ import confetti from 'canvas-confetti';
 export const AbandonedCheckoutsTab: React.FC = () => {
   const [abandonedList, setAbandonedList] = useState([
     {
-      id: 'abn_kodo_01',
+      id: 'abn_qivropay_01',
       customerEmail: 'marcus.vance@axonlabs.io',
       productName: 'Pro Intelligence SaaS',
       amount: 99.00,
@@ -28,7 +28,7 @@ export const AbandonedCheckoutsTab: React.FC = () => {
       discountOffered: 15
     },
     {
-      id: 'abn_kodo_02',
+      id: 'abn_qivropay_02',
       customerEmail: 'charlotte@creativespark.design',
       productName: 'AI Token Starter Pack',
       amount: 29.00,
@@ -39,7 +39,7 @@ export const AbandonedCheckoutsTab: React.FC = () => {
       discountOffered: 15
     },
     {
-      id: 'abn_kodo_03',
+      id: 'abn_qivropay_03',
       customerEmail: 'dev.lead@robomind.ai',
       productName: 'Self-Hosted Agent Runtime',
       amount: 499.00,

@@ -16,7 +16,7 @@ import confetti from 'canvas-confetti';
 export const DisputeRebuttalTab: React.FC = () => {
   const [rebuttals, setRebuttals] = useState([
     {
-      id: 'reb_kodo_781',
+      id: 'reb_qivropay_781',
       disputeId: 'disp_001_fraudulent',
       amount: '$499.00 USD',
       reason: 'Fraudulent Transaction (Claimed Unauthorized)',

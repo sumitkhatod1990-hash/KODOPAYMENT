@@ -16,7 +16,7 @@ export const BBPSInvoicingTab: React.FC = () => {
   const [bills, setBills] = useState([
     {
       id: 'bbps_bill_9921',
-      consumerNumber: 'KODO-SaaS-90812',
+      consumerNumber: 'QIVROPAY-SaaS-90812',
       billerCategory: 'SaaS & IT Cloud Subscriptions',
       customerName: 'Vikram Mehra',
       billAmount: '₹4,999.00 INR',

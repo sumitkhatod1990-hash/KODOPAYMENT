@@ -142,7 +142,7 @@ export const ProductsTab: React.FC = () => {
                 )}
                 {product.type === 'subscription' && (
                   <div className="text-xs text-purple-700 font-semibold mt-0.5">
-                    🔄 Renews monthly via KODO MoR
+                    🔄 Renews monthly via QIVROPAY MoR
                   </div>
                 )}
               </div>

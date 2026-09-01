@@ -1,4 +1,4 @@
-# Multi-Stage Production Dockerfile for KODO Payments (India MoR)
+# Multi-Stage Production Dockerfile for QIVROPAY Payments (India MoR)
 
 # Stage 1: Build Frontend Assets
 FROM node:20-alpine AS builder

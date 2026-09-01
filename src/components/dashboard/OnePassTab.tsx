@@ -17,7 +17,7 @@ export const OnePassTab: React.FC = () => {
     totalRegisteredShoppers: '14,280,000+',
     networkConversionUplift: '+31.4%',
     avgCheckoutTime: '0.84s (FaceID Passkey)',
-    activeKodoMerchants: 5420
+    activeQivroPayMerchants: 5420
   });
 
   const [testedPasskey, setTestedPasskey] = useState(false);
@@ -36,10 +36,10 @@ export const OnePassTab: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-[#0A0D14] font-heading flex items-center gap-2">
             <Fingerprint className="w-6 h-6 text-[#0055FF]" />
-            <span>KODO One-Pass: 1-Click Universal Biometric Checkout</span>
+            <span>QIVROPAY One-Pass: 1-Click Universal Biometric Checkout</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
-            Universal passkey network enabling 14M+ verified buyers across the entire KODO merchant ecosystem to checkout in under 1 second with TouchID and FaceID biometrics.
+            Universal passkey network enabling 14M+ verified buyers across the entire QIVROPAY merchant ecosystem to checkout in under 1 second with TouchID and FaceID biometrics.
           </p>
         </div>
 
@@ -58,7 +58,7 @@ export const OnePassTab: React.FC = () => {
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Universal Verified Shopper Network</div>
           <div className="text-2xl font-bold font-mono text-emerald-700">{stats.totalRegisteredShoppers}</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" /> Across {stats.activeKodoMerchants.toLocaleString()} KODO merchants
+            <CheckCircle2 className="w-3 h-3" /> Across {stats.activeQivroPayMerchants.toLocaleString()} QIVROPAY merchants
           </div>
         </div>
 
@@ -98,7 +98,7 @@ export const OnePassTab: React.FC = () => {
           </div>
           <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 space-y-1">
             <span className="text-emerald-800 font-bold">Network Effect:</span>
-            <div className="font-bold text-emerald-700 text-sm">Recognized on Any KODO Site</div>
+            <div className="font-bold text-emerald-700 text-sm">Recognized on Any QIVROPAY Site</div>
           </div>
         </div>
       </div>

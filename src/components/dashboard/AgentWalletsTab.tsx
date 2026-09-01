@@ -160,9 +160,9 @@ export const AgentWalletsTab: React.FC = () => {
           <h3 className="font-bold text-[#0A0D14] text-sm">How AI Agents Programmatically Incur Balance in Python</h3>
         </div>
         <pre className="p-4 rounded-2xl bg-[#0A0D14] text-emerald-300 font-mono text-xs overflow-x-auto">
-{`from kodo import KodoAgentWallet
+{`from qivropay import QivroPayAgentWallet
 
-wallet = KodoAgentWallet(api_key="kodo_live_...", wallet_id="wallet_agent_01")
+wallet = QivroPayAgentWallet(api_key="qivropay_live_...", wallet_id="wallet_agent_01")
 
 # Deduct fractional micro-cents after completing LLM inference task
 wallet.deduct_compute(

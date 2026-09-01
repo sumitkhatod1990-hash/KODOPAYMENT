@@ -12,7 +12,7 @@ export const UsageMetersTab: React.FC = () => {
   const handleSimulate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSimulating(true);
-    await trackMeterEvent(selectedMeter, eventUnits, 'cus_kodo_simulated');
+    await trackMeterEvent(selectedMeter, eventUnits, 'cus_qivropay_simulated');
     setIsSimulating(false);
     setSimulatedSuccess(true);
     setTimeout(() => setSimulatedSuccess(false), 2500);
@@ -81,7 +81,7 @@ export const UsageMetersTab: React.FC = () => {
               Live Ingestion Stream Simulator
             </h3>
             <p className="text-xs text-[#86868b]">
-              Test sending real-time consumption events to KODO usage meter aggregator.
+              Test sending real-time consumption events to QIVROPAY usage meter aggregator.
             </p>
           </div>
         </div>

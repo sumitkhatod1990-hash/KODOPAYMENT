@@ -2,10 +2,10 @@ import { jsPDF } from 'jspdf';
 import { Transaction } from '../types';
 
 /** Generate and download a real PDF invoice without relying on a popup/print dialog. */
-export function printOrDownloadInvoice(tx: Transaction, businessName = 'KODO AI Technologies Inc.') {
+export function printOrDownloadInvoice(tx: Transaction, businessName = 'QIVROPAY AI Technologies Inc.') {
   const amount = Number(tx.amount || 0);
   const transactionId = String(tx.id || `qv_${Date.now()}`);
-  const invoiceNumber = `INV-${transactionId.replace('tx_kodo_', '').toUpperCase()}`;
+  const invoiceNumber = `INV-${transactionId.replace('tx_qivropay_', '').toUpperCase()}`;
   const date = new Date(tx.createdAt || Date.now()).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
   const paymentRail = String(tx.paymentMethod || 'UPI').replace('_', ' ').toUpperCase();
   const customer = tx.customerName || 'Customer';

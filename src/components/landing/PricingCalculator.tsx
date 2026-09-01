@@ -9,9 +9,9 @@ export const PricingCalculator: React.FC = () => {
 
   const totalTransactions = Math.max(1, Math.round(monthlyVolume / avgOrderValue));
   
-  // KODO: 4% + $0.40
-  const kodoFee = (monthlyVolume * 0.04) + (totalTransactions * 0.40);
-  const kodoNet = monthlyVolume - kodoFee;
+  // QIVROPAY: 4% + $0.40
+  const qivropayFee = (monthlyVolume * 0.04) + (totalTransactions * 0.40);
+  const qivropayNet = monthlyVolume - qivropayFee;
 
   // LemonSqueezy: 5% + $0.50
   const lsFee = (monthlyVolume * 0.05) + (totalTransactions * 0.50);
@@ -21,7 +21,7 @@ export const PricingCalculator: React.FC = () => {
   const stripeStackFee = (monthlyVolume * (0.029 + 0.007 + 0.005 + 0.015)) + (totalTransactions * 0.30) + 250;
   const stripeNet = monthlyVolume - stripeStackFee;
 
-  const savingsVsLS = Math.max(0, lsFee - kodoFee);
+  const savingsVsLS = Math.max(0, lsFee - qivropayFee);
 
   return (
     <section className="py-24 md:py-36 bg-white border-t border-black/5">
@@ -33,7 +33,7 @@ export const PricingCalculator: React.FC = () => {
             Transparent Economics
           </div>
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#1d1d1f] tracking-tight">
-            Calculate your net earnings with KODO.
+            Calculate your net earnings with QIVROPAY.
           </h2>
           <p className="text-base sm:text-lg text-[#6e6e73] max-w-2xl mx-auto">
             No monthly subscription fees, no minimums, no surprise charges. Just simple 4% + 40¢ per transaction.
@@ -99,7 +99,7 @@ export const PricingCalculator: React.FC = () => {
           {/* 3-Column Result Tier */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            {/* KODO (White Hero) */}
+            {/* QIVROPAY (White Hero) */}
             <div className="p-8 rounded-3xl bg-white border-2 border-[#0071e3] space-y-6 relative overflow-hidden shadow-md">
               <div className="absolute top-0 right-0 bg-[#0071e3] text-white font-mono font-bold text-[10px] uppercase px-4 py-1 rounded-bl-2xl">
                 Highest Take-Home
@@ -107,10 +107,10 @@ export const PricingCalculator: React.FC = () => {
 
               <div>
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#0071e3]">
-                  KODO Payments
+                  QIVROPAY Payments
                 </span>
                 <div className="text-3xl sm:text-4xl font-black text-[#1d1d1f] font-mono mt-1">
-                  ${Math.round(kodoNet).toLocaleString()}
+                  ${Math.round(qivropayNet).toLocaleString()}
                 </div>
                 <div className="text-xs text-[#86868b] font-medium mt-0.5">Net Monthly Payout</div>
               </div>
@@ -118,7 +118,7 @@ export const PricingCalculator: React.FC = () => {
               <div className="space-y-3 text-xs border-t border-black/5 pt-4 text-[#6e6e73] font-mono">
                 <div className="flex justify-between">
                   <span>Platform Fee (4% + 40¢):</span>
-                  <span className="text-[#1d1d1f] font-bold">${Math.round(kodoFee).toLocaleString()}</span>
+                  <span className="text-[#1d1d1f] font-bold">${Math.round(qivropayFee).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Merchant of Record:</span>
@@ -149,7 +149,7 @@ export const PricingCalculator: React.FC = () => {
                   <span className="text-[#1d1d1f]">${Math.round(lsFee).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-amber-600">
-                  <span>Extra Cost vs KODO:</span>
+                  <span>Extra Cost vs QIVROPAY:</span>
                   <span className="font-bold">+${Math.round(savingsVsLS).toLocaleString()}/mo</span>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export const PricingCalculator: React.FC = () => {
           <div className="pt-6 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3 text-sm text-[#1d1d1f]">
               <Sparkles className="w-5 h-5 text-[#0071e3]" />
-              <span>You save <strong>${Math.round(savingsVsLS * 12).toLocaleString()} every year</strong> with KODO.</span>
+              <span>You save <strong>${Math.round(savingsVsLS * 12).toLocaleString()} every year</strong> with QIVROPAY.</span>
             </div>
 
             <button

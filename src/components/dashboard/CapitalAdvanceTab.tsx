@@ -96,7 +96,7 @@ export const CapitalAdvanceTab: React.FC = () => {
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Credit Check Requirement</div>
           <div className="text-2xl font-bold font-mono text-[#0A0D14]">Zero Credit Checks</div>
-          <div className="text-[11px] text-purple-700 font-mono">100% based on KODO MRR telemetry</div>
+          <div className="text-[11px] text-purple-700 font-mono">100% based on QIVROPAY MRR telemetry</div>
         </div>
       </div>
 

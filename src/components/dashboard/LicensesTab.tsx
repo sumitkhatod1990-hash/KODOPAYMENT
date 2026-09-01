@@ -7,7 +7,7 @@ export const LicensesTab: React.FC = () => {
   const { licenses, generateLicense, revokeLicense, products } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [productName, setProductName] = useState('KODO Desktop Agent Pro License');
+  const [productName, setProductName] = useState('QIVROPAY Desktop Agent Pro License');
   const [customerEmail, setCustomerEmail] = useState('');
   const [maxActivations, setMaxActivations] = useState(3);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);

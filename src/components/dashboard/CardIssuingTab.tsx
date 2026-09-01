@@ -18,7 +18,7 @@ import confetti from 'canvas-confetti';
 export const CardIssuingTab: React.FC = () => {
   const [cards, setCards] = useState([
     {
-      id: 'crd_kodo_001',
+      id: 'crd_qivropay_001',
       cardholderName: 'Autonomous AI Agent #04',
       last4: '8841',
       exp: '08/29',
@@ -29,7 +29,7 @@ export const CardIssuingTab: React.FC = () => {
       type: 'virtual'
     },
     {
-      id: 'crd_kodo_002',
+      id: 'crd_qivropay_002',
       cardholderName: 'DevOps Cluster Infra',
       last4: '4291',
       exp: '11/28',
@@ -51,7 +51,7 @@ export const CardIssuingTab: React.FC = () => {
     if (!cardholderName) return;
 
     const newCard = {
-      id: `crd_kodo_${Date.now().toString().slice(-3)}`,
+      id: `crd_qivropay_${Date.now().toString().slice(-3)}`,
       cardholderName,
       last4: Math.floor(1000 + Math.random() * 9000).toString(),
       exp: '12/29',
@@ -132,7 +132,7 @@ export const CardIssuingTab: React.FC = () => {
           >
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-[10px] font-mono tracking-widest uppercase opacity-75">KODO COMMERCIAL</span>
+                <span className="text-[10px] font-mono tracking-widest uppercase opacity-75">QIVROPAY COMMERCIAL</span>
                 <h4 className="text-base font-bold font-heading pt-1">{card.cardholderName}</h4>
               </div>
               <span className="text-xs font-mono font-bold px-2 py-1 rounded-lg bg-white/10 text-white">

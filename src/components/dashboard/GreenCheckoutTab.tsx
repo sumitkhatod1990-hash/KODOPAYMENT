@@ -78,7 +78,7 @@ export const GreenCheckoutTab: React.FC = () => {
         <div className="flex justify-between items-center pb-4 border-b border-black/5">
           <h3 className="font-bold text-base text-[#0A0D14] font-heading flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-[#0055FF]" />
-            <span>&lt;kodo-checkout&gt; Green Badge Integration Preview</span>
+            <span>&lt;qivropay-checkout&gt; Green Badge Integration Preview</span>
           </h3>
           <button
             onClick={handleToggleGreen}
@@ -96,7 +96,7 @@ export const GreenCheckoutTab: React.FC = () => {
               🌿
             </div>
             <div>
-              <div className="text-sm font-bold text-emerald-950 font-heading">Climate Positive Checkout Powered by KODO</div>
+              <div className="text-sm font-bold text-emerald-950 font-heading">Climate Positive Checkout Powered by QIVROPAY</div>
               <div className="text-xs text-emerald-800">1.0% of this purchase goes directly towards permanent carbon removal via Frontier.</div>
             </div>
           </div>

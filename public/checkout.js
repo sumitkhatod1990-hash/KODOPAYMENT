@@ -1,18 +1,18 @@
 /**
- * KODO Payments — Embeddable JavaScript SDK
+ * QIVROPAY Payments — Embeddable JavaScript SDK
  * Usage:
- *   <script src="https://js.kodo.io/v1/checkout.js"></script>
- *   Kodo.openCheckout({ sessionId: 'cs_kodo_...' });
+ *   <script src="https://js.qivropay.io/v1/checkout.js"></script>
+ *   QivroPay.openCheckout({ sessionId: 'cs_qivropay_...' });
  */
 (function (window) {
-  const Kodo = {
+  const QivroPay = {
     openCheckout: function (options) {
       const sessionId = options.sessionId || 'demo_session';
       const checkoutUrl = (options.origin || window.location.origin) + '/checkout/' + sessionId;
 
       // Create modal iframe
       const overlay = document.createElement('div');
-      overlay.id = 'kodo-checkout-overlay';
+      overlay.id = 'qivropay-checkout-overlay';
       overlay.style.position = 'fixed';
       overlay.style.top = '0';
       overlay.style.left = '0';
@@ -46,5 +46,5 @@
     }
   };
 
-  window.Kodo = Kodo;
+  window.QivroPay = QivroPay;
 })(window);

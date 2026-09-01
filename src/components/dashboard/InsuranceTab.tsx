@@ -16,8 +16,8 @@ export const InsuranceTab: React.FC = () => {
   const [policyActive, setPolicyActive] = useState(true);
 
   const policy = {
-    policyNumber: 'POL-KODO-LLOYDS-99482',
-    underwriter: 'Lloyds & KODO Risk Syndication LLC',
+    policyNumber: 'POL-QIVROPAY-LLOYDS-99482',
+    underwriter: 'Lloyds & QIVROPAY Risk Syndication LLC',
     coverageLimit: '$2,500,000.00 USD',
     status: 'active',
     reimbursementRate: '100% Guaranteed Reimbursement',
@@ -67,7 +67,7 @@ export const InsuranceTab: React.FC = () => {
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Merchant Fraud Liability</div>
           <div className="text-2xl font-bold font-mono text-[#0055FF]">0.00% Zero Liability</div>
-          <div className="text-[11px] text-[#8C90A0] font-mono">100% covered by KODO MoR</div>
+          <div className="text-[11px] text-[#8C90A0] font-mono">100% covered by QIVROPAY MoR</div>
         </div>
 
         <div className="opp-card p-6 space-y-2">

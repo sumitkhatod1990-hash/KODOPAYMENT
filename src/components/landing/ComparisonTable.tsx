@@ -3,14 +3,14 @@ import { Check, X } from 'lucide-react';
 
 export const ComparisonTable: React.FC = () => {
   const comparisonRows = [
-    { feature: "Built-in Merchant of Record (MoR)", kodo: true, stripe: false, ls: true, paddle: true },
-    { feature: "Global Tax, VAT & GST Auto-Remittance", kodo: true, stripe: "Requires Stripe Tax ($)", ls: true, paddle: true },
-    { feature: "Native AI Credit & Token Metering", kodo: true, stripe: false, ls: false, paddle: false },
-    { feature: "Transparent Pricing (Zero Fixed Fees)", kodo: "4% + 40¢", stripe: "2.9% + 30¢ + Addons", ls: "5% + 50¢", paddle: "5% + 50¢" },
-    { feature: "Purchasing Power Parity (PPP)", kodo: true, stripe: false, ls: false, paddle: false },
-    { feature: "Instant Apple Pay & UPI Checkout", kodo: true, stripe: true, ls: true, paddle: true },
-    { feature: "Digital License Key Engine", kodo: true, stripe: false, ls: true, paddle: false },
-    { feature: "Same-Day Merchant Verification", kodo: true, stripe: true, ls: "Weeks Delay", paddle: "Slow" },
+    { feature: "Built-in Merchant of Record (MoR)", qivropay: true, stripe: false, ls: true, paddle: true },
+    { feature: "Global Tax, VAT & GST Auto-Remittance", qivropay: true, stripe: "Requires Stripe Tax ($)", ls: true, paddle: true },
+    { feature: "Native AI Credit & Token Metering", qivropay: true, stripe: false, ls: false, paddle: false },
+    { feature: "Transparent Pricing (Zero Fixed Fees)", qivropay: "4% + 40¢", stripe: "2.9% + 30¢ + Addons", ls: "5% + 50¢", paddle: "5% + 50¢" },
+    { feature: "Purchasing Power Parity (PPP)", qivropay: true, stripe: false, ls: false, paddle: false },
+    { feature: "Instant Apple Pay & UPI Checkout", qivropay: true, stripe: true, ls: true, paddle: true },
+    { feature: "Digital License Key Engine", qivropay: true, stripe: false, ls: true, paddle: false },
+    { feature: "Same-Day Merchant Verification", qivropay: true, stripe: true, ls: "Weeks Delay", paddle: "Slow" },
   ];
 
   return (
@@ -23,7 +23,7 @@ export const ComparisonTable: React.FC = () => {
             Feature Matrix
           </div>
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#1d1d1f] tracking-tight">
-            How KODO compares.
+            How QIVROPAY compares.
           </h2>
           <p className="text-base sm:text-lg text-[#6e6e73] max-w-2xl mx-auto">
             Engineered from the ground up for modern AI agents and global SaaS founders.
@@ -37,7 +37,7 @@ export const ComparisonTable: React.FC = () => {
               <tr className="border-b border-black/10 bg-[#fafafc] font-mono text-xs uppercase">
                 <th className="p-5 text-[#1d1d1f] font-bold">Feature</th>
                 <th className="p-5 text-[#0071e3] font-black bg-blue-50/60 border-x border-blue-100">
-                  ⚡ KODO Payments
+                  ⚡ QIVROPAY Payments
                 </th>
                 <th className="p-5 text-[#86868b]">Stripe Stack</th>
                 <th className="p-5 text-[#86868b]">LemonSqueezy</th>
@@ -51,14 +51,14 @@ export const ComparisonTable: React.FC = () => {
                     {row.feature}
                   </td>
                   
-                  {/* KODO Column */}
+                  {/* QIVROPAY Column */}
                   <td className="p-5 font-bold text-[#1d1d1f] bg-blue-50/30 border-x border-blue-100">
-                    {typeof row.kodo === 'boolean' ? (
+                    {typeof row.qivropay === 'boolean' ? (
                       <span className="flex items-center gap-2 text-[#0071e3]">
                         <Check className="w-4 h-4" /> Yes
                       </span>
                     ) : (
-                      <span className="font-mono text-[#0071e3]">{row.kodo}</span>
+                      <span className="font-mono text-[#0071e3]">{row.qivropay}</span>
                     )}
                   </td>
 

@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  kodo-payments:
+  qivropay-payments:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: kodo-payments-app
+    container_name: qivropay-payments-app
     restart: always
     ports:
       - "4000:4000"
@@ -15,7 +15,7 @@ services:
       - CASHFREE_APP_ID=${CASHFREE_APP_ID:-TEST110559449949df01b9dff3b901f544955011}
       - CASHFREE_SECRET_KEY=${CASHFREE_SECRET_KEY}
       - CASHFREE_ENV=${CASHFREE_ENV:-TEST}
-      - KODO_WEBHOOK_SECRET=${KODO_WEBHOOK_SECRET:-whsec_kodo_prod_991820}
+      - QIVROPAY_WEBHOOK_SECRET=${QIVROPAY_WEBHOOK_SECRET:-whsec_qivropay_prod_991820}
       - HOSTNAME=0.0.0.0
     volumes:
       - ./server/db.json:/app/server/db.json
@@ -28,4 +28,4 @@ services:
 
 networks:
   default:
-    name: kodo-network
+    name: qivropay-network

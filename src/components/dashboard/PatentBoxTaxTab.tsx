@@ -17,7 +17,7 @@ export const PatentBoxTaxTab: React.FC = () => {
     {
       id: 'ptb_roy_2026_01',
       patentNumber: 'IN-PAT-382901 (Deep Learning Encryption Engine)',
-      patentHolder: 'KODO Labs Technologies India Pvt Ltd',
+      patentHolder: 'QIVROPAY Labs Technologies India Pvt Ltd',
       grossGlobalRoyalty: '₹85,00,000.00 INR',
       statutoryNormalTaxRate: '25.0% Corporate Tax',
       concessionalSec115BBFRate: '10.0% Concessional Patent Box Rate',

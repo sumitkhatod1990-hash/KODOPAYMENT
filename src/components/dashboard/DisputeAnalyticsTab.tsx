@@ -91,7 +91,7 @@ export const DisputeAnalyticsTab: React.FC = () => {
                     </span>
                   </td>
                   <td className="p-4 font-semibold text-[#0055FF]">
-                    ✓ 100% Insulated under KODO MoR
+                    ✓ 100% Insulated under QIVROPAY MoR
                   </td>
                 </tr>
               ))}

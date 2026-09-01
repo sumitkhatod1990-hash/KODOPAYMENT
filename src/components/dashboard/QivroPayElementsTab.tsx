@@ -14,19 +14,19 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export const KodoElementsTab: React.FC = () => {
+export const QivroPayElementsTab: React.FC = () => {
   const [selectedFramework, setSelectedFramework] = useState<'react' | 'vue' | 'html'>('react');
   const [selectedComponent, setSelectedComponent] = useState<'pricing' | 'card' | 'portal'>('pricing');
   const [copiedCode, setCopiedCode] = useState(false);
 
   const snippets = {
     pricing: {
-      react: `import { KodoPricingTable } from '@kodo/elements-react';
+      react: `import { QivroPayPricingTable } from '@qivropay/elements-react';
 
 export default function PricingSection() {
   return (
-    <KodoPricingTable 
-      apiKey="pk_live_kodo_9812..."
+    <QivroPayPricingTable 
+      apiKey="pk_live_qivropay_9812..."
       productId="prod_starter"
       theme="light"
       showPPPBanners={true}
@@ -35,31 +35,31 @@ export default function PricingSection() {
   );
 }`,
       vue: `<script setup>
-import { KodoPricingTable } from '@kodo/elements-vue';
+import { QivroPayPricingTable } from '@qivropay/elements-vue';
 </script>
 
 <template>
-  <KodoPricingTable 
-    apiKey="pk_live_kodo_9812..."
+  <QivroPayPricingTable 
+    apiKey="pk_live_qivropay_9812..."
     productId="prod_starter"
     :showPPPBanners="true"
   />
 </template>`,
-      html: `<!-- KODO Elements HTML Embed -->
-<script src="https://js.kodo.io/v1/elements.js"></script>
-<div id="kodo-pricing-container"></div>
+      html: `<!-- QIVROPAY Elements HTML Embed -->
+<script src="https://js.qivropay.io/v1/elements.js"></script>
+<div id="qivropay-pricing-container"></div>
 <script>
-  KodoElements.renderPricingTable('#kodo-pricing-container', {
-    apiKey: 'pk_live_kodo_9812...',
+  QivroPayElements.renderPricingTable('#qivropay-pricing-container', {
+    apiKey: 'pk_live_qivropay_9812...',
     productId: 'prod_starter'
   });
 </script>`
     },
     card: {
-      react: `import { KodoCardElement, useKodo } from '@kodo/elements-react';
+      react: `import { QivroPayCardElement, useQivroPay } from '@qivropay/elements-react';
 
 export function InlineCheckout() {
-  const { createToken } = useKodo();
+  const { createToken } = useQivroPay();
 
   const handlePay = async () => {
     const { token, error } = await createToken();
@@ -68,47 +68,47 @@ export function InlineCheckout() {
 
   return (
     <form onSubmit={handlePay} className="space-y-4">
-      <KodoCardElement hidePostalCode={false} />
+      <QivroPayCardElement hidePostalCode={false} />
       <button type="submit" className="opp-btn-primary">Pay $49 USD</button>
     </form>
   );
 }`,
       vue: `<script setup>
-import { KodoCardElement } from '@kodo/elements-vue';
+import { QivroPayCardElement } from '@qivropay/elements-vue';
 </script>
 
 <template>
-  <KodoCardElement :hidePostalCode="false" />
+  <QivroPayCardElement :hidePostalCode="false" />
 </template>`,
-      html: `<script src="https://js.kodo.io/v1/elements.js"></script>
-<div id="kodo-card-element"></div>
+      html: `<script src="https://js.qivropay.io/v1/elements.js"></script>
+<div id="qivropay-card-element"></div>
 <script>
-  const card = KodoElements.createCardElement('#kodo-card-element');
+  const card = QivroPayElements.createCardElement('#qivropay-card-element');
 </script>`
     },
     portal: {
-      react: `import { KodoCustomerPortalWidget } from '@kodo/elements-react';
+      react: `import { QivroPayCustomerPortalWidget } from '@qivropay/elements-react';
 
 export function UserSettings() {
   return (
-    <KodoCustomerPortalWidget 
-      customerId="cus_kodo_991"
+    <QivroPayCustomerPortalWidget 
+      customerId="cus_qivropay_991"
       allowCancel={true}
       allowPaymentMethodUpdate={true}
     />
   );
 }`,
       vue: `<script setup>
-import { KodoCustomerPortalWidget } from '@kodo/elements-vue';
+import { QivroPayCustomerPortalWidget } from '@qivropay/elements-vue';
 </script>
 
 <template>
-  <KodoCustomerPortalWidget customerId="cus_kodo_991" />
+  <QivroPayCustomerPortalWidget customerId="cus_qivropay_991" />
 </template>`,
-      html: `<script src="https://js.kodo.io/v1/elements.js"></script>
-<div id="kodo-portal-widget"></div>
+      html: `<script src="https://js.qivropay.io/v1/elements.js"></script>
+<div id="qivropay-portal-widget"></div>
 <script>
-  KodoElements.renderPortal('#kodo-portal-widget', { customerId: 'cus_kodo_991' });
+  QivroPayElements.renderPortal('#qivropay-portal-widget', { customerId: 'cus_qivropay_991' });
 </script>`
     }
   };
@@ -127,7 +127,7 @@ import { KodoCustomerPortalWidget } from '@kodo/elements-vue';
       <div>
         <h2 className="text-2xl font-bold text-[#0A0D14] font-heading flex items-center gap-2">
           <Layers className="w-6 h-6 text-[#0055FF]" />
-          <span>KODO Elements UI Component Library</span>
+          <span>QIVROPAY Elements UI Component Library</span>
         </h2>
         <p className="text-xs sm:text-sm text-[#8C90A0]">
           Drop-in, styled UI components with built-in Apple Pay, 3DS 2.0 fraud defense, and Purchasing Power Parity (PPP) localization.

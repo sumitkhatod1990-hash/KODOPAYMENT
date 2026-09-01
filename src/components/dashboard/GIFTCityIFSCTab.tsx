@@ -16,7 +16,7 @@ export const GIFTCityIFSCTab: React.FC = () => {
   const [settlements, setSettlements] = useState([
     {
       id: 'ifsc_tx_7701',
-      ifscEntity: 'KODO Global FinTech IFSC Unit (GIFT City Gandhinagar)',
+      ifscEntity: 'QIVROPAY Global FinTech IFSC Unit (GIFT City Gandhinagar)',
       ifscaLicenseNo: 'IFSCA/BF/2026/0091',
       settlementCurrency: 'USD ($48,500.00 USD)',
       inrEquivalent: '₹40,49,750.00 INR',

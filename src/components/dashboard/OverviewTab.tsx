@@ -173,7 +173,7 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
               Recent Transactions Feed
             </h3>
             <p className="text-xs text-[#86868b]">
-              Live payments settled via KODO MoR checkout rails
+              Live payments settled via QIVROPAY MoR checkout rails
             </p>
           </div>
 

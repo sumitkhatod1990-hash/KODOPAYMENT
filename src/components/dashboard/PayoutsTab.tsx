@@ -29,14 +29,14 @@ export const PayoutsTab: React.FC = () => {
       t.fee.toFixed(2),
       t.net.toFixed(2),
       t.paymentMethod.toUpperCase(),
-      'KODO Remitted (0% Liability)'
+      'QIVROPAY Remitted (0% Liability)'
     ]);
 
     const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `kodo_reconciliation_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `qivropay_reconciliation_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

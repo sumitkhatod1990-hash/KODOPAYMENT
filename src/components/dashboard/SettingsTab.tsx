@@ -25,10 +25,10 @@ export const SettingsTab: React.FC = () => {
   const { currentBrand, brands, isTestMode, setIsTestMode } = useApp();
 
   // Business Profile
-  const [businessName, setBusinessName] = useState(currentBrand?.name || 'KODO Labs Technologies India Pvt Ltd');
-  const [statementDescriptor, setStatementDescriptor] = useState(currentBrand?.statementDescriptor || 'KODO*PAYMENTS');
-  const [supportEmail, setSupportEmail] = useState(currentBrand?.supportEmail || 'support@kodo.in');
-  const [domain, setDomain] = useState(currentBrand?.domain || 'kodo.in');
+  const [businessName, setBusinessName] = useState(currentBrand?.name || 'QIVROPAY Labs Technologies India Pvt Ltd');
+  const [statementDescriptor, setStatementDescriptor] = useState(currentBrand?.statementDescriptor || 'QIVROPAY*PAYMENTS');
+  const [supportEmail, setSupportEmail] = useState(currentBrand?.supportEmail || 'support@qivropay.in');
+  const [domain, setDomain] = useState(currentBrand?.domain || 'qivropay.in');
   
   // Cashfree PG & Easy Split Settings
   const [cashfreeAppId, setCashfreeAppId] = useState('');
@@ -335,7 +335,7 @@ export const SettingsTab: React.FC = () => {
             <span>Master Merchant of Record (MoR) Reseller Legal Shield Active</span>
           </div>
           <p className="text-xs text-[#6E717D] leading-relaxed">
-            Under KODO's Master Reseller Agreement, KODO Labs Technologies India Pvt Ltd operates as the legal seller of record for sales across all 28 Indian States &amp; 8 UTs, collecting and remitting 18% GST (CGST/SGST/IGST) and 1% Section 194-O TDS. Zero GST registration or compliance liability for software developers.
+            Under QIVROPAY's Master Reseller Agreement, QIVROPAY Labs Technologies India Pvt Ltd operates as the legal seller of record for sales across all 28 Indian States &amp; 8 UTs, collecting and remitting 18% GST (CGST/SGST/IGST) and 1% Section 194-O TDS. Zero GST registration or compliance liability for software developers.
           </p>
         </div>
 

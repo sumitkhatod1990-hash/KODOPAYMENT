@@ -19,8 +19,8 @@ export const DisputesTab: React.FC = () => {
   const { user } = useAuth();
   const [disputesList, setDisputesList] = useState(() => user?.email === 'demo@qivropay.com' ? [
     {
-      id: 'dp_kodo_01',
-      transactionId: 'tx_kodo_9881',
+      id: 'dp_qivropay_01',
+      transactionId: 'tx_qivropay_9881',
       amount: 49.00,
       currency: 'USD',
       reason: 'Fraudulent Claim (Unrecognized Charge)',
@@ -53,7 +53,7 @@ export const DisputesTab: React.FC = () => {
             Automated Chargeback Defense AI & Dispute Shield
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
-            KODO Merchant of Record insulates 100% of chargeback financial liabilities while our AI automatically compiles forensic evidence packages for card networks.
+            QIVROPAY Merchant of Record insulates 100% of chargeback financial liabilities while our AI automatically compiles forensic evidence packages for card networks.
           </p>
         </div>
 
@@ -68,7 +68,7 @@ export const DisputesTab: React.FC = () => {
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Merchant Liability Loss</div>
           <div className="text-2xl font-bold font-mono text-emerald-700">$0.00 USD</div>
-          <div className="text-[11px] text-emerald-600 font-mono">Covered completely by KODO MoR</div>
+          <div className="text-[11px] text-emerald-600 font-mono">Covered completely by QIVROPAY MoR</div>
         </div>
 
         <div className="opp-card p-6 space-y-2">

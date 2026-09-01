@@ -185,7 +185,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       if (anal.success) setAnalytics(anal.analytics);
     } catch (err) {
-      console.error('Error fetching data from KODO API:', err);
+      console.error('Error fetching data from QIVROPAY API:', err);
     } finally {
       setLoading(false);
     }

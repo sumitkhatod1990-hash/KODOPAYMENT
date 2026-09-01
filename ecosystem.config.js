@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'kodo-payments',
+      name: 'qivropay-payments',
       script: 'server/index.js',
       instances: 'max',
       exec_mode: 'cluster',

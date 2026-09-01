@@ -21,7 +21,7 @@ export const ThemeStudioTab: React.FC = () => {
   const [borderRadius, setBorderRadius] = useState<'8px' | '16px' | '24px'>('16px');
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
   const [fontFamily, setFontFamily] = useState('Plus Jakarta Sans');
-  const [customCss, setCustomCss] = useState('/* Custom merchant checkout CSS overrides */\n.kodo-btn-pay {\n  box-shadow: 0 8px 24px rgba(0, 85, 255, 0.25);\n}');
+  const [customCss, setCustomCss] = useState('/* Custom merchant checkout CSS overrides */\n.qivropay-btn-pay {\n  box-shadow: 0 8px 24px rgba(0, 85, 255, 0.25);\n}');
   const [saved, setSaved] = useState(false);
 
   const handleSaveTheme = () => {
@@ -210,7 +210,7 @@ export const ThemeStudioTab: React.FC = () => {
 
               <div className="flex items-center justify-center gap-1 text-[11px] text-[#8C90A0]">
                 <CheckCircle2 className="w-3.5 h-3.5" style={{ color: accentColor }} />
-                <span>Encrypted & Insulated by KODO Merchant of Record</span>
+                <span>Encrypted & Insulated by QIVROPAY Merchant of Record</span>
               </div>
 
             </div>

@@ -10,7 +10,7 @@ export const DeveloperTab: React.FC = () => {
   
   // Webhook Simulator State
   const [selectedEvent, setSelectedEvent] = useState('payment.succeeded');
-  const [targetWebhookUrl, setTargetWebhookUrl] = useState('https://api.yourdomain.com/webhooks/kodo');
+  const [targetWebhookUrl, setTargetWebhookUrl] = useState('https://api.yourdomain.com/webhooks/qivropay');
   const [customAmount, setCustomAmount] = useState(29.00);
   const [customCustomer, setCustomCustomer] = useState('developer@startup.ai');
   const [isDispatching, setIsDispatching] = useState(false);
@@ -83,7 +83,7 @@ export const DeveloperTab: React.FC = () => {
               API Authentication Keys
             </h3>
             <p className="text-xs text-[#86868b]">
-              Include in your HTTP Authorization header: <code>Bearer kodo_live_...</code>
+              Include in your HTTP Authorization header: <code>Bearer qivropay_live_...</code>
             </p>
           </div>
         </div>
@@ -202,7 +202,7 @@ export const DeveloperTab: React.FC = () => {
 
         <div className="flex items-center justify-between pt-2">
           <div className="text-xs font-mono text-[#86868b]">
-            Header: <code>kodo-signature: t=172500...,v1=9f8e7d...</code>
+            Header: <code>qivropay-signature: t=172500...,v1=9f8e7d...</code>
           </div>
           <button
             onClick={handleSimulateWebhook}
@@ -240,9 +240,9 @@ export const DeveloperTab: React.FC = () => {
           <pre className="p-3 rounded-xl bg-white border border-black/5 text-slate-800 font-mono text-[11px] overflow-x-auto">
 {`import crypto from 'crypto';
 
-export function verifyKodoWebhook(req) {
-  const signature = req.headers['kodo-signature'];
-  const expected = crypto.createHmac('sha256', process.env.KODO_WEBHOOK_SECRET)
+export function verifyQivroPayWebhook(req) {
+  const signature = req.headers['qivropay-signature'];
+  const expected = crypto.createHmac('sha256', process.env.QIVROPAY_WEBHOOK_SECRET)
     .update(JSON.stringify(req.body)).digest('hex');
   return signature === expected;
 }`}
@@ -251,13 +251,13 @@ export function verifyKodoWebhook(req) {
 
       </div>
 
-      {/* 3. KODO CLI & Localhost Tunneling Simulator */}
+      {/* 3. QIVROPAY CLI & Localhost Tunneling Simulator */}
       <div className="opp-card p-6 sm:p-8 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Terminal className="w-5 h-5 text-[#0055FF]" />
             <h3 className="font-bold text-base text-[#0A0D14] font-heading">
-              KODO CLI & Localhost Tunneling Daemon
+              QIVROPAY CLI & Localhost Tunneling Daemon
             </h3>
           </div>
           <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-mono text-[10px] font-bold border border-emerald-200">
@@ -275,22 +275,22 @@ export function verifyKodoWebhook(req) {
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
-            <span className="ml-2">bash - kodo listen --forward-to localhost:3000/api/webhook</span>
+            <span className="ml-2">bash - qivropay listen --forward-to localhost:3000/api/webhook</span>
           </div>
 
           <div className="space-y-1.5 leading-relaxed text-[11px]">
-            <div className="text-white/60">$ npm install -g @kodo/cli</div>
-            <div className="text-white/60">$ kodo login --api-key kodo_live_9a7d3...</div>
-            <div className="text-emerald-400 font-bold">&gt; Logged in to KODO Merchant of Record (kodo.io)</div>
-            <div className="text-white/60 pt-2">$ kodo listen --forward-to http://localhost:3000/api/webhooks</div>
+            <div className="text-white/60">$ npm install -g @qivropay/cli</div>
+            <div className="text-white/60">$ qivropay login --api-key qivropay_live_9a7d3...</div>
+            <div className="text-emerald-400 font-bold">&gt; Logged in to QIVROPAY Merchant of Record (qivropay.io)</div>
+            <div className="text-white/60 pt-2">$ qivropay listen --forward-to http://localhost:3000/api/webhooks</div>
             <div className="text-blue-400 font-semibold">&gt; Ready! Forwarding live MoR webhook events to http://localhost:3000/api/webhooks</div>
-            <div className="text-white/40">&gt; Webhook signing secret: whsec_kodo_7719a8bc43d0e9812f (saved to local .env)</div>
+            <div className="text-white/40">&gt; Webhook signing secret: whsec_qivropay_7719a8bc43d0e9812f (saved to local .env)</div>
             
             <div className="pt-2 border-t border-white/10 text-emerald-300">
-              [2026-08-31 04:45:12] 200 OK payment.succeeded (tx_kodo_9881) &rarr; 14ms
+              [2026-08-31 04:45:12] 200 OK payment.succeeded (tx_qivropay_9881) &rarr; 14ms
             </div>
             <div className="text-emerald-300">
-              [2026-08-31 04:45:18] 200 OK subscription.created (sub_kodo_771) &rarr; 8ms
+              [2026-08-31 04:45:18] 200 OK subscription.created (sub_qivropay_771) &rarr; 8ms
             </div>
           </div>
         </div>

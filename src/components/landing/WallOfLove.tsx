@@ -6,21 +6,21 @@ export const WallOfLove: React.FC = () => {
 
   const testimonials = [
     {
-      quote: "Goodbye LemonSqueezy — too many failed payments and endless support delays. Moved over to KODO for our AI agents today. Onboarding took less than a day, and international checkout conversion skyrocketed.",
+      quote: "Goodbye LemonSqueezy — too many failed payments and endless support delays. Moved over to QIVROPAY for our AI agents today. Onboarding took less than a day, and international checkout conversion skyrocketed.",
       name: "Ayush Saxena",
       handle: "@ayushtweetshere",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
       company: "SynthFlow AI"
     },
     {
-      quote: "KODO is the definitive Stripe alternative for AI-first products and solopreneurs. Zero VAT headaches, built-in credit metering, and same-day verification.",
+      quote: "QIVROPAY is the definitive Stripe alternative for AI-first products and solopreneurs. Zero VAT headaches, built-in credit metering, and same-day verification.",
       name: "Sarah Miller",
       handle: "@sarahm_dev",
       avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80",
       company: "AgentCraft.io"
     },
     {
-      quote: "After trying PayPal, manual wires, and complex Stripe tax registrations, we moved everything to KODO Payments. The developer experience is on par with Apple products.",
+      quote: "After trying PayPal, manual wires, and complex Stripe tax registrations, we moved everything to QIVROPAY Payments. The developer experience is on par with Apple products.",
       name: "Praveen Naik",
       handle: "@p_naix",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80",

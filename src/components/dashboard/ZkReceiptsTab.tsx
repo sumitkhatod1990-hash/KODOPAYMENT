@@ -16,7 +16,7 @@ import confetti from 'canvas-confetti';
 export const ZkReceiptsTab: React.FC = () => {
   const [receipts, setReceipts] = useState([
     {
-      id: 'zk_kodo_01',
+      id: 'zk_qivropay_01',
       txHash: '0x7f8e3b2a9d1c0e4f',
       zkProof: 'zk-SNARK-BN254:0x49a8d29b01c3e4f7a8b9c0d1e2f3a4b5c6d7e8f9',
       settlementVerified: true,

@@ -17,7 +17,7 @@ import confetti from 'canvas-confetti';
 export const ChurnInterceptorTab: React.FC = () => {
   const [rescuedSubscribers, setRescuedSubscribers] = useState([
     {
-      id: 'res_kodo_01',
+      id: 'res_qivropay_01',
       customerEmail: 'alex.chen@synthflow.ai',
       reason: 'Too expensive for current volume',
       deflectionOffer: '50% Discount for 3 Months',
@@ -26,7 +26,7 @@ export const ChurnInterceptorTab: React.FC = () => {
       status: 'accepted_retained'
     },
     {
-      id: 'res_kodo_02',
+      id: 'res_qivropay_02',
       customerEmail: 'marcus@hypercompute.de',
       reason: 'Temporarily pausing project',
       deflectionOffer: '2-Month Subscription Snooze (Zero Charge)',
@@ -43,7 +43,7 @@ export const ChurnInterceptorTab: React.FC = () => {
     setSimulating(true);
     setTimeout(() => {
       const newRescue = {
-        id: `res_kodo_${Date.now().toString().slice(-4)}`,
+        id: `res_qivropay_${Date.now().toString().slice(-4)}`,
         customerEmail: testEmail,
         reason: 'Feature complexity / underutilized',
         deflectionOffer: 'Switch to Developer Lite Plan ($19/mo) + 1-on-1 Onboarding Call',

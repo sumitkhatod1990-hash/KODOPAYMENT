@@ -57,7 +57,7 @@ export const CustomerBillingPortal: React.FC = () => {
             onClick={() => setCurrentView('landing')}
             className="opp-btn-secondary py-1.5 px-4 text-xs font-semibold"
           >
-            ← Back to KODO
+            ← Back to QIVROPAY
           </button>
         </div>
       </header>
@@ -180,7 +180,7 @@ export const CustomerBillingPortal: React.FC = () => {
                     </div>
                     <div className="text-[11px] text-[#8C90A0] font-mono flex items-center gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Protected by KODO MoR Smart Dunning (0 involuntary churn)</span>
+                      <span>Protected by QIVROPAY MoR Smart Dunning (0 involuntary churn)</span>
                     </div>
                   </div>
 
@@ -263,7 +263,7 @@ export const CustomerBillingPortal: React.FC = () => {
       </main>
 
       <footer className="border-t border-black/[0.06] py-6 text-center text-xs text-[#8C90A0] font-mono">
-        Secured by KODO Payments Inc. • 256-bit SSL • Merchant of Record for Digital Software & AI Services
+        Secured by QIVROPAY Payments Inc. • 256-bit SSL • Merchant of Record for Digital Software & AI Services
       </footer>
 
     </div>

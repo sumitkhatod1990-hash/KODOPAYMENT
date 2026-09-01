@@ -16,7 +16,7 @@ import confetti from 'canvas-confetti';
 export const ContractSignTab: React.FC = () => {
   const [contracts, setContracts] = useState([
     {
-      id: 'cnt_kodo_881',
+      id: 'cnt_qivropay_881',
       title: 'Enterprise Master Services Agreement (MSA) & 99.99% SLA',
       clientName: 'Synthetix Global Corp',
       contractValue: '$120,000.00 / yr',
@@ -38,7 +38,7 @@ export const ContractSignTab: React.FC = () => {
     if (!clientName || !signerEmail) return;
 
     const newCnt = {
-      id: `cnt_kodo_${Date.now().toString().slice(-3)}`,
+      id: `cnt_qivropay_${Date.now().toString().slice(-3)}`,
       title: 'Enterprise Master Services Agreement (MSA) & SLA',
       clientName,
       contractValue,

@@ -17,7 +17,7 @@ export const ONDCGatewayTab: React.FC = () => {
     {
       id: 'ondc_ord_9901',
       buyerApp: 'Paytm Mall (ONDC Network)',
-      catalogItem: 'KODO Pro SaaS 1-Year License Key',
+      catalogItem: 'QIVROPAY Pro SaaS 1-Year License Key',
       orderAmount: '₹4,999.00 INR',
       settlementType: 'Instant RSP Protocol (T+0)',
       networkTxId: 'beckn_tx_881902847190',

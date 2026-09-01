@@ -17,7 +17,7 @@ import confetti from 'canvas-confetti';
 export const MarketplaceConnectTab: React.FC = () => {
   const [vendors, setVendors] = useState([
     {
-      id: 'ven_kodo_01',
+      id: 'ven_qivropay_01',
       name: 'NeuralVoice Plugins Inc.',
       email: 'partners@neuralvoice.ai',
       platformFeePercent: 15,
@@ -28,7 +28,7 @@ export const MarketplaceConnectTab: React.FC = () => {
       payoutMethod: 'US Bank (••••4190)'
     },
     {
-      id: 'ven_kodo_02',
+      id: 'ven_qivropay_02',
       name: 'Autonomous Vision Models LLC',
       email: 'billing@autovision.io',
       platformFeePercent: 10,
@@ -54,7 +54,7 @@ export const MarketplaceConnectTab: React.FC = () => {
     e.preventDefault();
     if (!name || !email) return;
     const newVendor = {
-      id: `ven_kodo_${Date.now()}`,
+      id: `ven_qivropay_${Date.now()}`,
       name,
       email,
       platformFeePercent: Number(feePercent),

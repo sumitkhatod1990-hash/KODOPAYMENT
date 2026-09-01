@@ -27,22 +27,22 @@ export const CashfreeEasySplitTab: React.FC = () => {
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [selectedPreset, setSelectedPreset] = useState<number>(10000);
 
-  const kodoTakeRatePercent = 3.0;
-  const kodoFee = (simAmount * kodoTakeRatePercent) / 100;
-  const gstOnFee = (kodoFee * 18) / 100;
+  const qivropayTakeRatePercent = 3.0;
+  const qivropayFee = (simAmount * qivropayTakeRatePercent) / 100;
+  const gstOnFee = (qivropayFee * 18) / 100;
   const tds194O = (simAmount * 1.0) / 100;
-  const merchantBase = simAmount - kodoFee;
+  const merchantBase = simAmount - qivropayFee;
   const netMerchantBank = merchantBase - tds194O;
 
   const [history, setHistory] = useState([
     {
       id: 'cf_split_99201',
-      orderId: 'order_kodo_in_881920',
+      orderId: 'order_qivropay_in_881920',
       customerName: 'Vikramaditya Singhal (Bangalore)',
       paymentMode: 'UPI (GPay / vpa: vikram@okhdfcbank)',
       grossAmount: '₹10,000.00',
       merchantShare: '₹9,700.00',
-      kodoFee: '₹300.00',
+      qivropayFee: '₹300.00',
       tds194O: '₹100.00',
       netMerchantSettled: '₹9,600.00',
       merchantBankAccount: 'HDFC Bank (A/C **** 4829)',
@@ -51,12 +51,12 @@ export const CashfreeEasySplitTab: React.FC = () => {
     },
     {
       id: 'cf_split_99202',
-      orderId: 'order_kodo_in_881921',
+      orderId: 'order_qivropay_in_881921',
       customerName: 'Pooja Agarwal (Mumbai)',
       paymentMode: 'RuPay Credit Card on UPI',
       grossAmount: '₹25,000.00',
       merchantShare: '₹24,250.00',
-      kodoFee: '₹750.00',
+      qivropayFee: '₹750.00',
       tds194O: '₹250.00',
       netMerchantSettled: '₹24,000.00',
       merchantBankAccount: 'ICICI Bank (A/C **** 9102)',
@@ -103,7 +103,7 @@ export const CashfreeEasySplitTab: React.FC = () => {
             <span>Cashfree Payment Gateway + Easy Split &amp; Instant Bank Settlement</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
-            Autonomous payment orchestration routing Indian Customer checkouts through Cashfree PG, executing real-time Easy Split between Merchant Account &amp; KODO MoR Take-Rate, and dispatching T+0 instant IMPS payouts.
+            Autonomous payment orchestration routing Indian Customer checkouts through Cashfree PG, executing real-time Easy Split between Merchant Account &amp; QIVROPAY MoR Take-Rate, and dispatching T+0 instant IMPS payouts.
           </p>
         </div>
 
@@ -188,7 +188,7 @@ export const CashfreeEasySplitTab: React.FC = () => {
             <ArrowDown className="w-5 h-5 animate-bounce" />
           </div>
 
-          {/* Node 2: KODO Checkout */}
+          {/* Node 2: QIVROPAY Checkout */}
           <div className={`w-full max-w-md p-4 rounded-2xl border transition-all duration-500 flex items-center justify-between ${
             activeStep >= 2 
               ? 'bg-purple-50 border-purple-500 shadow-md scale-102 ring-2 ring-purple-500/20' 
@@ -200,7 +200,7 @@ export const CashfreeEasySplitTab: React.FC = () => {
               </div>
               <div>
                 <div className="text-xs font-mono text-[#8C90A0] uppercase font-bold">Checkout Engine</div>
-                <div className="text-sm font-bold text-[#0A0D14]">⚡ KODO Checkout Modal</div>
+                <div className="text-sm font-bold text-[#0A0D14]">⚡ QIVROPAY Checkout Modal</div>
                 <div className="text-[11px] text-[#6E717D]">Dynamic UPI QR &amp; MoR Invoicing Layer</div>
               </div>
             </div>
@@ -316,7 +316,7 @@ export const CashfreeEasySplitTab: React.FC = () => {
               </div>
             </div>
 
-            {/* Branch B: KODO Platform Fee */}
+            {/* Branch B: QIVROPAY Platform Fee */}
             <div className="space-y-2">
               <div className="flex justify-center text-[#0055FF]">
                 <ArrowDown className="w-5 h-5" />
@@ -329,10 +329,10 @@ export const CashfreeEasySplitTab: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="text-xs font-bold text-[#0A0D14] flex items-center gap-1.5">
                     <Receipt className="w-4 h-4 text-[#0055FF]" />
-                    <span>KODO MoR Fee (3%)</span>
+                    <span>QIVROPAY MoR Fee (3%)</span>
                   </div>
                   <span className="font-mono text-xs font-bold text-[#0055FF]">
-                    ₹{kodoFee.toLocaleString('en-IN')}.00
+                    ₹{qivropayFee.toLocaleString('en-IN')}.00
                   </span>
                 </div>
                 <div className="text-[11px] text-[#6E717D] space-y-0.5 border-t border-black/5 pt-1.5 font-mono">
@@ -342,18 +342,18 @@ export const CashfreeEasySplitTab: React.FC = () => {
                   </div>
                   <div className="flex justify-between font-bold text-[#0A0D14] pt-0.5">
                     <span>Total Platform Yield:</span>
-                    <span className="text-[#0055FF]">₹{(kodoFee + gstOnFee).toLocaleString('en-IN')}.00</span>
+                    <span className="text-[#0055FF]">₹{(qivropayFee + gstOnFee).toLocaleString('en-IN')}.00</span>
                   </div>
                 </div>
 
-                {/* Final Landing: KODO Reserve */}
+                {/* Final Landing: QIVROPAY Reserve */}
                 <div className="pt-2 border-t border-blue-200/60">
                   <div className="p-2.5 rounded-xl bg-white border border-blue-300 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <ShieldCheck className="w-4 h-4 text-[#0055FF]" />
                       <div>
                         <div className="text-[10px] font-mono text-[#8C90A0] uppercase font-bold">MoR Revenue</div>
-                        <div className="text-xs font-bold text-[#0A0D14]">KODO Escrow Reserve</div>
+                        <div className="text-xs font-bold text-[#0A0D14]">QIVROPAY Escrow Reserve</div>
                       </div>
                     </div>
                     <span className="px-2 py-0.5 rounded-full bg-blue-100 text-[#0055FF] font-bold text-[9px]">
@@ -384,13 +384,13 @@ export const CashfreeEasySplitTab: React.FC = () => {
 
         <pre className="p-4 rounded-xl bg-[#0A0D14] text-emerald-400 font-mono text-xs overflow-x-auto leading-relaxed">
 {`{
-  "order_id": "order_kodo_in_881920",
+  "order_id": "order_qivropay_in_881920",
   "order_amount": ${simAmount}.00,
   "order_currency": "INR",
   "split_type": "PERCENTAGE_AND_TDS_WITHHOLDING",
   "transfers": [
     {
-      "vendor_id": "MERCHANT_KODO_IND_0981",
+      "vendor_id": "MERCHANT_QIVROPAY_IND_0981",
       "percentage": 97.0,
       "amount": ${merchantBase}.00,
       "tds_deduction": {
@@ -402,9 +402,9 @@ export const CashfreeEasySplitTab: React.FC = () => {
       "beneficiary_account": "HDFC0000060_4829"
     },
     {
-      "vendor_id": "KODO_PLATFORM_MOR_RESERVE",
+      "vendor_id": "QIVROPAY_PLATFORM_MOR_RESERVE",
       "percentage": 3.0,
-      "amount": ${kodoFee}.00,
+      "amount": ${qivropayFee}.00,
       "tax_invoicing": {
         "sac_code": "998313",
         "gst_rate": 18.0,
@@ -434,7 +434,7 @@ export const CashfreeEasySplitTab: React.FC = () => {
                 <th className="p-4 font-semibold">Order Reference</th>
                 <th className="p-4 font-semibold">Customer &amp; Payment Rail</th>
                 <th className="p-4 font-semibold">Gross Value</th>
-                <th className="p-4 font-semibold">KODO Fee (3%)</th>
+                <th className="p-4 font-semibold">QIVROPAY Fee (3%)</th>
                 <th className="p-4 font-semibold">Merchant Net Bank (IMPS)</th>
                 <th className="p-4 font-semibold">Bank UTR &amp; Status</th>
               </tr>
@@ -454,7 +454,7 @@ export const CashfreeEasySplitTab: React.FC = () => {
                     {h.grossAmount}
                   </td>
                   <td className="p-4 font-mono font-semibold text-[#0055FF]">
-                    {h.kodoFee}
+                    {h.qivropayFee}
                   </td>
                   <td className="p-4">
                     <div className="font-mono font-bold text-emerald-700 text-sm">{h.netMerchantSettled}</div>

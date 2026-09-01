@@ -39,7 +39,7 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
               Merchant of Record Active (220+ Countries)
             </h4>
             <p className="text-xs text-[#86868b]">
-              Global sales tax, EU VAT, dunning, and currency FX automated under KODO's tax nexus. Zero liability.
+              Global sales tax, EU VAT, dunning, and currency FX automated under QIVROPAY's tax nexus. Zero liability.
             </p>
           </div>
         </div>
@@ -227,7 +227,7 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
               Recent Transactions Feed
             </h3>
             <p className="text-xs text-[#86868b]">
-              Live payments settled via KODO MoR checkout rails
+              Live payments settled via QIVROPAY MoR checkout rails
             </p>
           </div>
 

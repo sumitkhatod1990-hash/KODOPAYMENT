@@ -16,24 +16,24 @@ import confetti from 'canvas-confetti';
 export const MultiEntityTab: React.FC = () => {
   const [entities, setEntities] = useState([
     {
-      id: 'ent_kodo_101',
-      name: 'KODO Global Holdings Delaware Inc.',
+      id: 'ent_qivropay_101',
+      name: 'QIVROPAY Global Holdings Delaware Inc.',
       jurisdiction: 'Delaware, United States',
       taxId: 'US-EIN-94-3829104',
       role: 'Parent Global Holding Entity',
       annualVolume: '$4,280,000.00 USD'
     },
     {
-      id: 'ent_kodo_102',
-      name: 'KODO European Operations Ireland Ltd.',
+      id: 'ent_qivropay_102',
+      name: 'QIVROPAY European Operations Ireland Ltd.',
       jurisdiction: 'Dublin, Ireland',
       taxId: 'IE99382104M',
       role: 'EU & UK MoR Operating Subsidiary',
       annualVolume: '€2,490,000.00 EUR'
     },
     {
-      id: 'ent_kodo_103',
-      name: 'KODO Asia-Pacific Pte. Ltd.',
+      id: 'ent_qivropay_103',
+      name: 'QIVROPAY Asia-Pacific Pte. Ltd.',
       jurisdiction: 'Singapore',
       taxId: 'SG202601928K',
       role: 'APAC Regional Gateway Entity',
@@ -52,7 +52,7 @@ export const MultiEntityTab: React.FC = () => {
     if (!name) return;
 
     const newEnt = {
-      id: `ent_kodo_${Date.now().toString().slice(-3)}`,
+      id: `ent_qivropay_${Date.now().toString().slice(-3)}`,
       name,
       jurisdiction,
       taxId: taxId || 'PENDING-TAX-ID',

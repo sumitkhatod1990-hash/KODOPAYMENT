@@ -70,7 +70,7 @@ export const MobilePOSTab: React.FC = () => {
         <div className="lg:col-span-6 opp-card p-6 sm:p-8 space-y-6">
           
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-[#8C90A0]">KODO TERMINAL V4.2</span>
+            <span className="text-xs font-mono font-bold text-[#8C90A0]">QIVROPAY TERMINAL V4.2</span>
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>ONLINE • READY</span>
@@ -146,7 +146,7 @@ export const MobilePOSTab: React.FC = () => {
                   Payment Captured!
                 </h3>
                 <p className="text-xs text-emerald-800 font-mono font-semibold">
-                  ${parseFloat(amountStr || '0').toFixed(2)} USD settled to KODO MoR
+                  ${parseFloat(amountStr || '0').toFixed(2)} USD settled to QIVROPAY MoR
                 </p>
               </div>
               <button
@@ -185,7 +185,7 @@ export const MobilePOSTab: React.FC = () => {
               <div className="p-6 rounded-3xl bg-white border-2 border-black/10 shadow-md max-w-xs mx-auto space-y-3">
                 <div className="w-48 h-48 bg-white mx-auto flex items-center justify-center border-4 border-[#0A0D14] rounded-2xl p-2">
                   <img 
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=kodo_pay_${qrType}_${amountStr}`} 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=qivropay_pay_${qrType}_${amountStr}`} 
                     alt="Dynamic Payment QR Code" 
                     className="w-full h-full object-contain"
                   />

@@ -53,10 +53,10 @@ export const DocsPage: React.FC = () => {
           body: JSON.stringify({ 
             eventType: 'payment.succeeded',
             data: {
-              orderId: 'kodo_ord_99018',
+              orderId: 'qivropay_ord_99018',
               grossAmount: 10000,
               merchantShare: 9600,
-              kodoFee: 300,
+              qivropayFee: 300,
               tdsWithheld194O: 100,
               payoutMode: 'IMPS_T0'
             }
@@ -109,10 +109,10 @@ export const DocsPage: React.FC = () => {
             <div className="p-5 rounded-3xl bg-[#f5f5f7] border border-black/5 space-y-3 text-xs">
               <div className="font-bold text-[#1d1d1f]">SDK Installation</div>
               <div className="p-2.5 rounded-xl bg-white border border-black/5 font-mono text-[11px] text-[#1d1d1f] shadow-sm">
-                npm i @kodo/payments
+                npm i @qivropay/payments
               </div>
               <div className="p-2.5 rounded-xl bg-white border border-black/5 font-mono text-[11px] text-[#1d1d1f] shadow-sm">
-                pip install kodo-payments
+                pip install qivropay-payments
               </div>
             </div>
           </aside>
@@ -133,7 +133,7 @@ export const DocsPage: React.FC = () => {
                 {endpoints.find(e => e.id === selectedEndpoint)?.name}
               </h1>
               <p className="text-xs sm:text-sm text-[#6e6e73] leading-relaxed">
-                Execute authenticated requests with your <code>kodo_live_...</code> or <code>kodo_test_...</code> secret key.
+                Execute authenticated requests with your <code>qivropay_live_...</code> or <code>qivropay_test_...</code> secret key.
               </p>
             </div>
 
@@ -147,8 +147,8 @@ export const DocsPage: React.FC = () => {
               <div className="p-6 text-slate-200 leading-relaxed overflow-x-auto bg-[#090a0c]">
                 {selectedEndpoint === 'create_session' && (
                   <pre className="text-emerald-400">
-{`curl -X POST https://api.kodo.io/v1/payments/create-session \\
-  -H "Authorization: Bearer kodo_live_india_9a7d3c5f8e1b4a20984efc71289" \\
+{`curl -X POST https://api.qivropay.io/v1/payments/create-session \\
+  -H "Authorization: Bearer qivropay_live_india_9a7d3c5f8e1b4a20984efc71289" \\
   -H "Content-Type: application/json" \\
   -d '{
     "title": "Pro SaaS Subscription (Monthly)",
@@ -163,11 +163,11 @@ export const DocsPage: React.FC = () => {
 
                 {selectedEndpoint === 'track_meter' && (
                   <pre className="text-blue-300">
-{`curl -X POST https://api.kodo.io/v1/meters/track \\
-  -H "Authorization: Bearer kodo_live_india_9a7d3c5f8e1b4a20984efc71289" \\
+{`curl -X POST https://api.qivropay.io/v1/meters/track \\
+  -H "Authorization: Bearer qivropay_live_india_9a7d3c5f8e1b4a20984efc71289" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "customerId": "cus_kodo_bangalore_9910",
+    "customerId": "cus_qivropay_bangalore_9910",
     "eventName": "llm_tokens_consumed",
     "units": 25000,
     "ratePerUnitInr": 0.002
@@ -177,8 +177,8 @@ export const DocsPage: React.FC = () => {
 
                 {selectedEndpoint === 'create_product' && (
                   <pre className="text-purple-300">
-{`curl -X POST https://api.kodo.io/v1/products \\
-  -H "Authorization: Bearer kodo_live_india_9a7d3c5f8e1b4a20984efc71289" \\
+{`curl -X POST https://api.qivropay.io/v1/products \\
+  -H "Authorization: Bearer qivropay_live_india_9a7d3c5f8e1b4a20984efc71289" \\
   -H "Content-Type: application/json" \\
   -d '{
     "name": "AI Agents Scale Tier (UPI AutoPay)",
@@ -194,11 +194,11 @@ export const DocsPage: React.FC = () => {
                 {selectedEndpoint === 'webhooks' && (
                   <pre className="text-amber-300">
 {`// Verify Signed Webhooks & Cashfree Easy Split in Node.js
-import { Kodo } from '@kodo/payments';
+import { QivroPay } from '@qivropay/payments';
 
 export async function handleWebhook(req, res) {
-  const signature = req.headers['kodo-signature'];
-  const event = Kodo.webhooks.constructEvent(req.body, signature, process.env.KODO_WEBHOOK_SECRET);
+  const signature = req.headers['qivropay-signature'];
+  const event = QivroPay.webhooks.constructEvent(req.body, signature, process.env.QIVROPAY_WEBHOOK_SECRET);
 
   if (event.type === 'payment.succeeded') {
     console.log('Customer Paid:', event.data.grossAmount);
@@ -230,7 +230,7 @@ export async function handleWebhook(req, res) {
                 <div className="p-4 border-t border-emerald-500/20 bg-emerald-50/50 text-xs font-mono">
                   <div className="flex justify-between text-emerald-900 font-bold mb-2">
                     <span>⚡ Server Response (200 OK):</span>
-                    <span className="text-[10px] text-emerald-700">kodo-core/1.0</span>
+                    <span className="text-[10px] text-emerald-700">qivropay-core/1.0</span>
                   </div>
                   <pre className="text-emerald-900 overflow-x-auto p-3 bg-white rounded-2xl border border-emerald-200">
                     {testResult}

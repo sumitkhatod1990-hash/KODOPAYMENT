@@ -15,20 +15,20 @@ import confetti from 'canvas-confetti';
 
 export const WebComponentTab: React.FC = () => {
   const [copied, setCopied] = useState(false);
-  const [productId, setProductId] = useState('prod_kodo_pro_49');
+  const [productId, setProductId] = useState('prod_qivropay_pro_49');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  const snippet = `<!-- 1. Include the Ultra-Lightweight KODO Web Component Loader (2.4kb) -->
-<script type="module" src="https://js.kodo.io/v1/kodo-checkout.js"></script>
+  const snippet = `<!-- 1. Include the Ultra-Lightweight QIVROPAY Web Component Loader (2.4kb) -->
+<script type="module" src="https://js.qivropay.io/v1/qivropay-checkout.js"></script>
 
 <!-- 2. Drop the Zero-Iframe Shadow DOM Checkout Element Anywhere -->
-<kodo-checkout
+<qivropay-checkout
   product-id="${productId}"
   theme="${theme}"
   currency="USD"
   mor-nexus="true"
   on-success="handlePaymentSuccess"
-></kodo-checkout>
+></qivropay-checkout>
 
 <script>
   function handlePaymentSuccess(event) {
@@ -51,7 +51,7 @@ export const WebComponentTab: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-[#0A0D14] font-heading flex items-center gap-2">
             <Code2 className="w-6 h-6 text-[#0055FF]" />
-            <span>Zero-Iframe Native &lt;kodo-checkout&gt; Web Component</span>
+            <span>Zero-Iframe Native &lt;qivropay-checkout&gt; Web Component</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
             Drop-in Shadow DOM Web Component rendering native Apple Pay, Cards, and BNPL without iframe performance penalties or CSS layout thrashing.

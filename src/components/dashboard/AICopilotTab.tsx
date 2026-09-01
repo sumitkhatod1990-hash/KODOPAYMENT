@@ -67,7 +67,7 @@ export const AICopilotTab: React.FC = () => {
           <span>AI Prompt-to-Checkout Copilot</span>
         </h2>
         <p className="text-xs sm:text-sm text-[#8C90A0]">
-          Describe your pricing model or software product in plain English, and KODO's copilot will provision the product, configure global tax rules, and generate your live checkout link.
+          Describe your pricing model or software product in plain English, and QIVROPAY's copilot will provision the product, configure global tax rules, and generate your live checkout link.
         </p>
       </div>
 

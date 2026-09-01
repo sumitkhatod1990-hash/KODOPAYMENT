@@ -19,7 +19,7 @@ export const ArchitectureFlow: React.FC = () => {
 
   const nodeDetails = {
     checkout: {
-      title: 'Indian Customer & KODO Checkout',
+      title: 'Indian Customer & QIVROPAY Checkout',
       badge: '0.28s Checkout',
       desc: 'Seamless Indian customer checkout supporting UPI (GPay, PhonePe, Paytm, CRED), RuPay on UPI (0% MDR), UPI AutoPay 2.0, NetBanking across 55+ banks, and Corporate Credit Cards.',
       metrics: ['Sub-second load times', 'UPI AutoPay Mandates', 'Dynamic GSTIN Input']
@@ -33,7 +33,7 @@ export const ArchitectureFlow: React.FC = () => {
     tax: {
       title: 'Merchant of Record (MoR) GST Shield',
       badge: '100% Zero Tax Liability',
-      desc: 'KODO acts as the official legal reseller of your digital software. We calculate, collect, and file GST across all 28 Indian States & 8 UTs under KODO\'s GSTIN. Zero tax liability for developers.',
+      desc: 'QIVROPAY acts as the official legal reseller of your digital software. We calculate, collect, and file GST across all 28 Indian States & 8 UTs under QIVROPAY\'s GSTIN. Zero tax liability for developers.',
       metrics: ['Zero GST State Registrations', 'Automated IRN & QR Codes', 'GSTR-1/3B Filings Handled']
     },
     rails: {
@@ -45,7 +45,7 @@ export const ArchitectureFlow: React.FC = () => {
     ledger: {
       title: 'Cashfree Easy Split & MoR Fee',
       badge: 'Transparent 3% Fee',
-      desc: 'Automated split engine: 97.0% merchant share, 3.0% KODO MoR platform fee (+ 18% GST), and statutory 1.0% Section 194-O TDS deduction remitted directly to the Income Tax Department.',
+      desc: 'Automated split engine: 97.0% merchant share, 3.0% QIVROPAY MoR platform fee (+ 18% GST), and statutory 1.0% Section 194-O TDS deduction remitted directly to the Income Tax Department.',
       metrics: ['Section 194-O TDS Remittance', '18% GST Invoicing', 'Instant Split Calculation']
     },
     payout: {
@@ -170,7 +170,7 @@ export const ArchitectureFlow: React.FC = () => {
                   Global Remittance
                 </div>
                 <p className="text-xs text-[#6e6e73] leading-relaxed">
-                  VAT, GST, and US Sales Tax auto-remitted under KODO.
+                  VAT, GST, and US Sales Tax auto-remitted under QIVROPAY.
                 </p>
               </div>
 
@@ -203,7 +203,7 @@ export const ArchitectureFlow: React.FC = () => {
             </div>
           </div>
 
-          {/* Level 3: KODO Ledger Connector */}
+          {/* Level 3: QIVROPAY Ledger Connector */}
           <div className="flex flex-col items-center space-y-2">
             <div className="w-0.5 h-6 bg-black/20" />
             <div 
@@ -218,7 +218,7 @@ export const ArchitectureFlow: React.FC = () => {
                 <Layers className="w-5 h-5 text-[#0071e3]" />
                 <div>
                   <div className="font-bold text-[#1d1d1f] text-xs uppercase tracking-wider">
-                    KODO LEDGER & FEE SEGREGATION
+                    QIVROPAY LEDGER & FEE SEGREGATION
                   </div>
                   <div className="text-[11px] text-emerald-700 font-mono font-bold">
                     Gross Revenue → Deducts (4% + 40¢) + Segregated Tax

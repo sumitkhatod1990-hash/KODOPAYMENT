@@ -1,11 +1,11 @@
 #!/bin/bash
 # ==============================================================================
-# KODO Payments — 1-Click Production Deployment Script for Ubuntu / Debian VPS
+# QIVROPAY Payments — 1-Click Production Deployment Script for Ubuntu / Debian VPS
 # ==============================================================================
 
 set -e
 
-echo "🚀 [1/5] Starting KODO Payments Production Deployment..."
+echo "🚀 [1/5] Starting QIVROPAY Payments Production Deployment..."
 
 # 1. Update system and check Node.js
 if ! command -v node &> /dev/null; then
@@ -33,13 +33,13 @@ fi
 
 # 5. Start or restart PM2 cluster
 echo "🚀 [4/5] Starting application cluster with PM2..."
-pm2 delete kodo-payments 2> /dev/null || true
+pm2 delete qivropay-payments 2> /dev/null || true
 pm2 start ecosystem.config.js
 pm2 save
 
-echo "🎉 [5/5] KODO Payments is now LIVE on port 4000!"
+echo "🎉 [5/5] QIVROPAY Payments is now LIVE on port 4000!"
 echo "--------------------------------------------------------"
 echo "🌐 Local Health Check: http://localhost:4000"
 echo "📊 PM2 Status: pm2 status"
-echo "📜 View Logs: pm2 logs kodo-payments"
+echo "📜 View Logs: pm2 logs qivropay-payments"
 echo "--------------------------------------------------------"

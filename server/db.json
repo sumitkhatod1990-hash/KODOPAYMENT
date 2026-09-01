@@ -9,7 +9,7 @@
       "default": true
     },
     {
-      "id": "brand_kodo_02",
+      "id": "brand_qivropay_02",
       "name": "HyperScale Labs",
       "domain": "hyperscale.ai",
       "statementDescriptor": "HYPERSCALE*API",
@@ -39,7 +39,7 @@
       "createdAt": "2026-08-30T23:18:24.612Z"
     },
     {
-      "id": "prod_kodo_01",
+      "id": "prod_qivropay_01",
       "name": "AI Token Starter Pack",
       "description": "5,000,000 GPT-4o & Claude 3.5 Sonnet tokens with zero rate-limit constraints.",
       "price": 29,
@@ -50,7 +50,7 @@
       "createdAt": "2026-08-20T10:00:00Z"
     },
     {
-      "id": "prod_kodo_02",
+      "id": "prod_qivropay_02",
       "name": "Pro Intelligence SaaS",
       "description": "Monthly subscription with 50M tokens, automated smart dunning, and dedicated GPU priority queue.",
       "price": 99,
@@ -61,7 +61,7 @@
       "createdAt": "2026-08-22T14:30:00Z"
     },
     {
-      "id": "prod_kodo_03",
+      "id": "prod_qivropay_03",
       "name": "Self-Hosted Agent Runtime (Perpetual)",
       "description": "Commercial node license with offline cryptographic key verification.",
       "price": 499,
@@ -74,7 +74,7 @@
   ],
   "transactions": [
     {
-      "id": "tx_kodo_aad396bb",
+      "id": "tx_qivropay_aad396bb",
       "amount": 29,
       "currency": "USD",
       "status": "succeeded",
@@ -89,7 +89,7 @@
       "createdAt": "2026-08-31T07:05:57.459Z"
     },
     {
-      "id": "tx_kodo_9881",
+      "id": "tx_qivropay_9881",
       "amount": 49,
       "currency": "USD",
       "fee": 2.36,
@@ -105,7 +105,7 @@
       "createdAt": "2026-08-30T22:15:00Z"
     },
     {
-      "id": "tx_kodo_9882",
+      "id": "tx_qivropay_9882",
       "amount": 99,
       "currency": "USD",
       "fee": 4.36,
@@ -121,7 +121,7 @@
       "createdAt": "2026-08-30T21:40:00Z"
     },
     {
-      "id": "tx_kodo_9883",
+      "id": "tx_qivropay_9883",
       "amount": 29,
       "currency": "USD",
       "fee": 1.56,
@@ -139,7 +139,7 @@
   ],
   "subscriptions": [
     {
-      "id": "sub_kodo_771",
+      "id": "sub_qivropay_771",
       "customerName": "Alex Chen",
       "customerEmail": "alex.chen@synthflow.ai",
       "planName": "Pro Intelligence SaaS",
@@ -150,7 +150,7 @@
       "cancelAtPeriodEnd": false
     },
     {
-      "id": "sub_kodo_772",
+      "id": "sub_qivropay_772",
       "customerName": "Liam Davies",
       "customerEmail": "liam@autolink.uk",
       "planName": "Pro Intelligence SaaS",
@@ -163,7 +163,7 @@
   ],
   "customers": [
     {
-      "id": "cus_kodo_9910",
+      "id": "cus_qivropay_9910",
       "name": "Alex Chen",
       "email": "alex.chen@synthflow.ai",
       "country": "US",
@@ -174,7 +174,7 @@
       "lastActive": "2026-08-31T07:05:57.459Z"
     },
     {
-      "id": "cus_kodo_9911",
+      "id": "cus_qivropay_9911",
       "name": "Sophia Lindqvist",
       "email": "sophia@nordicai.io",
       "country": "NL",
@@ -196,7 +196,7 @@
   "licenses": [
     {
       "id": "lic_9901",
-      "key": "KODO-8F3A-99B2-C14D-7E82",
+      "key": "QIVROPAY-8F3A-99B2-C14D-7E82",
       "customerEmail": "alex.chen@synthflow.ai",
       "productName": "Self-Hosted Agent Runtime",
       "activations": 1,
@@ -207,7 +207,7 @@
   ],
   "payouts": [
     {
-      "id": "po_kodo_401",
+      "id": "po_qivropay_401",
       "amount": 3480.5,
       "currency": "USD",
       "status": "paid",
@@ -230,8 +230,8 @@
     {
       "id": "key_live_01",
       "name": "Production Server Key",
-      "key": "kodo_live_9a7d3c5f8e1b4a20984efc71289a0b34",
-      "prefix": "kodo_live_",
+      "key": "qivropay_live_9a7d3c5f8e1b4a20984efc71289a0b34",
+      "prefix": "qivropay_live_",
       "environment": "live",
       "createdAt": "2026-08-20T12:00:00Z",
       "lastUsed": "2 mins ago"
@@ -240,12 +240,12 @@
   "webhooks": [
     {
       "id": "wh_01",
-      "url": "https://api.synthflow.ai/webhooks/kodo",
+      "url": "https://api.synthflow.ai/webhooks/qivropay",
       "events": [
         "payment.succeeded",
         "subscription.created"
       ],
-      "secret": "whsec_kodo_7719a8bc43d0e9812f",
+      "secret": "whsec_qivropay_7719a8bc43d0e9812f",
       "active": true,
       "createdAt": "2026-08-20T12:30:00Z"
     }
@@ -314,8 +314,8 @@
   "teamMembers": [
     {
       "id": "team_01",
-      "name": "Alex Kodo (Founder & CEO)",
-      "email": "founder@kodo.io",
+      "name": "Alex QivroPay (Founder & CEO)",
+      "email": "founder@qivropay.io",
       "role": "Owner",
       "status": "active",
       "lastActive": "Just now"
@@ -323,7 +323,7 @@
     {
       "id": "team_02",
       "name": "Devin Lead Architect",
-      "email": "devin@kodo.io",
+      "email": "devin@qivropay.io",
       "role": "Developer",
       "status": "active",
       "lastActive": "15 mins ago"
@@ -331,7 +331,7 @@
     {
       "id": "team_03",
       "name": "Sarah Accounting Lead",
-      "email": "sarah@kodo.io",
+      "email": "sarah@qivropay.io",
       "role": "Accountant",
       "status": "active",
       "lastActive": "2 hours ago"
@@ -341,7 +341,7 @@
     {
       "id": "log_8801",
       "action": "API Key Generated",
-      "user": "founder@kodo.io",
+      "user": "founder@qivropay.io",
       "details": "Generated key_live_01 (Production Server Key)",
       "timestamp": "2026-08-30T22:10:00Z"
     },
@@ -349,7 +349,7 @@
       "id": "log_8802",
       "action": "Webhook Dispatch",
       "user": "System Engine",
-      "details": "Event payment.succeeded dispatched to https://api.synthflow.ai/webhooks/kodo",
+      "details": "Event payment.succeeded dispatched to https://api.synthflow.ai/webhooks/qivropay",
       "timestamp": "2026-08-30T22:15:00Z"
     },
     {
@@ -362,7 +362,7 @@
   ],
   "abandonedCheckouts": [
     {
-      "id": "abn_kodo_01",
+      "id": "abn_qivropay_01",
       "customerEmail": "marcus.vance@axonlabs.io",
       "productName": "Pro Intelligence SaaS",
       "amount": 99,
@@ -373,7 +373,7 @@
       "discountOffered": 15
     },
     {
-      "id": "abn_kodo_02",
+      "id": "abn_qivropay_02",
       "customerEmail": "charlotte@creativespark.design",
       "productName": "AI Token Starter Pack",
       "amount": 29,
@@ -418,7 +418,7 @@
   ],
   "vendors": [
     {
-      "id": "ven_kodo_01",
+      "id": "ven_qivropay_01",
       "name": "NeuralVoice Plugins Inc.",
       "email": "partners@neuralvoice.ai",
       "platformFeePercent": 15,
@@ -429,7 +429,7 @@
       "payoutMethod": "US Bank (••••4190)"
     },
     {
-      "id": "ven_kodo_02",
+      "id": "ven_qivropay_02",
       "name": "Autonomous Vision Models LLC",
       "email": "billing@autovision.io",
       "platformFeePercent": 10,
@@ -463,8 +463,8 @@
     }
   ],
   "sessions": {
-    "cs_kodo_92d441d8e2a1690fbdbf0ba8": {
-      "sessionId": "cs_kodo_92d441d8e2a1690fbdbf0ba8",
+    "cs_qivropay_92d441d8e2a1690fbdbf0ba8": {
+      "sessionId": "cs_qivropay_92d441d8e2a1690fbdbf0ba8",
       "productId": "custom",
       "title": "Custom AI Payment Link",
       "amount": 49,
@@ -477,8 +477,8 @@
   },
   "disputes": [
     {
-      "id": "dp_kodo_01",
-      "transactionId": "tx_kodo_9881",
+      "id": "dp_qivropay_01",
+      "transactionId": "tx_qivropay_9881",
       "amount": 49,
       "currency": "USD",
       "reason": "fraudulent_claim",
@@ -499,7 +499,7 @@
       "terms": "Net 30",
       "status": "sent",
       "dueDate": "2026-09-30",
-      "virtualIban": "US84 KODO 0192 8847 2910 44",
+      "virtualIban": "US84 QIVROPAY 0192 8847 2910 44",
       "items": [
         "Enterprise AI Gateway Dedicated Cluster (Annual License)",
         "Custom SLA & 24/7 Support"
@@ -514,7 +514,7 @@
       "terms": "Net 15",
       "status": "paid",
       "dueDate": "2026-08-25",
-      "virtualIban": "DE89 KODO 0044 0532 0130 99",
+      "virtualIban": "DE89 QIVROPAY 0044 0532 0130 99",
       "items": [
         "Self-Hosted On-Premise GPU Nodes (5 Seats)"
       ]
@@ -522,8 +522,8 @@
   ],
   "giftCards": [
     {
-      "id": "gc_kodo_01",
-      "code": "GIFT-KODO-9812-PRO",
+      "id": "gc_qivropay_01",
+      "code": "GIFT-QIVROPAY-9812-PRO",
       "initialAmount": 100,
       "currentBalance": 71,
       "currency": "USD",
@@ -533,8 +533,8 @@
       "createdAt": "2026-08-28T14:00:00Z"
     },
     {
-      "id": "gc_kodo_02",
-      "code": "GIFT-KODO-4410-VIP",
+      "id": "gc_qivropay_02",
+      "code": "GIFT-QIVROPAY-4410-VIP",
       "initialAmount": 50,
       "currentBalance": 50,
       "currency": "USD",
@@ -590,7 +590,7 @@
       "nexusThreshold": ",000 / 200 txs per state",
       "currentVolume": ",800 / yr",
       "status": "Fully Compliant & Insulated",
-      "taxRateApplied": "State & Local Sales Tax Managed by KODO",
+      "taxRateApplied": "State & Local Sales Tax Managed by QIVROPAY",
       "nexusId": "US-EIN-94-3829104"
     },
     {
@@ -632,10 +632,10 @@
   ],
   "deadLetterQueue": [
     {
-      "id": "dlq_kodo_991",
-      "eventId": "evt_kodo_7718a2",
+      "id": "dlq_qivropay_991",
+      "eventId": "evt_qivropay_7718a2",
       "eventType": "payment.succeeded",
-      "targetUrl": "https://api.synthflow.ai/webhooks/kodo",
+      "targetUrl": "https://api.synthflow.ai/webhooks/qivropay",
       "lastAttempt": "10 mins ago",
       "failureReason": "HTTP 504 Gateway Timeout",
       "retryCount": 3,
@@ -643,8 +643,8 @@
       "status": "quarantined"
     },
     {
-      "id": "dlq_kodo_992",
-      "eventId": "evt_kodo_8819b4",
+      "id": "dlq_qivropay_992",
+      "eventId": "evt_qivropay_8819b4",
       "eventType": "subscription.canceled",
       "targetUrl": "https://api.nordicai.io/billing-events",
       "lastAttempt": "2 hours ago",
@@ -689,7 +689,7 @@
   },
   "taxExemptions": [
     {
-      "id": "exm_kodo_101",
+      "id": "exm_qivropay_101",
       "organizationName": "Mozilla Open Source Foundation",
       "type": "501(c)(3) Non-Profit Charity",
       "certificateNumber": "US-EXM-94-382910",
@@ -699,7 +699,7 @@
       "verifiedAt": "2026-08-15"
     },
     {
-      "id": "exm_kodo_102",
+      "id": "exm_qivropay_102",
       "organizationName": "NextGen Systems Reseller Corp",
       "type": "Wholesale B2B Resale Exemption",
       "certificateNumber": "TX-RESALE-8849102",
@@ -729,7 +729,7 @@
     {
       "id": "notif_03",
       "title": "Chargeback Defense Won",
-      "message": "Dispute dp_kodo_01 won with 100% MoR protection against Visa network.",
+      "message": "Dispute dp_qivropay_01 won with 100% MoR protection against Visa network.",
       "type": "security",
       "read": true,
       "createdAt": "2 hours ago"
@@ -783,8 +783,8 @@
   ],
   "creditNotes": [
     {
-      "id": "cn_kodo_701",
-      "originalInvoiceId": "inv_kodo_9881",
+      "id": "cn_qivropay_701",
+      "originalInvoiceId": "inv_qivropay_9881",
       "customerEmail": "elena.tech@berlin-ai.de",
       "taxId": "DE391029482",
       "amount": 49,
@@ -820,9 +820,9 @@
   ],
   "customDomains": [
     {
-      "id": "dom_kodo_01",
+      "id": "dom_qivropay_01",
       "domain": "billing.synthflow.ai",
-      "targetCname": "custom.kodo.io",
+      "targetCname": "custom.qivropay.io",
       "sslStatus": "issued_active",
       "dnsStatus": "verified",
       "createdAt": "2026-08-25"
@@ -830,24 +830,24 @@
   ],
   "corporateEntities": [
     {
-      "id": "ent_kodo_101",
-      "name": "KODO Global Holdings Delaware Inc.",
+      "id": "ent_qivropay_101",
+      "name": "QIVROPAY Global Holdings Delaware Inc.",
       "jurisdiction": "Delaware, United States",
       "taxId": "US-EIN-94-3829104",
       "role": "Parent Global Holding Entity",
       "annualVolume": ",280,000.00 USD"
     },
     {
-      "id": "ent_kodo_102",
-      "name": "KODO European Operations Ireland Ltd.",
+      "id": "ent_qivropay_102",
+      "name": "QIVROPAY European Operations Ireland Ltd.",
       "jurisdiction": "Dublin, Ireland",
       "taxId": "IE99382104M",
       "role": "EU & UK MoR Operating Subsidiary",
       "annualVolume": "€2,490,000.00 EUR"
     },
     {
-      "id": "ent_kodo_103",
-      "name": "KODO Asia-Pacific Pte. Ltd.",
+      "id": "ent_qivropay_103",
+      "name": "QIVROPAY Asia-Pacific Pte. Ltd.",
       "jurisdiction": "Singapore",
       "taxId": "SG202601928K",
       "role": "APAC Regional Gateway Entity",
@@ -856,7 +856,7 @@
   ],
   "contracts": [
     {
-      "id": "cnt_kodo_881",
+      "id": "cnt_qivropay_881",
       "title": "Enterprise Master Services Agreement (MSA) & 99.99% SLA",
       "clientName": "Synthetix Global Corp",
       "contractValue": ",000.00 / yr",
@@ -868,7 +868,7 @@
   ],
   "issuedCards": [
     {
-      "id": "crd_kodo_001",
+      "id": "crd_qivropay_001",
       "cardholderName": "Autonomous AI Agent #04",
       "last4": "8841",
       "exp": "08/29",
@@ -879,7 +879,7 @@
       "type": "virtual"
     },
     {
-      "id": "crd_kodo_002",
+      "id": "crd_qivropay_002",
       "cardholderName": "DevOps Cluster Infra",
       "last4": "4291",
       "exp": "11/28",
@@ -891,8 +891,8 @@
     }
   ],
   "insurancePolicy": {
-    "policyNumber": "POL-KODO-LLOYDS-99482",
-    "underwriter": "Lloyds & KODO Risk Syndication LLC",
+    "policyNumber": "POL-QIVROPAY-LLOYDS-99482",
+    "underwriter": "Lloyds & QIVROPAY Risk Syndication LLC",
     "coverageLimit": ",500,000.00 USD",
     "status": "active",
     "reimbursementRate": "100% Guaranteed",
@@ -1059,7 +1059,7 @@
   ],
   "zkReceipts": [
     {
-      "id": "zk_kodo_01",
+      "id": "zk_qivropay_01",
       "txHash": "0x7f8e...3b2a",
       "zkProof": "zk-SNARK-BN254:0x49a8d29b01c3e4f7a8b9c0d1e2f3a4b5",
       "settlementVerified": true,
@@ -1102,7 +1102,7 @@
   },
   "disputeRebuttals": [
     {
-      "id": "reb_kodo_781",
+      "id": "reb_qivropay_781",
       "disputeId": "disp_001_fraudulent",
       "amount": ".00 USD",
       "reason": "Fraudulent Transaction (Claimed Unauthorized)",
@@ -1273,7 +1273,7 @@
     "totalRegisteredShoppers": "14,280,000+",
     "networkConversionUplift": "+31.4%",
     "avgCheckoutTime": "0.84s (FaceID Passkey)",
-    "activeKodoMerchants": 5420
+    "activeQivroPayMerchants": 5420
   },
   "slaCredits": [
     {
@@ -1388,7 +1388,7 @@
       "id": "pny_kyc_8819",
       "accountNumber": "•••• •••• 9812",
       "ifsc": "HDFC0000240 (HDFC Bank, Koramangala)",
-      "bankBeneficiaryName": "KODO LABS TECHNOLOGIES INDIA PVT LTD",
+      "bankBeneficiaryName": "QIVROPAY LABS TECHNOLOGIES INDIA PVT LTD",
       "pennyCreditStatus": "₹1.00 Credited via IMPS",
       "nameMatchScore": "100% Exact Match",
       "kycStatus": "verified_active"
@@ -1414,7 +1414,7 @@
   "bbpsInvoices": [
     {
       "id": "bbps_bill_9921",
-      "consumerNumber": "KODO-SaaS-90812",
+      "consumerNumber": "QIVROPAY-SaaS-90812",
       "billerCategory": "SaaS & IT Cloud Subscriptions",
       "customerName": "Vikram Mehra",
       "billAmount": "₹4,999.00 INR",
@@ -1463,7 +1463,7 @@
     {
       "id": "ondc_ord_9901",
       "buyerApp": "Paytm Mall (ONDC Network)",
-      "catalogItem": "KODO Pro SaaS 1-Year License Key",
+      "catalogItem": "QIVROPAY Pro SaaS 1-Year License Key",
       "orderAmount": "₹4,999.00 INR",
       "settlementType": "Instant RSP Protocol (T+0)",
       "networkTxId": "beckn_tx_881902847190",
@@ -1496,7 +1496,7 @@
     {
       "id": "mca_roc_2026_01",
       "companyCin": "U72900KA2024PTC189021",
-      "companyName": "KODO LABS TECHNOLOGIES INDIA PVT LTD",
+      "companyName": "QIVROPAY LABS TECHNOLOGIES INDIA PVT LTD",
       "formType": "AOC-4 (Annual Financial Statements) & MGT-7",
       "directorDin": "DIN 09817263 (DSC Signed)",
       "rocRoStatus": "MCA21 V3 Verified & Filed",
@@ -1575,7 +1575,7 @@
   "giftCitySettlements": [
     {
       "id": "ifsc_tx_7701",
-      "ifscEntity": "KODO Global FinTech IFSC Unit (GIFT City Gandhinagar)",
+      "ifscEntity": "QIVROPAY Global FinTech IFSC Unit (GIFT City Gandhinagar)",
       "ifscaLicenseNo": "IFSCA/BF/2026/0091",
       "settlementCurrency": "USD (,500.00 USD)",
       "inrEquivalent": "₹40,49,750.00 INR",
@@ -1623,7 +1623,7 @@
     {
       "id": "dlt_tmpl_88190",
       "principalEntityId": "PE-110198271629",
-      "headerSenderId": "KODOPY (Transactional)",
+      "headerSenderId": "QIVROPAYPY (Transactional)",
       "templateType": "Transactional Mandate & OTP Alerts",
       "contentHash": "0x88f1a2c891b0...",
       "carrierSync": "Jio, Airtel, Vi, BSNL DLT Verified",
@@ -1669,7 +1669,7 @@
       "invoiceNumber": "INV-2026-B2C-8819",
       "consumerName": "Ananya Deshmukh",
       "invoiceTotal": "₹1,768.82 INR (incl. 18% GST)",
-      "upiIntentPayload": "upi://pay?pa=kodopayments@icici&pn=KodoPayments&am=1768.82&tr=INV8819",
+      "upiIntentPayload": "upi://pay?pa=qivropaypayments@icici&pn=QivroPayPayments&am=1768.82&tr=INV8819",
       "cbicCompliance": "CBIC Notification 14/2020 Compliant Dynamic QR",
       "status": "scanned_and_settled"
     }
@@ -1810,16 +1810,16 @@
   "cashfreeSplitTransactions": [
     {
       "id": "cf_split_99201",
-      "orderId": "order_kodo_in_881920",
+      "orderId": "order_qivropay_in_881920",
       "customerName": "Vikramaditya Singhal (Bangalore)",
       "paymentMode": "UPI (GPay / vpa: vikram@okhdfcbank)",
       "grossAmount": "₹10,000.00 INR",
       "cashfreePgFee": "₹0.00 (RuPay/UPI 0% MDR)",
       "easySplit": {
-        "merchantVendorId": "MERCHANT_KODO_IND_0981",
+        "merchantVendorId": "MERCHANT_QIVROPAY_IND_0981",
         "merchantShare": "₹9,700.00 INR (97.0%)",
-        "kodoPlatformFee": "₹300.00 INR (3.0%)",
-        "gstOnKodoFee": "₹54.00 (18% GST)",
+        "qivropayPlatformFee": "₹300.00 INR (3.0%)",
+        "gstOnQivroPayFee": "₹54.00 (18% GST)",
         "tds194OWithholding": "-₹100.00 (1% TDS deducted to Govt)",
         "netMerchantSettled": "₹9,600.00 INR"
       },
@@ -1830,16 +1830,16 @@
     },
     {
       "id": "cf_split_99202",
-      "orderId": "order_kodo_in_881921",
+      "orderId": "order_qivropay_in_881921",
       "customerName": "Pooja Agarwal (Mumbai)",
       "paymentMode": "RuPay Credit Card on UPI",
       "grossAmount": "₹25,000.00 INR",
       "cashfreePgFee": "₹0.00 (Sub-₹2000 0% MDR / CoFT)",
       "easySplit": {
-        "merchantVendorId": "MERCHANT_KODO_IND_0981",
+        "merchantVendorId": "MERCHANT_QIVROPAY_IND_0981",
         "merchantShare": "₹24,250.00 INR (97.0%)",
-        "kodoPlatformFee": "₹750.00 INR (3.0%)",
-        "gstOnKodoFee": "₹135.00 (18% GST)",
+        "qivropayPlatformFee": "₹750.00 INR (3.0%)",
+        "gstOnQivroPayFee": "₹135.00 (18% GST)",
         "tds194OWithholding": "-₹250.00 (1% TDS deducted to Govt)",
         "netMerchantSettled": "₹24,000.00 INR"
       },
@@ -1919,7 +1919,7 @@
     {
       "id": "ptb_roy_2026_01",
       "patentNumber": "IN-PAT-382901 (Deep Learning Encryption Engine)",
-      "patentHolder": "KODO Labs Technologies India Pvt Ltd",
+      "patentHolder": "QIVROPAY Labs Technologies India Pvt Ltd",
       "grossGlobalRoyalty": "₹85,00,000.00 INR",
       "statutoryNormalTaxRate": "25.0% Corporate Tax",
       "concessionalSec115BBFRate": "10.0% Concessional Patent Box Rate",

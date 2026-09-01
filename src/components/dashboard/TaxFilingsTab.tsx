@@ -78,17 +78,17 @@ export const TaxFilingsTab: React.FC = () => {
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
-          <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Tax Remitted Under KODO MoR</div>
+          <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Tax Remitted Under QIVROPAY MoR</div>
           <div className="text-2xl font-bold font-mono text-emerald-700">$54,350.00 USD</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" /> Segregated in KODO Escrow Trust
+            <CheckCircle2 className="w-3 h-3" /> Segregated in QIVROPAY Escrow Trust
           </div>
         </div>
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Merchant Tax Filing Liability</div>
           <div className="text-2xl font-bold font-mono text-[#0055FF]">0% Zero Filings</div>
-          <div className="text-[11px] text-[#8C90A0] font-mono">KODO files all returns directly</div>
+          <div className="text-[11px] text-[#8C90A0] font-mono">QIVROPAY files all returns directly</div>
         </div>
 
         <div className="opp-card p-6 space-y-2">

@@ -74,7 +74,7 @@ export const VendorTaxFormsTab: React.FC = () => {
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">IRS Penalty Liability</div>
           <div className="text-2xl font-bold font-mono text-[#0A0D14]">$0.00 Liability</div>
-          <div className="text-[11px] text-purple-700 font-mono">100% protected under KODO MoR</div>
+          <div className="text-[11px] text-purple-700 font-mono">100% protected under QIVROPAY MoR</div>
         </div>
       </div>
 

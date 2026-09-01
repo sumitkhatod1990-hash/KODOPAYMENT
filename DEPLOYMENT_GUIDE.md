@@ -1,6 +1,6 @@
-# 🌐 KODO Payments: Production Deployment Guide
+# 🌐 QIVROPAY Payments: Production Deployment Guide
 
-This guide details how to host **KODO Payments (India's Merchant of Record)** on the live internet using your custom domain (e.g. `https://kodopayments.in` or `https://app.kodo.io`).
+This guide details how to host **QIVROPAY Payments (India's Merchant of Record)** on the live internet using your custom domain (e.g. `https://qivropaypayments.in` or `https://app.qivropay.io`).
 
 ---
 
@@ -12,8 +12,8 @@ This guide details how to host **KODO Payments (India's Merchant of Record)** on
 ### 1-Step Deploy:
 ```bash
 # 1. Clone repository on your VPS
-git clone <your-repo-url> kodo-payments
-cd kodo-payments
+git clone <your-repo-url> qivropay-payments
+cd qivropay-payments
 
 # 2. Start container in background
 docker-compose up -d --build
@@ -29,20 +29,20 @@ Your app is now running with automatic restart and health monitoring on port `40
 
 ### Step 1: Run the 1-Click Deployment Script
 ```bash
-cd kodo-payments
+cd qivropay-payments
 ./deploy.sh
 ```
 
 ### Step 2: Configure Nginx & SSL Certificate
 ```bash
 # Copy Nginx configuration
-sudo cp nginx/kodo.conf /etc/nginx/sites-available/kodo.conf
+sudo cp nginx/qivropay.conf /etc/nginx/sites-available/qivropay.conf
 
 # Replace 'yourdomain.com' with your real domain
-sudo sed -i 's/yourdomain.com/app.yourdomain.in/g' /etc/nginx/sites-available/kodo.conf
+sudo sed -i 's/yourdomain.com/app.yourdomain.in/g' /etc/nginx/sites-available/qivropay.conf
 
 # Enable site
-sudo ln -s /etc/nginx/sites-available/kodo.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/qivropay.conf /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 

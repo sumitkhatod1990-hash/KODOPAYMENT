@@ -157,7 +157,7 @@ export const Hero: React.FC = () => {
               }`}>
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-[10px] font-mono uppercase font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md">
-                    KODO MoR LEDGER
+                    QIVROPAY MoR LEDGER
                   </span>
                   <ShieldCheck className="w-4 h-4 text-purple-600" />
                 </div>
@@ -208,7 +208,7 @@ export const Hero: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                 <span className="text-emerald-400 font-bold">LIVE TRANSACTION STREAM:</span>
-                <span className="text-neutral-300 truncate">tx_kodo_9881 • $49.00 USD via Apple Pay • Net $46.64 credited</span>
+                <span className="text-neutral-300 truncate">tx_qivropay_9881 • $49.00 USD via Apple Pay • Net $46.64 credited</span>
               </div>
               <span className="text-[11px] text-neutral-400">Latency: 14ms</span>
             </div>

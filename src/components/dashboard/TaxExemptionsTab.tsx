@@ -16,7 +16,7 @@ import confetti from 'canvas-confetti';
 export const TaxExemptionsTab: React.FC = () => {
   const [exemptions, setExemptions] = useState([
     {
-      id: 'exm_kodo_101',
+      id: 'exm_qivropay_101',
       organizationName: 'Mozilla Open Source Foundation',
       type: '501(c)(3) Non-Profit Charity',
       certificateNumber: 'US-EXM-94-382910',
@@ -26,7 +26,7 @@ export const TaxExemptionsTab: React.FC = () => {
       verifiedAt: 'Aug 15, 2026'
     },
     {
-      id: 'exm_kodo_102',
+      id: 'exm_qivropay_102',
       organizationName: 'NextGen Systems Reseller Corp',
       type: 'Wholesale B2B Resale Exemption',
       certificateNumber: 'TX-RESALE-8849102',
@@ -48,7 +48,7 @@ export const TaxExemptionsTab: React.FC = () => {
     if (!organizationName || !certificateNumber) return;
 
     const newExm = {
-      id: `exm_kodo_${Date.now().toString().slice(-3)}`,
+      id: `exm_qivropay_${Date.now().toString().slice(-3)}`,
       organizationName,
       type,
       certificateNumber,

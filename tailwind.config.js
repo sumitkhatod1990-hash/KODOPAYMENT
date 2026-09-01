@@ -18,7 +18,7 @@ export default {
           100: '#ebfccf',
           200: '#d7f9a2',
           300: '#bff26c',
-          400: '#B3E910', // Dodo / Kodo vibrant electric lime
+          400: '#B3E910', // Dodo / QivroPay vibrant electric lime
           500: '#90cb06',
           600: '#6ea102',
           700: '#547b06',

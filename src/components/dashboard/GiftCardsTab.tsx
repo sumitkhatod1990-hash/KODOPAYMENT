@@ -17,8 +17,8 @@ import confetti from 'canvas-confetti';
 export const GiftCardsTab: React.FC = () => {
   const [giftCards, setGiftCards] = useState([
     {
-      id: 'gc_kodo_01',
-      code: 'GIFT-KODO-9812-PRO',
+      id: 'gc_qivropay_01',
+      code: 'GIFT-QIVROPAY-9812-PRO',
       initialAmount: 100.00,
       currentBalance: 71.00,
       currency: 'USD',
@@ -28,8 +28,8 @@ export const GiftCardsTab: React.FC = () => {
       createdAt: 'Aug 28, 2026'
     },
     {
-      id: 'gc_kodo_02',
-      code: 'GIFT-KODO-4410-VIP',
+      id: 'gc_qivropay_02',
+      code: 'GIFT-QIVROPAY-4410-VIP',
       initialAmount: 50.00,
       currentBalance: 50.00,
       currency: 'USD',
@@ -43,7 +43,7 @@ export const GiftCardsTab: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [amount, setAmount] = useState(50);
   const [recipientEmail, setRecipientEmail] = useState('');
-  const [senderName, setSenderName] = useState('KODO Team');
+  const [senderName, setSenderName] = useState('QIVROPAY Team');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const totalIssued = giftCards.reduce((acc, g) => acc + g.initialAmount, 0);
@@ -54,8 +54,8 @@ export const GiftCardsTab: React.FC = () => {
     if (!recipientEmail || !amount) return;
 
     const newCard = {
-      id: `gc_kodo_${Date.now().toString().slice(-4)}`,
-      code: `GIFT-KODO-${Math.floor(1000 + Math.random() * 9000)}-VIP`,
+      id: `gc_qivropay_${Date.now().toString().slice(-4)}`,
+      code: `GIFT-QIVROPAY-${Math.floor(1000 + Math.random() * 9000)}-VIP`,
       initialAmount: Number(amount),
       currentBalance: Number(amount),
       currency: 'USD',

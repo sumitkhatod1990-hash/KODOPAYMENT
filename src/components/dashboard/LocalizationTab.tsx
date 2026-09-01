@@ -19,42 +19,42 @@ export const LocalizationTab: React.FC = () => {
     en: {
       name: 'English (US)',
       btn: 'Pay $49.00 USD (1-Click Apple Pay)',
-      vatNotice: 'Prices include all applicable sales taxes under KODO Merchant of Record.',
+      vatNotice: 'Prices include all applicable sales taxes under QIVROPAY Merchant of Record.',
       cardPlaceholder: 'Card number • MM / YY • CVC',
       trust: '100% Tax Nexus Insulated'
     },
     de: {
       name: 'Deutsch (Germany & Austria)',
       btn: 'Jetzt 49,00 € bezahlen (1-Klick Apple Pay)',
-      vatNotice: 'Preise inkl. gesetzlicher MwSt. Abgewickelt über KODO als Merchant of Record.',
+      vatNotice: 'Preise inkl. gesetzlicher MwSt. Abgewickelt über QIVROPAY als Merchant of Record.',
       cardPlaceholder: 'Kartennummer • MM / JJ • CVC',
       trust: '100% MwSt.-sicher abgewickelt'
     },
     fr: {
       name: 'Français (France & EU)',
       btn: 'Payer 49,00 € (1-Clic Apple Pay)',
-      vatNotice: 'Prix TTC avec TVA incluse gérée par KODO Merchant of Record.',
+      vatNotice: 'Prix TTC avec TVA incluse gérée par QIVROPAY Merchant of Record.',
       cardPlaceholder: 'Numéro de carte • MM / AA • CVC',
       trust: '100% Conforme TVA UE'
     },
     es: {
       name: 'Español (Spain & LatAm)',
       btn: 'Pagar $49.00 USD (Apple Pay en 1 Clic)',
-      vatNotice: 'Precios con impuestos incluidos bajo KODO Merchant of Record.',
+      vatNotice: 'Precios con impuestos incluidos bajo QIVROPAY Merchant of Record.',
       cardPlaceholder: 'Número de tarjeta • MM / AA • CVC',
       trust: '100% Libre de Responsabilidad Fiscal'
     },
     ja: {
       name: '日本語 (Japan)',
       btn: '¥7,500 を支払う (Apple Pay 1クリック)',
-      vatNotice: '消費税込・KODO Merchant of Recordにより安全に処理されます。',
+      vatNotice: '消費税込・QIVROPAY Merchant of Recordにより安全に処理されます。',
       cardPlaceholder: 'カード番号 • MM / YY • セキュリティコード',
       trust: '100% 税務完全準拠'
     },
     hi: {
       name: 'हिन्दी (India)',
       btn: '₹4,100 का भुगतान करें (UPI / Apple Pay)',
-      vatNotice: 'जीएसटी (GST) सहित मूल्य • KODO द्वारा सुरक्षित रूप से प्रोसेस किया गया।',
+      vatNotice: 'जीएसटी (GST) सहित मूल्य • QIVROPAY द्वारा सुरक्षित रूप से प्रोसेस किया गया।',
       cardPlaceholder: 'कार्ड नंबर • MM / YY • सीवीसी',
       trust: '100% सुरक्षित भुगतान'
     }

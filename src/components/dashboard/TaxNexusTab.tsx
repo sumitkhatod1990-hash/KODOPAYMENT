@@ -29,7 +29,7 @@ export const TaxNexusTab: React.FC = () => {
       nexusThreshold: '$100,000 / 200 txs per state',
       currentVolume: '$142,800 / yr',
       status: 'Fully Compliant & Insulated',
-      taxRateApplied: 'State & Local Sales Tax Managed by KODO',
+      taxRateApplied: 'State & Local Sales Tax Managed by QIVROPAY',
       nexusId: 'US-EIN-94-3829104'
     },
     {
@@ -71,7 +71,7 @@ export const TaxNexusTab: React.FC = () => {
             Global Tax Nexus & Automated VAT/GST World Radar
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
-            KODO acts as your official Merchant of Record: registering, calculating, collecting, and remitting digital goods taxes in 220+ territories with zero liability for your business.
+            QIVROPAY acts as your official Merchant of Record: registering, calculating, collecting, and remitting digital goods taxes in 220+ territories with zero liability for your business.
           </p>
         </div>
 
@@ -87,7 +87,7 @@ export const TaxNexusTab: React.FC = () => {
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Merchant Tax Liability</div>
           <div className="text-2xl font-bold font-mono text-emerald-700">0.00% (Zero Risk)</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" /> Fully remitted under KODO Nexus
+            <CheckCircle2 className="w-3 h-3" /> Fully remitted under QIVROPAY Nexus
           </div>
         </div>
 
@@ -111,7 +111,7 @@ export const TaxNexusTab: React.FC = () => {
             <thead>
               <tr className="border-b border-black/[0.06] bg-[#FAFBFD] text-[#8C90A0] font-mono uppercase text-[10px]">
                 <th className="p-4 font-semibold">Jurisdiction / Region</th>
-                <th className="p-4 font-semibold">KODO Nexus ID</th>
+                <th className="p-4 font-semibold">QIVROPAY Nexus ID</th>
                 <th className="p-4 font-semibold">Economic Threshold</th>
                 <th className="p-4 font-semibold">Your Annual Volume</th>
                 <th className="p-4 font-semibold">Standard Tax Rate</th>

@@ -364,7 +364,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
           <Logo onClick={() => setCurrentView('landing')} />
           <div className="flex items-center gap-2 text-xs font-mono text-[#8C90A0]">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span className="hidden sm:inline">256-bit Encrypted • KODO MoR Global Payment Rails</span>
+            <span className="hidden sm:inline">256-bit Encrypted • QIVROPAY MoR Global Payment Rails</span>
           </div>
         </div>
       </header>
@@ -413,7 +413,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
               </div>
               <div className="flex justify-between">
                 <span className="text-[#8C90A0]">Settled Via:</span>
-                <span className="text-emerald-700 font-bold">KODO MoR (Zero Tax Liability)</span>
+                <span className="text-emerald-700 font-bold">QIVROPAY MoR (Zero Tax Liability)</span>
               </div>
             </div>
 
@@ -437,7 +437,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                 onClick={() => setCurrentView('landing')}
                 className="text-xs text-[#8C90A0] hover:text-[#0A0D14] transition-colors pt-1"
               >
-                ← Back to KODO Home
+                ← Back to QIVROPAY Home
               </button>
             </div>
           </div>
@@ -977,7 +977,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
       )}
 
       <footer className="border-t border-black/[0.06] py-4 text-center text-xs text-[#8C90A0]">
-        Powered by KODO Payments Inc. • Reseller & Merchant of Record for Digital Products across 220+ Territories
+        Powered by QIVROPAY Payments Inc. • Reseller & Merchant of Record for Digital Products across 220+ Territories
       </footer>
 
     </div>

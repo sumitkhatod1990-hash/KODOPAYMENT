@@ -17,7 +17,7 @@ export const TRAIDLTSMSTab: React.FC = () => {
     {
       id: 'dlt_tmpl_88190',
       principalEntityId: 'PE-110198271629',
-      headerSenderId: 'KODOPY (Transactional)',
+      headerSenderId: 'QIVROPAYPY (Transactional)',
       templateType: 'Transactional Mandate & OTP Alerts',
       contentHash: '0x88f1a2c891b0...',
       carrierSync: 'Jio, Airtel, Vi, BSNL DLT Verified',
@@ -64,7 +64,7 @@ export const TRAIDLTSMSTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">DLT Header Sender ID</div>
-          <div className="text-2xl font-bold font-mono text-[#0A0D14]">KODOPY Active</div>
+          <div className="text-2xl font-bold font-mono text-[#0A0D14]">QIVROPAYPY Active</div>
           <div className="text-[11px] text-purple-700 font-mono">Registered on Airtel &amp; Jio DLT</div>
         </div>
       </div>

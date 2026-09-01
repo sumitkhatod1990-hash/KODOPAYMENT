@@ -26,7 +26,7 @@ export const B2BInvoicesTab: React.FC = () => {
       terms: 'Net 30',
       status: 'sent',
       dueDate: '2026-09-30',
-      virtualIban: 'US84 KODO 0192 8847 2910 44',
+      virtualIban: 'US84 QIVROPAY 0192 8847 2910 44',
       items: ['Enterprise AI Gateway Dedicated Cluster (Annual License)', 'Custom SLA & 24/7 Support']
     },
     {
@@ -38,7 +38,7 @@ export const B2BInvoicesTab: React.FC = () => {
       terms: 'Net 15',
       status: 'paid',
       dueDate: '2026-08-25',
-      virtualIban: 'DE89 KODO 0044 0532 0130 99',
+      virtualIban: 'DE89 QIVROPAY 0044 0532 0130 99',
       items: ['Self-Hosted On-Premise GPU Nodes (5 Seats)']
     }
   ]);
@@ -67,7 +67,7 @@ export const B2BInvoicesTab: React.FC = () => {
       terms,
       status: 'sent',
       dueDate: '2026-09-30',
-      virtualIban: `US84 KODO 0192 ${Math.floor(1000 + Math.random() * 9000)} ${Math.floor(1000 + Math.random() * 9000)} 44`,
+      virtualIban: `US84 QIVROPAY 0192 ${Math.floor(1000 + Math.random() * 9000)} ${Math.floor(1000 + Math.random() * 9000)} 44`,
       items: [itemName]
     };
 

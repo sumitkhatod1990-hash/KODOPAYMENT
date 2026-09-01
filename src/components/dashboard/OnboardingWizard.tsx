@@ -23,8 +23,8 @@ export const OnboardingWizard: React.FC<WizardProps> = ({ isOpen, onClose }) => 
   const { createProduct, createCheckoutSession, setCurrentView } = useApp();
   
   const [step, setStep] = useState(1);
-  const [brandName, setBrandName] = useState('KODO AI Technologies Inc.');
-  const [statementDescriptor, setStatementDescriptor] = useState('KODO*AI');
+  const [brandName, setBrandName] = useState('QIVROPAY AI Technologies Inc.');
+  const [statementDescriptor, setStatementDescriptor] = useState('QIVROPAY*AI');
   const [primaryCurrency, setPrimaryCurrency] = useState('USD');
   const [bankAccount, setBankAccount] = useState('Silicon Valley Bank (••••9812)');
   const [productTitle, setProductTitle] = useState('AI Inference Credit Pack');
@@ -139,7 +139,7 @@ export const OnboardingWizard: React.FC<WizardProps> = ({ isOpen, onClose }) => 
                 Merchant of Record & Tax Setup
               </h3>
               <p className="text-xs text-[#6e6e73]">
-                Zero sales tax filing burden. KODO handles 220+ international jurisdictions automatically.
+                Zero sales tax filing burden. QIVROPAY handles 220+ international jurisdictions automatically.
               </p>
             </div>
 
@@ -161,10 +161,10 @@ export const OnboardingWizard: React.FC<WizardProps> = ({ isOpen, onClose }) => 
               <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-100 space-y-2">
                 <div className="flex items-center gap-2 text-[#0071e3] font-bold">
                   <ShieldCheck className="w-4 h-4" />
-                  <span>KODO Tax Nexus Coverage</span>
+                  <span>QIVROPAY Tax Nexus Coverage</span>
                 </div>
                 <p className="text-xs text-[#6e6e73]">
-                  EU VAT, US State Sales Tax, and UK HMRC returns are 100% prepared, collected, and filed by KODO.
+                  EU VAT, US State Sales Tax, and UK HMRC returns are 100% prepared, collected, and filed by QIVROPAY.
                 </p>
               </div>
             </div>

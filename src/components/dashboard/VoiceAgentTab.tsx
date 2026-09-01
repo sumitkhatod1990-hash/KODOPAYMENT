@@ -20,7 +20,7 @@ export const VoiceAgentTab: React.FC = () => {
     { sender: 'agent', text: "Hello! This is Sarah from SynthFlow billing support. How can I assist you today?" },
     { sender: 'user', text: "I'd like to renew my Enterprise GPU license and pay over the phone." },
     { sender: 'agent', text: "Certainly! I've authorized your Enterprise GPU cluster invoice for $4,800.00 USD. Sending a 1-tap Apple Pay SMS trigger to your verified phone number now." },
-    { sender: 'system', text: "⚡ [KODO Intent Triggered]: payment_intent_created (Amount: $4,800.00, Status: Succeeded via Apple Pay SMS Token)" }
+    { sender: 'system', text: "⚡ [QIVROPAY Intent Triggered]: payment_intent_created (Amount: $4,800.00, Status: Succeeded via Apple Pay SMS Token)" }
   ]);
 
   const [simulatedVoiceInput, setSimulatedVoiceInput] = useState("Please upgrade my quota to 500M inference tokens.");
@@ -41,7 +41,7 @@ export const VoiceAgentTab: React.FC = () => {
       };
       const sysMsg = {
         sender: 'system' as const,
-        text: `⚡ [KODO MoR Verified]: sub_update_succeeded (Charge: $240.00, 0% Tax Liability under US Nexus)`
+        text: `⚡ [QIVROPAY MoR Verified]: sub_update_succeeded (Charge: $240.00, 0% Tax Liability under US Nexus)`
       };
       setTranscript(prev => [...prev, agentReply, sysMsg]);
       setProcessing(false);
@@ -119,7 +119,7 @@ export const VoiceAgentTab: React.FC = () => {
               }`}
             >
               <span className="font-bold uppercase text-[10px] text-[#8C90A0] block mb-1">
-                {msg.sender === 'agent' ? 'AI Voice Agent' : msg.sender === 'user' ? 'Customer Phone Call' : 'KODO Engine'}
+                {msg.sender === 'agent' ? 'AI Voice Agent' : msg.sender === 'user' ? 'Customer Phone Call' : 'QIVROPAY Engine'}
               </span>
               <p>{msg.text}</p>
             </div>

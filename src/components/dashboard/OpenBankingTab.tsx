@@ -15,7 +15,7 @@ import confetti from 'canvas-confetti';
 export const OpenBankingTab: React.FC = () => {
   const [mandates, setMandates] = useState([
     {
-      id: 'mnd_kodo_001',
+      id: 'mnd_qivropay_001',
       customerName: 'Marcus Vance',
       bank: 'Barclays Bank UK',
       rail: 'Faster Payments Open Banking Mandate',
@@ -24,7 +24,7 @@ export const OpenBankingTab: React.FC = () => {
       status: 'active_mandate'
     },
     {
-      id: 'mnd_kodo_002',
+      id: 'mnd_qivropay_002',
       customerName: 'Synthetix Tech GmbH',
       bank: 'BNP Paribas (France)',
       rail: 'SEPA Direct Request-to-Pay',
@@ -33,7 +33,7 @@ export const OpenBankingTab: React.FC = () => {
       status: 'active_mandate'
     },
     {
-      id: 'mnd_kodo_003',
+      id: 'mnd_qivropay_003',
       customerName: 'Aarav Sharma',
       bank: 'HDFC Bank (India)',
       rail: 'UPI AutoPay Recurring Mandate',
