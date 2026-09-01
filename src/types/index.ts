@@ -325,4 +325,4 @@ export type DashboardTabType =
   | 'team-audit'
   | 'settings';
 
-export type CurrentViewType = 'landing' | 'dashboard' | 'checkout' | 'docs' | 'portal';
+export type CurrentViewType = 'landing' | 'auth' | 'dashboard' | 'checkout' | 'docs' | 'portal';
