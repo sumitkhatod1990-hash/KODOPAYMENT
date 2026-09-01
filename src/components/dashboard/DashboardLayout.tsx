@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { Logo } from '../common/Logo';
 import { HomeTab } from './HomeTab';
 import { OverviewTab } from './OverviewTab';
@@ -250,6 +251,7 @@ export const DashboardLayout: React.FC = () => {
     currentBrand,
     setCurrentBrand
   } = useApp();
+  const { user, signOut } = useAuth();
 
   const [brandDropdownOpen, setBrandDropdownOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -603,6 +605,10 @@ export const DashboardLayout: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2.5">
+            <div className="hidden md:flex items-center gap-2 mr-2 text-right">
+              <div><div className="text-xs font-semibold text-[#1d1d1f]">{user?.name || 'Merchant'}</div><div className="text-[10px] text-[#86868b]">{user?.company || 'QivroPay account'}</div></div>
+              <button onClick={() => { signOut(); setCurrentView('landing'); }} className="text-[10px] font-semibold text-[#6e6e73] hover:text-[#1d1d1f]">Sign out</button>
+            </div>
             <button
               onClick={() => setNotifDrawerOpen(true)}
               className="relative p-2 rounded-xl border border-black/10 bg-[#F4F5F8] text-[#0A0D14] hover:border-black/20 transition-all"
