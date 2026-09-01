@@ -54,6 +54,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   const [customerPhone, setCustomerPhone] = useState('9999999999');
   const [paymentRail, setPaymentRail] = useState<PaymentRail>('upi');
   const [paymentCategory] = useState<'asia_latam'>('asia_latam');
+  const [indiaPaymentMode, setIndiaPaymentMode] = useState<'upi' | 'card'>('upi');
   
   // Country & PPP State
   const [selectedCountry] = useState('IN');
@@ -85,6 +86,11 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   const [cashfreePaymentStarted, setCashfreePaymentStarted] = useState(false);
   const cashfreeContainerRef = useRef<HTMLDivElement>(null);
   const cashfreePaymentMethodRef = useRef<any>(null);
+  const cashfreeCardNumberRef = useRef<any>(null);
+  const cashfreeCardHolderRef = useRef<any>(null);
+  const cashfreeCardExpiryRef = useRef<any>(null);
+  const cashfreeCardCvvRef = useRef<any>(null);
+  const cashfreeCardReadyRef = useRef(false);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -148,6 +154,28 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
 
     fetchSession();
   }, [sessionId, products]);
+
+  useEffect(() => {
+    if (checkoutStep !== 2 || indiaPaymentMode !== 'card') return;
+    const cashfree = (window as any).Cashfree?.({ mode: 'production' });
+    if (!cashfree) return;
+    const mountCard = (name: string, ref: React.MutableRefObject<any>, selector: string) => {
+      const component = cashfree.create(name, { values: name === 'cardNumber' ? { placeholder: 'Enter card number' } : undefined });
+      component.mount(selector);
+      ref.current = component;
+      return component;
+    };
+    const number = mountCard('cardNumber', cashfreeCardNumberRef, '#qivropay-card-number');
+    const holder = mountCard('cardHolder', cashfreeCardHolderRef, '#qivropay-card-holder');
+    const expiry = mountCard('cardExpiry', cashfreeCardExpiryRef, '#qivropay-card-expiry');
+    const cvv = mountCard('cardCvv', cashfreeCardCvvRef, '#qivropay-card-cvv');
+    const markReady = () => { cashfreeCardReadyRef.current = true; };
+    number.on('ready', markReady); holder.on('ready', markReady); expiry.on('ready', markReady); cvv.on('ready', markReady);
+    return () => {
+      [number, holder, expiry, cvv].forEach((component) => { try { component.unmount(); } catch {} });
+      cashfreeCardReadyRef.current = false;
+    };
+  }, [checkoutStep, indiaPaymentMode]);
 
   const handleApplyPromo = () => {
     if (promoCode.trim().toUpperCase() === 'LAUNCH50') {
@@ -216,28 +244,30 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
         }
         const cashfree = (window as any).Cashfree?.({ mode: 'production' });
         if (!cashfree) throw new Error('Cashfree checkout SDK load nahi hua');
-        if (!cashfreeContainerRef.current) throw new Error('Payment container could not be opened');
-        // QivroPay owns the visible checkout. Cashfree only mounts its secure
-        // PCI component (QR/UPI data never touches our server).
-        const upiQr = cashfree.create('upiQr', { values: { size: '260px' } });
-        const qrReady = new Promise<void>((resolve, reject) => {
-          upiQr.on('ready', () => resolve());
-          upiQr.on('loaderror', (data: any) => reject(new Error(data?.error || 'UPI QR load failed')));
-        });
-        cashfreeContainerRef.current.id = 'qivropay-upi-qr';
-        upiQr.mount('#qivropay-upi-qr');
-        cashfreePaymentMethodRef.current = upiQr;
-        await Promise.race([
-          qrReady,
-          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('UPI QR took too long to load')), 10000))
-        ]);
-        setCashfreePaymentStarted(true);
-        const paymentResult = await cashfree.pay({
-          paymentMethod: upiQr,
-          paymentSessionId: orderData.paymentSessionId,
-          redirect: 'if_required',
-          returnUrl: `${window.location.origin}/checkout/${encodeURIComponent(sessionId || '')}`
-        });
+        let paymentResult: any;
+        if (indiaPaymentMode === 'card') {
+          const card = cashfreeCardNumberRef.current;
+          if (!card || !cashfreeCardReadyRef.current || !card.isComplete?.() || !cashfreeCardHolderRef.current?.isComplete?.() || !cashfreeCardExpiryRef.current?.isComplete?.() || !cashfreeCardCvvRef.current?.isComplete?.()) {
+            throw new Error('Card details complete karein.');
+          }
+          cashfreePaymentMethodRef.current = card;
+          paymentResult = await cashfree.pay({ paymentMethod: card, paymentSessionId: orderData.paymentSessionId, redirect: 'if_required', returnUrl: `${window.location.origin}/checkout/${encodeURIComponent(sessionId || '')}` });
+        } else {
+          // QivroPay owns the visible checkout. Cashfree only mounts its secure
+          // PCI component (QR/UPI data never touches our server).
+          if (!cashfreeContainerRef.current) throw new Error('Payment container could not be opened');
+          const upiQr = cashfree.create('upiQr', { values: { size: '260px' } });
+          const qrReady = new Promise<void>((resolve, reject) => {
+            upiQr.on('ready', () => resolve());
+            upiQr.on('loaderror', (data: any) => reject(new Error(data?.error || 'UPI QR load failed')));
+          });
+          cashfreeContainerRef.current.id = 'qivropay-upi-qr';
+          upiQr.mount('#qivropay-upi-qr');
+          cashfreePaymentMethodRef.current = upiQr;
+          await Promise.race([qrReady, new Promise<never>((_, reject) => setTimeout(() => reject(new Error('UPI QR took too long to load')), 10000))]);
+          setCashfreePaymentStarted(true);
+          paymentResult = await cashfree.pay({ paymentMethod: upiQr, paymentSessionId: orderData.paymentSessionId, redirect: 'if_required', returnUrl: `${window.location.origin}/checkout/${encodeURIComponent(sessionId || '')}` });
+        }
         // Cashfree may return an intermediate status while the QR is already
         // mounted and waiting for the customer to approve in their UPI app.
         // Do not show a false failure after the QR has rendered.
@@ -597,13 +627,14 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                   <span className="text-[10px] text-emerald-700 font-bold">● India · UPI</span>
                 </div>
 
-                <div className="rounded-2xl bg-[#F4F5F8] border border-black/5 px-4 py-3 text-sm font-semibold text-[#0A0D14]">
-                  UPI India 🇮🇳
+                <div className="grid grid-cols-2 gap-2">
+                  <button type="button" onClick={() => { setIndiaPaymentMode('upi'); setPaymentRail('upi'); }} className={`rounded-2xl border px-4 py-3 text-sm font-semibold ${indiaPaymentMode === 'upi' ? 'border-[#0055FF] bg-blue-50 text-[#0055FF]' : 'border-black/5 bg-[#F4F5F8] text-[#0A0D14]'}`}>UPI QR 🇮🇳</button>
+                  <button type="button" onClick={() => { setIndiaPaymentMode('card'); setPaymentRail('card'); }} className={`rounded-2xl border px-4 py-3 text-sm font-semibold ${indiaPaymentMode === 'card' ? 'border-[#0055FF] bg-blue-50 text-[#0055FF]' : 'border-black/5 bg-[#F4F5F8] text-[#0A0D14]'}`}>Credit / Debit / RuPay</button>
                 </div>
 
                 {/* Sub-methods inside category */}
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 pt-1">
-                  {paymentCategory === 'cards' && (
+                  {false && paymentCategory === 'cards' && (
                     <button
                       type="button"
                       onClick={() => setPaymentRail('card')}
@@ -783,39 +814,10 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                 {/* 1. Card Form */}
                 {paymentRail === 'card' && (
                   <div className="space-y-3 p-4 rounded-2xl bg-[#F4F5F8] border border-black/5">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between">
-                        <label className="font-semibold text-[#0A0D14]">Card Number</label>
-                        <span className="text-[10px] text-[#8C90A0] font-mono">Visa • MC • Amex • JCB</span>
-                      </div>
-                      <input
-                        type="text"
-                        value={cardNumber}
-                        onChange={(e) => setCardNumber(e.target.value)}
-                        className="w-full p-3 rounded-xl border border-black/10 bg-white text-[#0A0D14] focus:border-[#0055FF] outline-none font-mono text-sm shadow-xs"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <label className="font-semibold text-[#0A0D14]">Expiry (MM/YY)</label>
-                        <input
-                          type="text"
-                          value={cardExp}
-                          onChange={(e) => setCardExp(e.target.value)}
-                          className="w-full p-3 rounded-xl border border-black/10 bg-white text-[#0A0D14] focus:border-[#0055FF] outline-none font-mono shadow-xs"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="font-semibold text-[#0A0D14]">CVC / CVV</label>
-                        <input
-                          type="text"
-                          value={cardCvc}
-                          onChange={(e) => setCardCvc(e.target.value)}
-                          className="w-full p-3 rounded-xl border border-black/10 bg-white text-[#0A0D14] focus:border-[#0055FF] outline-none font-mono shadow-xs"
-                        />
-                      </div>
-                    </div>
+                    <p className="text-[11px] text-[#6E717D]">Secure card fields powered by Cashfree. Your card number never reaches QivroPay servers.</p>
+                    <label className="font-semibold text-[#0A0D14]">Card Number</label><div id="qivropay-card-number" className="rounded-xl border border-black/10 bg-white p-3" />
+                    <label className="font-semibold text-[#0A0D14]">Card Holder Name</label><div id="qivropay-card-holder" className="rounded-xl border border-black/10 bg-white p-3" />
+                    <div className="grid grid-cols-2 gap-3"><div><label className="font-semibold text-[#0A0D14]">Expiry</label><div id="qivropay-card-expiry" className="rounded-xl border border-black/10 bg-white p-3" /></div><div><label className="font-semibold text-[#0A0D14]">CVV</label><div id="qivropay-card-cvv" className="rounded-xl border border-black/10 bg-white p-3" /></div></div>
                   </div>
                 )}
 
