@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Logo } from '../common/Logo';
 import { HomeTab } from './HomeTab';
+import { OverviewTab } from './OverviewTab';
 import { PaymentsTab } from './PaymentsTab';
 import { SubscriptionsTab } from './SubscriptionsTab';
 import { ProductsTab } from './ProductsTab';
@@ -255,7 +256,10 @@ export const DashboardLayout: React.FC = () => {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [notifDrawerOpen, setNotifDrawerOpen] = useState(false);
 
-  const navigationGroups = [
+  // Keep the primary navigation focused on the jobs merchants do every day.
+  // The long India/feature catalogue remains routable for backwards
+  // compatibility, but is intentionally not exposed as the main sidebar.
+  const internalReferenceGroups = [
     {
       group: 'BHARAT (INDIA) SOVEREIGN STACK 🇮🇳',
       items: [
@@ -421,6 +425,41 @@ export const DashboardLayout: React.FC = () => {
         { id: 'developer', label: 'Developer Hub', icon: Terminal },
         { id: 'team-audit', label: 'Team & Audit Logs', icon: ShieldCheck },
         { id: 'settings', label: 'Settings & Multi-Brand', icon: Settings },
+      ]
+    }
+  ];
+
+  const navigationGroups = [
+    {
+      group: 'OVERVIEW',
+      items: [
+        { id: 'home', label: 'Overview', icon: LayoutDashboard },
+        { id: 'payments', label: 'Payments', icon: CreditCard },
+        { id: 'payouts', label: 'Payouts', icon: Building },
+      ]
+    },
+    {
+      group: 'REVENUE',
+      items: [
+        { id: 'payment-links', label: 'Payment Links', icon: Link2 },
+        { id: 'products', label: 'Products', icon: Package },
+        { id: 'subscriptions', label: 'Subscriptions', icon: RefreshCw },
+        { id: 'customers', label: 'Customers', icon: Users },
+      ]
+    },
+    {
+      group: 'OPERATIONS',
+      items: [
+        { id: 'disputes', label: 'Disputes & Refunds', icon: ShieldCheck },
+        { id: 'invoice-batch-export', label: 'Invoices', icon: FileText },
+      ]
+    },
+    {
+      group: 'DEVELOPERS',
+      items: [
+        { id: 'developer', label: 'API & Webhooks', icon: Terminal },
+        { id: 'team-audit', label: 'Team & Audit Logs', icon: Users2 },
+        { id: 'settings', label: 'Settings', icon: Settings },
       ]
     }
   ];
@@ -601,7 +640,7 @@ export const DashboardLayout: React.FC = () => {
 
         {/* Dynamic Route Container */}
         <main className="flex-1 p-6 sm:p-8 lg:p-10 overflow-y-auto max-w-7xl">
-          {dashboardTab === 'home' && <HomeTab onNavigateTab={setDashboardTab} />}
+          {dashboardTab === 'home' && <OverviewTab onNavigateTab={setDashboardTab} />}
           {dashboardTab === 'copilot' && <AICopilotTab />}
           {dashboardTab === 'payments' && <PaymentsTab />}
           {dashboardTab === 'smart-routing' && <SmartRoutingTab />}

@@ -32,10 +32,10 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
           </div>
           <div>
             <h4 className="font-bold text-[#1d1d1f] text-sm font-sans">
-              Merchant of Record Active (220+ Countries)
+              Merchant of Record Active · India
             </h4>
             <p className="text-xs text-[#86868b]">
-              Global sales tax, EU VAT, and dunning automated under KODO's tax nexus. Zero liability.
+              INR collection, GST handling, and bank settlement in one place.
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
             <DollarSign className="w-4 h-4 text-[#0071e3]" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ${analytics?.totalVolume.toLocaleString() || '0.00'}
+            ₹{analytics?.totalVolume.toLocaleString() || '0.00'}
           </div>
           <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
             <TrendingUp className="w-3.5 h-3.5" />
@@ -81,10 +81,10 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
             <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ${analytics?.totalNet.toLocaleString() || '0.00'}
+            ₹{analytics?.totalNet.toLocaleString() || '0.00'}
           </div>
           <div className="text-xs text-[#86868b]">
-            Platform fee: <strong>${analytics?.totalFees || '0.00'}</strong> (4% + 40¢)
+            Platform fee: <strong>₹{analytics?.totalFees || '0.00'}</strong>
           </div>
         </div>
 
@@ -95,7 +95,7 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
             <CreditCard className="w-4 h-4 text-purple-600" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ${analytics?.mrr.toLocaleString() || '0.00'}
+            ₹{analytics?.mrr.toLocaleString() || '0.00'}
           </div>
           <div className="text-xs text-[#86868b]">
             <strong>{analytics?.activeSubscriptions || 0}</strong> active subscribers
@@ -126,7 +126,7 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
               Revenue Growth & Settled Volume
             </h3>
             <p className="text-xs text-[#86868b]">
-              Processed across all 220+ supported countries over the last 30 days
+              INR volume processed over the last 30 days
             </p>
           </div>
           <div className="text-xs font-mono font-semibold text-[#0071e3]">

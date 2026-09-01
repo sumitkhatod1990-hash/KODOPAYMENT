@@ -35,16 +35,8 @@ export const PaymentsTab: React.FC = () => {
 
   const getRailBadge = (method: string) => {
     const m = method.toLowerCase();
-    if (m === 'apple_pay') return { label: 'Apple Pay', color: 'bg-black text-white' };
-    if (m === 'google_pay') return { label: 'Google Pay', color: 'bg-blue-50 text-blue-700' };
-    if (m === 'paypal') return { label: 'PayPal', color: 'bg-blue-100 text-blue-800' };
-    if (m === 'ideal') return { label: 'iDEAL 🇳🇱', color: 'bg-pink-100 text-pink-800' };
-    if (m === 'sepa') return { label: 'SEPA 🇪🇺', color: 'bg-indigo-100 text-indigo-800' };
-    if (m === 'bancontact') return { label: 'Bancontact 🇧🇪', color: 'bg-blue-100 text-blue-800' };
     if (m === 'upi') return { label: 'UPI 🇮🇳', color: 'bg-orange-100 text-orange-800' };
-    if (m === 'pix') return { label: 'PIX 🇧🇷', color: 'bg-emerald-100 text-emerald-800' };
-    if (m === 'crypto') return { label: 'USDC Crypto', color: 'bg-purple-100 text-purple-800' };
-    return { label: 'Card (Visa/MC)', color: 'bg-slate-100 text-slate-800' };
+    return { label: 'Card · India', color: 'bg-slate-100 text-slate-800' };
   };
 
   return (
@@ -57,7 +49,7 @@ export const PaymentsTab: React.FC = () => {
             Payments Ledger & Invoices
           </h2>
           <p className="text-xs sm:text-sm text-[#86868b]">
-            Audit trail across all payment rails: Apple Pay, Cards, PayPal, SEPA, iDEAL, UPI, PIX & USDC.
+            Complete India payment ledger with UPI and secure card payments.
           </p>
         </div>
 
@@ -91,16 +83,8 @@ export const PaymentsTab: React.FC = () => {
             className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#f5f5f7] border border-black/10 text-[#1d1d1f] outline-none"
           >
             <option value="all">All Payment Rails</option>
-            <option value="card">Cards (Visa/MC/Amex)</option>
-            <option value="apple_pay">Apple Pay</option>
-            <option value="google_pay">Google Pay</option>
-            <option value="paypal">PayPal</option>
-            <option value="sepa">SEPA Debit 🇪🇺</option>
-            <option value="ideal">iDEAL 🇳🇱</option>
-            <option value="bancontact">Bancontact 🇧🇪</option>
+            <option value="card">Cards (Visa / Mastercard / RuPay)</option>
             <option value="upi">UPI India 🇮🇳</option>
-            <option value="pix">PIX Brazil 🇧🇷</option>
-            <option value="crypto">USDC Crypto</option>
           </select>
 
           {(['all', 'succeeded', 'refunded'] as const).map(status => (
@@ -152,13 +136,13 @@ export const PaymentsTab: React.FC = () => {
                       {tx.productName}
                     </td>
                     <td className="p-4 font-bold text-[#1d1d1f] font-mono">
-                      ${tx.amount.toFixed(2)}
+                      ₹{tx.amount.toFixed(2)}
                     </td>
                     <td className="p-4 font-mono text-[#86868b]">
-                      -${tx.fee.toFixed(2)}
+                      -₹{tx.fee.toFixed(2)}
                     </td>
                     <td className="p-4 font-mono text-emerald-700 font-bold">
-                      ${tx.net.toFixed(2)}
+                      ₹{tx.net.toFixed(2)}
                     </td>
                     <td className="p-4">
                       <span className={`px-2 py-0.5 rounded-full font-mono text-[10px] font-bold ${badge.color}`}>

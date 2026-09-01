@@ -17,7 +17,7 @@ export const PayoutsTab: React.FC = () => {
   };
 
   const exportReconciledCSV = () => {
-    const headers = ['Transaction ID', 'Date', 'Customer Email', 'Product', 'Gross Amount ($)', 'MoR Platform Fee ($)', 'Net Payout ($)', 'Payment Rail', 'Tax Nexus Status'];
+    const headers = ['Transaction ID', 'Date', 'Customer Email', 'Product', 'Gross Amount (INR)', 'MoR Platform Fee (INR)', 'Net Payout (INR)', 'Payment Rail', 'Tax Nexus Status'];
     const rows = transactions.map(t => [
       t.id,
       new Date(t.createdAt).toISOString(),
@@ -49,7 +49,7 @@ export const PayoutsTab: React.FC = () => {
             Payouts & Bank Settlement
           </h2>
           <p className="text-xs sm:text-sm text-[#86868b]">
-            Track revenue payouts transferred to your bank accounts under KODO's daily T+2 rolling settlement.
+            Track INR payouts transferred to your verified Indian bank account.
           </p>
         </div>
 
@@ -77,15 +77,15 @@ export const PayoutsTab: React.FC = () => {
         <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-sm space-y-1">
           <span className="text-xs text-[#86868b] font-medium">Available for Payout</span>
           <div className="text-3xl font-extrabold text-emerald-700 font-mono">
-            ${analytics?.totalNet ? (analytics.totalNet * 0.75).toFixed(2) : '1,240.00'}
+            ₹{analytics?.totalNet ? (analytics.totalNet * 0.75).toFixed(2) : '1,240.00'}
           </div>
           <span className="text-[11px] text-[#86868b]">Auto-settling on schedule</span>
         </div>
 
         <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-sm space-y-1">
           <span className="text-xs text-[#86868b] font-medium">Payout Destination Bank</span>
-          <div className="text-base font-bold text-[#1d1d1f] mt-1">Silicon Valley Bank</div>
-          <span className="text-xs text-[#86868b] font-mono">Routing: ••••9812 (Active)</span>
+          <div className="text-base font-bold text-[#1d1d1f] mt-1">Verified Indian bank account</div>
+          <span className="text-xs text-[#86868b] font-mono">Settlement destination active</span>
         </div>
 
         <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-sm space-y-1">
@@ -122,7 +122,7 @@ export const PayoutsTab: React.FC = () => {
                     {po.id}
                   </td>
                   <td className="p-4 font-bold text-emerald-700 font-mono text-sm">
-                    ${po.amount.toFixed(2)} USD
+                    ₹{po.amount.toFixed(2)} INR
                   </td>
                   <td className="p-4 font-medium text-[#1d1d1f]">
                     {po.destination}
@@ -161,7 +161,7 @@ export const PayoutsTab: React.FC = () => {
 
             <form onSubmit={handleRequest} className="space-y-4 text-xs">
               <div className="space-y-1.5">
-                <label className="font-semibold text-[#1d1d1f]">Amount to Transfer ($ USD)</label>
+                <label className="font-semibold text-[#1d1d1f]">Amount to Transfer (₹ INR)</label>
                 <input
                   type="number"
                   min="50"
@@ -173,7 +173,7 @@ export const PayoutsTab: React.FC = () => {
               </div>
 
               <div className="p-3 rounded-2xl bg-[#f5f5f7] border border-black/5 text-[11px] text-[#6e6e73]">
-                Transfers settle to <strong>Silicon Valley Bank (••••9812)</strong> within 1-2 business days.
+                Transfers settle to your verified Indian bank account within 1-2 business days.
               </div>
 
               <div className="pt-3 border-t border-black/5 flex justify-end gap-2">
