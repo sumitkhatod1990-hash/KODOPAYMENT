@@ -142,6 +142,26 @@ app.use('/api/v1', async (req, res, next) => {
     const user = await getUserForSession(readCookie(req, 'qivropay_session'));
     if (!user) return res.status(401).json({ success: false, error: 'Authentication required' });
     req.user = user;
+
+    // db.json is the legacy review workspace. Never expose that snapshot to
+    // a newly-created merchant through the API. The demo account is the only
+    // account allowed to read those seeded records.
+    if (req.method === 'GET' && user.email !== 'demo@qivropay.com') {
+      const empty = {
+        '/products': { products: [] }, '/transactions': { transactions: [] },
+        '/subscriptions': { subscriptions: [] }, '/customers': { customers: [] },
+        '/discounts': { discounts: [] }, '/licenses': { licenses: [] },
+        '/payouts': { payouts: [] }, '/meters': { meters: [] },
+        '/keys': { apiKeys: [] }, '/webhooks': { webhooks: [] },
+        '/brands': { brands: [] }, '/affiliates': { affiliates: [] },
+        '/wallets': { agentWallets: [] }, '/team': { teamMembers: [] },
+        '/audit-logs': { auditLogs: [] }, '/analytics': {
+          analytics: { totalVolume: 0, totalFees: 0, totalNet: 0, mrr: 0,
+            activeSubscriptions: 0, activeCustomers: 0, conversionRate: '0%', chargebackRate: '0%' }
+        }
+      };
+      if (empty[req.path]) return res.json({ success: true, ...empty[req.path] });
+    }
     next();
   } catch (error) {
     console.error('Dashboard authentication failed', error);
