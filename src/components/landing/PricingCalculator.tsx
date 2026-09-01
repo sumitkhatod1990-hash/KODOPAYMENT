@@ -51,7 +51,7 @@ export const PricingCalculator: React.FC = () => {
               <div className="flex justify-between items-center text-sm">
                 <span className="text-[#1d1d1f] font-semibold">Estimated Monthly Volume</span>
                 <span className="font-mono font-black text-2xl text-[#1d1d1f]">
-                  ${monthlyVolume.toLocaleString()}
+                  ₹{monthlyVolume.toLocaleString('en-IN')}
                 </span>
               </div>
               <input
@@ -75,7 +75,7 @@ export const PricingCalculator: React.FC = () => {
               <div className="flex justify-between items-center text-sm">
                 <span className="text-[#1d1d1f] font-semibold">Average Order / Plan Price</span>
                 <span className="font-mono font-black text-2xl text-[#0071e3]">
-                  ${avgOrderValue}
+                  ₹{avgOrderValue.toLocaleString('en-IN')}
                 </span>
               </div>
               <input
@@ -110,7 +110,7 @@ export const PricingCalculator: React.FC = () => {
                   QIVROPAY Payments
                 </span>
                 <div className="text-3xl sm:text-4xl font-black text-[#1d1d1f] font-mono mt-1">
-                  ${Math.round(qivropayNet).toLocaleString()}
+                  ₹{Math.round(qivropayNet).toLocaleString('en-IN')}
                 </div>
                 <div className="text-xs text-[#86868b] font-medium mt-0.5">Net Monthly Payout</div>
               </div>
@@ -138,7 +138,7 @@ export const PricingCalculator: React.FC = () => {
                   LemonSqueezy
                 </span>
                 <div className="text-3xl font-bold text-[#1d1d1f] font-mono mt-1">
-                  ${Math.round(lsNet).toLocaleString()}
+                  ₹{Math.round(lsNet).toLocaleString('en-IN')}
                 </div>
                 <div className="text-xs text-[#86868b] font-medium mt-0.5">Net Monthly Payout</div>
               </div>
@@ -162,7 +162,7 @@ export const PricingCalculator: React.FC = () => {
                   Stripe + Tax Stack
                 </span>
                 <div className="text-3xl font-bold text-[#1d1d1f] font-mono mt-1">
-                  ${Math.round(stripeNet).toLocaleString()}
+                  ₹{Math.round(stripeNet).toLocaleString('en-IN')}
                 </div>
                 <div className="text-xs text-[#86868b] font-medium mt-0.5">Net Monthly Payout</div>
               </div>
