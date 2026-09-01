@@ -149,6 +149,8 @@ import { TaxNexusTab } from './TaxNexusTab';
 import { WebhookDLQTab } from './WebhookDLQTab';
 import { NotificationsDrawer } from './NotificationsDrawer';
 import { OnboardingWizard } from './OnboardingWizard';
+import { SetupGuideWidget } from './SetupGuideWidget';
+import { AccountVerificationModal } from './AccountVerificationModal';
 import { OverlayCheckoutModal } from '../checkout/OverlayCheckoutModal';
 import { 
   LayoutDashboard, 
@@ -237,7 +239,10 @@ import {
   Train,
   Pickaxe,
   Plane,
-  Droplets
+  Droplets,
+  Moon,
+  Sun,
+  User as UserIcon
 } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {
@@ -257,6 +262,57 @@ export const DashboardLayout: React.FC = () => {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [notifDrawerOpen, setNotifDrawerOpen] = useState(false);
+  
+  // Setup Guide & Account Verification State
+  const [setupGuideOpen, setSetupGuideOpen] = useState<boolean>(true);
+  const [verificationModalOpen, setVerificationModalOpen] = useState<boolean>(false);
+  const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
+    }
+    return false;
+  });
+
+  const [verificationData, setVerificationData] = useState<any>(() => {
+    try {
+      const saved = localStorage.getItem('qivropay_account_verification');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return null;
+  });
+
+  const toggleDarkMode = () => {
+    const nextMode = !isDarkMode;
+    setIsDarkMode(nextMode);
+    if (nextMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
+
+  const getSetupProgress = () => {
+    try {
+      const saved = localStorage.getItem('qivropay_setup_guide_completed');
+      if (saved) {
+        const steps = JSON.parse(saved);
+        let score = 0;
+        if (steps.verification || verificationData) score += 25;
+        let testSub = (steps.testKeys ? 1 : 0) + (steps.testPayment ? 1 : 0) + (steps.testWebhook ? 1 : 0);
+        score += (testSub / 3) * 25;
+        let liveSub = (steps.liveKeys ? 1 : 0) + (steps.liveWebhook ? 1 : 0) + (steps.livePayment ? 1 : 0);
+        score += (liveSub / 3) * 25;
+        if (steps.goLive || (!isTestMode && (steps.verification || verificationData))) score += 25;
+        return Math.min(100, Math.round(score));
+      }
+    } catch (e) {}
+    return verificationData ? 25 : 0;
+  };
+
+  const setupProgress = getSetupProgress();
 
   // Keep the primary navigation focused on the jobs merchants do every day.
   // The long India/feature catalogue remains routable for backwards
@@ -611,43 +667,128 @@ export const DashboardLayout: React.FC = () => {
             </span>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <div className="hidden md:flex items-center gap-2 mr-2 text-right">
-              <div><div className="text-xs font-semibold text-[#1d1d1f]">{user?.name || 'Merchant'}</div><div className="text-[10px] text-[#86868b]">{user?.company || 'QivroPay account'}</div></div>
-              <button onClick={() => { signOut(); setCurrentView('landing'); }} className="text-[10px] font-semibold text-[#6e6e73] hover:text-[#1d1d1f]">Sign out</button>
-            </div>
+          {/* Topbar Right Action Bar (Image 2) */}
+          <div className="flex items-center gap-2">
+            
+            {/* Setup Guide Button with Circular Progress Ring */}
+            <button
+              onClick={() => setSetupGuideOpen(!setupGuideOpen)}
+              className={`h-10 px-3.5 rounded-2xl flex items-center gap-2 text-xs font-semibold border transition-all ${
+                setupGuideOpen
+                  ? 'bg-slate-100 text-slate-900 border-slate-300 shadow-sm'
+                  : 'bg-[#F4F5F8] hover:bg-[#EBECEF] text-[#334155] border-black/5'
+              }`}
+              title="Toggle Setup Guide"
+            >
+              {/* Circular Progress Ring Icon (0% or dynamic) */}
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                <svg className="w-4 h-4 transform -rotate-90" viewBox="0 0 20 20">
+                  <circle
+                    cx="10"
+                    cy="10"
+                    r="7.5"
+                    stroke="#CBD5E1"
+                    strokeWidth="2.5"
+                    fill="none"
+                  />
+                  {setupProgress > 0 && (
+                    <circle
+                      cx="10"
+                      cy="10"
+                      r="7.5"
+                      stroke="#0055FF"
+                      strokeWidth="2.5"
+                      fill="none"
+                      strokeDasharray={47.12}
+                      strokeDashoffset={47.12 - (47.12 * setupProgress) / 100}
+                      strokeLinecap="round"
+                    />
+                  )}
+                </svg>
+              </div>
+
+              <span>Setup guide</span>
+            </button>
+
+            {/* Dark Mode / Theme Toggle Button (Moon Icon) */}
+            <button
+              onClick={toggleDarkMode}
+              className="w-10 h-10 rounded-2xl bg-[#F4F5F8] hover:bg-[#EBECEF] text-[#1E293B] border border-black/5 flex items-center justify-center transition-all"
+              title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {isDarkMode ? (
+                <Sun className="w-4 h-4 text-amber-500" />
+              ) : (
+                <Moon className="w-4 h-4 text-[#1E293B]" />
+              )}
+            </button>
+
+            {/* Notifications Bell Button */}
             <button
               onClick={() => setNotifDrawerOpen(true)}
-              className="relative p-2 rounded-xl border border-black/10 bg-[#F4F5F8] text-[#0A0D14] hover:border-black/20 transition-all"
+              className="relative w-10 h-10 rounded-2xl bg-[#F4F5F8] hover:bg-[#EBECEF] text-[#1E293B] border border-black/5 flex items-center justify-center transition-all"
               title="Notifications"
             >
-              <Bell className="w-4 h-4 text-[#0055FF]" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
+              <Bell className="w-4 h-4 text-[#1E293B]" />
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white" />
             </button>
 
-            <button
-              onClick={() => setWizardOpen(true)}
-              className="apple-btn-secondary px-3.5 py-2 text-xs flex items-center gap-1.5 font-semibold"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-[#0071e3]" />
-              <span>Setup Wizard</span>
-            </button>
+            {/* User Profile Avatar Button */}
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="w-10 h-10 rounded-2xl bg-[#F4F5F8] hover:bg-[#EBECEF] text-[#1E293B] border border-black/5 flex items-center justify-center transition-all"
+                title="Account & Profile"
+              >
+                <UserIcon className="w-4 h-4 text-[#1E293B]" />
+              </button>
 
-            <button
-              onClick={() => setOverlayOpen(true)}
-              className="apple-btn-secondary px-3.5 py-2 text-xs flex items-center gap-1.5 font-semibold"
-            >
-              <Zap className="w-3.5 h-3.5 text-purple-600" />
-              <span>Test Overlay SDK</span>
-            </button>
+              {/* User Profile Dropdown */}
+              {userMenuOpen && (
+                <div className="absolute top-full right-0 mt-2 w-56 p-2 rounded-2xl bg-white border border-slate-200/90 shadow-2xl z-50 text-xs font-sans space-y-1 animate-scale-up">
+                  <div className="p-2.5 border-b border-slate-100">
+                    <div className="font-bold text-slate-900 truncate">{user?.name || 'Merchant'}</div>
+                    <div className="text-[11px] text-slate-500 truncate">{user?.email || 'admin@qivropay.in'}</div>
+                    <div className="text-[10px] text-[#0055FF] font-semibold mt-0.5">{user?.company || 'QivroPay account'}</div>
+                  </div>
 
+                  <button
+                    onClick={() => { setDashboardTab('settings'); setUserMenuOpen(false); }}
+                    className="w-full p-2 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors font-medium text-left"
+                  >
+                    <Settings className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Account Settings</span>
+                  </button>
+
+                  <button
+                    onClick={() => { setDashboardTab('developer'); setUserMenuOpen(false); }}
+                    className="w-full p-2 rounded-xl text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors font-medium text-left"
+                  >
+                    <Terminal className="w-3.5 h-3.5 text-slate-500" />
+                    <span>API & Keys</span>
+                  </button>
+
+                  <div className="border-t border-slate-100 pt-1">
+                    <button
+                      onClick={() => { signOut(); setCurrentView('landing'); }}
+                      className="w-full p-2 rounded-xl text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors font-semibold text-left"
+                    >
+                      <span>Sign out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Quick Action: Payment Link (on large screens) */}
             <button
               onClick={() => setDashboardTab('payment-links')}
-              className="apple-btn-black px-4 py-2 text-xs font-semibold shadow-sm flex items-center gap-1.5"
+              className="hidden lg:flex apple-btn-black px-4 py-2 text-xs font-semibold shadow-sm items-center gap-1.5 ml-2"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Payment Link</span>
             </button>
+
           </div>
         </header>
 
@@ -807,6 +948,27 @@ export const DashboardLayout: React.FC = () => {
 
         {/* Floating In-App Notifications Drawer */}
         <NotificationsDrawer isOpen={notifDrawerOpen} onClose={() => setNotifDrawerOpen(false)} />
+
+        {/* Setup Guide Floating Widget & Help Button (Image 1 & Image 2) */}
+        <SetupGuideWidget 
+          isOpen={setupGuideOpen}
+          onClose={() => setSetupGuideOpen(false)}
+          onOpenVerification={() => setVerificationModalOpen(true)}
+          verificationData={verificationData}
+          onNavigateTab={setDashboardTab}
+          isTestMode={isTestMode}
+          setIsTestMode={setIsTestMode}
+        />
+
+        {/* Account Verification Modal */}
+        <AccountVerificationModal 
+          isOpen={verificationModalOpen}
+          onClose={() => setVerificationModalOpen(false)}
+          initialData={verificationData}
+          onVerificationComplete={(data) => {
+            setVerificationData(data);
+          }}
+        />
 
       </div>
 
