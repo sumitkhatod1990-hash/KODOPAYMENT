@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { printOrDownloadInvoice } from '../../utils/invoiceGenerator';
-import { calculatePPPPrice, PPP_DATABASE } from '../../utils/pppEngine';
 
 interface CheckoutProps {
   sessionId?: string | null;
@@ -53,12 +52,11 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   const [customerName, setCustomerName] = useState('Alex Chen');
   const [customerEmail, setCustomerEmail] = useState('alex.chen@synthflow.ai');
   const [customerPhone, setCustomerPhone] = useState('9999999999');
-  const [paymentRail, setPaymentRail] = useState<PaymentRail>('card');
-  const [paymentCategory, setPaymentCategory] = useState<'cards' | 'wallets' | 'bnpl' | 'europe' | 'asia_latam' | 'crypto'>('cards');
+  const [paymentRail, setPaymentRail] = useState<PaymentRail>('upi');
+  const [paymentCategory] = useState<'asia_latam'>('asia_latam');
   
   // Country & PPP State
-  const [selectedCountry, setSelectedCountry] = useState('US');
-  const [enablePPP, setEnablePPP] = useState(true);
+  const [selectedCountry] = useState('IN');
   const [giftCardCode, setGiftCardCode] = useState('');
   const [giftCardApplied, setGiftCardApplied] = useState(false);
   
@@ -98,13 +96,11 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
         if (data.success && data.session) {
           setSessionData(data.session);
           if (String(data.session.currency || '').toUpperCase() === 'INR') {
-            setSelectedCountry('IN');
-            setPaymentCategory('asia_latam');
             setPaymentRail('upi');
             if (data.session.customerEmail) setCustomerEmail(data.session.customerEmail);
           }
         } else {
-          const p = products[0] || { name: 'AI Token Starter Pack', price: 29.00, currency: 'USD', credits: 5000000 };
+          const p = products[0] || { name: 'AI Token Starter Pack', price: 29.00, currency: 'INR', credits: 5000000 };
           setSessionData({
             sessionId: sid,
             title: p.name,
@@ -141,14 +137,13 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   };
 
   const basePrice = sessionData?.amount || 29.00;
-  const pppDetails = calculatePPPPrice(basePrice, selectedCountry);
-  
-  const isInrSession = (sessionData?.currency || '').toUpperCase() === 'INR';
-  const displayCurrency = isInrSession ? 'INR' : 'USD';
-  const displaySymbol = isInrSession ? '₹' : '$';
+  // QivroPay currently operates in India only: INR + UPI is the sole checkout rail.
+  const isInrSession = true;
+  const displayCurrency = 'INR';
+  const displaySymbol = '₹';
   const receiptCurrency = String(completedTx?.currency || displayCurrency).toUpperCase();
   const receiptSymbol = receiptCurrency === 'INR' ? '₹' : '$';
-  let finalUsdAmount = isInrSession ? basePrice : (enablePPP ? pppDetails.discountedUsd : basePrice);
+  let finalUsdAmount = basePrice;
   if (discountApplied) {
     finalUsdAmount = finalUsdAmount * 0.5;
   }
@@ -166,7 +161,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
       setPaymentError('Valid email address enter karein.');
       return;
     }
-    if ((sessionData?.currency || '').toUpperCase() === 'INR' && !/^\+?\d[\d\s-]{9,14}$/.test(customerPhone.trim())) {
+    if (!/^\+?\d[\d\s-]{9,14}$/.test(customerPhone.trim())) {
       setPaymentError('Valid 10-digit mobile number enter karein.');
       return;
     }
@@ -174,7 +169,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
     setIsProcessing(true);
     setPaymentError(null);
 
-    if ((sessionData?.currency || '').toUpperCase() === 'INR') {
+    if (isInrSession) {
       try {
         const orderRes = await fetch('/api/v1/india/cashfree/create-order', {
           method: 'POST',
@@ -277,7 +272,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
 
     if (result.success) {
       setCompletedTx(result.transaction);
-      setShowUpsellModal(true);
+      if (!isInrSession) setShowUpsellModal(true);
       confetti({
         particleCount: 100,
         spread: 70,
@@ -413,38 +408,17 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                 </p>
               </div>
 
-              {/* Country & Currency Selector with PPP */}
+              {/* India-only billing */}
               <div className="space-y-2 pt-2 border-t border-black/[0.06]">
                 <div className="flex justify-between items-center text-xs">
                   <label className="font-semibold text-[#0A0D14] flex items-center gap-1.5">
                     <Globe2 className="w-3.5 h-3.5 text-[#0055FF]" />
                     <span>Your Billing Region</span>
                   </label>
-                  {!isInrSession && pppDetails.discountPercentage > 0 && (
-                    <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
-                      {pppDetails.discountPercentage}% PPP Active
-                    </span>
-                  )}
                 </div>
-
-                <select
-                  value={selectedCountry}
-                  onChange={(e) => setSelectedCountry(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-[#F4F5F8] border border-black/10 text-xs font-mono text-[#0A0D14] outline-none"
-                >
-                  {Object.values(PPP_DATABASE).map(c => (
-                    <option key={c.countryCode} value={c.countryCode}>
-                      {c.countryName} ({c.symbol} {c.currency}) {c.discountPercentage > 0 ? `— ${c.discountPercentage}% PPP Discount` : ''}
-                    </option>
-                  ))}
-                </select>
-
-                {!isInrSession && pppDetails.discountPercentage > 0 && (
-                  <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-100 text-xs text-[#0055FF] font-mono flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 shrink-0" />
-                    <span>Purchasing Power Parity adjusted to <strong>{pppDetails.formattedLocal}</strong></span>
-                  </div>
-                )}
+                <div className="w-full p-2.5 rounded-xl bg-[#F4F5F8] border border-black/10 text-xs font-mono text-[#0A0D14]">
+                  India (+91) · ₹ INR
+                </div>
               </div>
 
               {/* Dynamic In-Checkout Order Bump */}
@@ -542,16 +516,10 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                     <span>+$19.00 USD</span>
                   </div>
                 )}
-                {!isInrSession && pppDetails.discountPercentage > 0 && (
-                  <div className="flex justify-between text-emerald-700 font-bold">
-                    <span>PPP Regional Discount ({pppDetails.discountPercentage}%)</span>
-                    <span>-${(basePrice * (pppDetails.discountPercentage / 100)).toFixed(2)} USD</span>
-                  </div>
-                )}
                 {discountApplied && (
                   <div className="flex justify-between text-[#0055FF] font-bold">
                     <span>Coupon (50%)</span>
-                    <span>-${(finalUsdAmount).toFixed(2)} USD</span>
+                    <span>-₹{(finalUsdAmount).toFixed(2)} INR</span>
                   </div>
                 )}
                 <div className="flex justify-between text-[#8C90A0]">
@@ -585,7 +553,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                   <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Full name" className="w-full rounded-xl border border-black/10 bg-white p-3 text-sm outline-none focus:border-[#0055FF]" />
                   <input type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} placeholder="Email address" className="w-full rounded-xl border border-black/10 bg-white p-3 text-sm outline-none focus:border-[#0055FF]" />
                   <input type="tel" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} placeholder="Phone number" className="w-full rounded-xl border border-black/10 bg-white p-3 text-sm outline-none focus:border-[#0055FF]" />
-                  <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} className="w-full rounded-xl border border-black/10 bg-white p-3 text-sm outline-none focus:border-[#0055FF]"><option value="IN">India (+91)</option><option value="US">United States (+1)</option><option value="GB">United Kingdom (+44)</option></select>
+                  <div className="w-full rounded-xl border border-black/10 bg-white p-3 text-sm text-[#0A0D14]">India (+91) · ₹ INR</div>
                   <textarea value={billingAddress} onChange={(e) => setBillingAddress(e.target.value)} placeholder="Billing address" rows={3} className="w-full resize-none rounded-xl border border-black/10 bg-white p-3 text-sm outline-none focus:border-[#0055FF]" />
                   {paymentError && <p className="text-xs text-red-600" role="alert">{paymentError}</p>}
                   <button type="button" onClick={handleContinueToPayment} className="opp-btn-primary w-full py-3 text-sm font-bold">Continue to Payment →</button>
@@ -596,39 +564,11 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
               <div className={`space-y-3 ${checkoutStep === 1 ? 'hidden' : ''}`}>
                 <div className="flex items-center justify-between text-xs font-semibold text-[#8C90A0]">
                   <span>SELECT PAYMENT METHOD</span>
-                  <span className="text-[10px] text-emerald-700 font-bold">● 220+ Countries Active</span>
+                  <span className="text-[10px] text-emerald-700 font-bold">● India · UPI</span>
                 </div>
 
-                <div className="grid grid-cols-6 gap-1 p-1 rounded-2xl bg-[#F4F5F8] border border-black/5 text-[11px] font-semibold">
-                  {[
-                    { id: 'cards', label: 'Cards' },
-                    { id: 'wallets', label: 'Apple/PayPal' },
-                    { id: 'bnpl', label: 'Pay in 4 (BNPL)' },
-                    { id: 'europe', label: 'EU SEPA/iDEAL' },
-                    { id: 'asia_latam', label: 'UPI / PIX' },
-                    { id: 'crypto', label: 'Crypto USDC' }
-                  ].map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => {
-                        setPaymentCategory(cat.id as any);
-                        if (cat.id === 'cards') setPaymentRail('card');
-                        if (cat.id === 'wallets') setPaymentRail('apple_pay');
-                        if (cat.id === 'bnpl') setPaymentRail('klarna');
-                        if (cat.id === 'europe') setPaymentRail('ideal');
-                        if (cat.id === 'asia_latam') setPaymentRail('upi');
-                        if (cat.id === 'crypto') setPaymentRail('crypto');
-                      }}
-                      className={`py-1.5 px-1 rounded-xl transition-all truncate text-center ${
-                        paymentCategory === cat.id
-                          ? 'bg-white text-[#0A0D14] shadow-xs font-bold'
-                          : 'text-[#6E717D] hover:text-[#0A0D14]'
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
+                <div className="rounded-2xl bg-[#F4F5F8] border border-black/5 px-4 py-3 text-sm font-semibold text-[#0A0D14]">
+                  UPI India 🇮🇳
                 </div>
 
                 {/* Sub-methods inside category */}
@@ -752,16 +692,6 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                       >
                         <QrCode className="w-4 h-4 text-orange-600" />
                         <span>UPI India 🇮🇳</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPaymentRail('pix')}
-                        className={`p-2.5 rounded-xl border flex flex-col items-center gap-1 text-xs transition-all ${
-                          paymentRail === 'pix' ? 'border-[#0055FF] bg-blue-50/50 text-[#0055FF] font-bold' : 'border-black/5 bg-[#F4F5F8] text-[#6E717D]'
-                        }`}
-                      >
-                        <Zap className="w-4 h-4 text-emerald-600" />
-                        <span>PIX Brazil 🇧🇷</span>
                       </button>
                     </>
                   )}
