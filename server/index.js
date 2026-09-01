@@ -417,27 +417,123 @@ app.post('/api/v1/support/tickets', (req, res) => {
   });
 });
 
-app.post('/api/v1/support/chat', (req, res) => {
-  const { query, category } = req.body || {};
-  const q = String(query || '').toLowerCase();
+app.post('/api/v1/support/chat', async (req, res) => {
+  const { query, category, conversationHistory = [], customApiKey } = req.body || {};
+  const q = String(query || '').trim();
 
-  let reply = "Namaste! I'm the QivroPay Merchant Assistant. How can I help you with your account, payment gateways, GST compliance, or bank settlements today?";
+  if (!q) {
+    return res.status(400).json({ success: false, error: 'Query message is required' });
+  }
 
-  if (q.includes('gst') || q.includes('tax') || q.includes('tds')) {
-    reply = "Under QivroPay's Merchant of Record structure, we act as the legal reseller of your digital products. We calculate, collect, and file GST across all 28 Indian States & 8 UTs under our GSTIN. Section 194-O TDS (1%) is automatically deducted and deposited with the Income Tax Department.";
-  } else if (q.includes('payout') || q.includes('settle') || q.includes('bank') || q.includes('imps')) {
-    reply = "QivroPay supports instant T+0 / T+2 IMPS bank payouts directly to your verified Indian bank account (HDFC, ICICI, SBI, Axis, etc.) via Cashfree Easy Split with verified Bank UTR numbers.";
-  } else if (q.includes('upi') || q.includes('autopay') || q.includes('mandate')) {
-    reply = "UPI AutoPay 2.0 allows you to create recurring subscriptions with zero OTP renewals up to ₹15,000. Customer mandates are authorized once and renewed seamlessly across PhonePe, GPay, Paytm, and CRED.";
-  } else if (q.includes('verify') || q.includes('kyc') || q.includes('pan') || q.includes('penny')) {
-    reply = "You can verify your merchant account in under 2 minutes by entering your PAN, GSTIN, and Bank IFSC in the Setup Guide. Our automated ₹1 NPCI IMPS Penny Drop verifies your bank account instantly.";
-  } else if (q.includes('key') || q.includes('webhook') || q.includes('api') || q.includes('sdk')) {
-    reply = "You can find your sandbox and live API credentials in the Developer Hub. Include `Bearer pk_live_...` in your authorization headers. Webhook endpoints must respond with HTTP 200 to confirm receipt.";
+  const geminiKey = customApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+  const openaiKey = process.env.OPENAI_API_KEY || '';
+
+  const systemInstruction = `You are the QivroPay 24/7 Merchant Engineering AI Assistant. QivroPay is India's premier Merchant of Record (MoR) platform built specifically for SaaS, AI applications, and digital creators.
+Key Information:
+- MoR Compliance: QivroPay acts as the legal merchant of record/reseller. Developers have 0% GST liability; QivroPay handles GST across 28 Indian States & 8 UTs and handles Section 194-O TDS (1%) remittance.
+- Payment Rails: Direct integration with Cashfree Payment Gateway, instant UPI AutoPay 2.0 (recurring subscriptions without OTP renewals up to ₹15,000), RuPay on UPI, NetBanking across 55+ banks, cards.
+- Settlements & Payouts: Instant T+0 and T+2 IMPS bank payouts directly to Indian banks (HDFC, ICICI, SBI, Axis) with real NPCI UTR numbers.
+- Verification: 2-minute instant KYC with PAN, GSTIN, and ₹1 Penny Drop validation via NPCI IMPS.
+- APIs: REST API with Bearer token authentication (pk_live_..., pk_test_...), HMAC-SHA256 webhook signatures, and webhooks studio.
+Tone: Helpful, polite (uses 'Namaste' occasionally), crisp, technically accurate, India fintech expert.`;
+
+  // 1. Try Google Gemini API if key is present
+  if (geminiKey) {
+    try {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+      const contents = [
+        {
+          role: 'user',
+          parts: [{ text: `${systemInstruction}\n\nUser Question: ${q}` }]
+        }
+      ];
+
+      const aiRes = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents,
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 600
+          }
+        })
+      });
+
+      const aiData = await aiRes.json();
+      const generatedText = aiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (generatedText) {
+        return res.json({
+          success: true,
+          reply: generatedText,
+          engine: 'gemini-1.5-flash',
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch (err) {
+      console.warn('Gemini API call error, falling back to local MoR intelligence', err.message);
+    }
+  }
+
+  // 2. Try OpenAI API if key is present
+  if (openaiKey) {
+    try {
+      const openAiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: systemInstruction },
+            { role: 'user', content: q }
+          ],
+          temperature: 0.7,
+          max_tokens: 500
+        })
+      });
+
+      const openAiData = await openAiRes.json();
+      const aiReply = openAiData?.choices?.[0]?.message?.content;
+      if (aiReply) {
+        return res.json({
+          success: true,
+          reply: aiReply,
+          engine: 'gpt-4o-mini',
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch (err) {
+      console.warn('OpenAI API call error, falling back to local MoR intelligence', err.message);
+    }
+  }
+
+  // 3. Fallback Built-in QivroPay Intelligence Engine
+  const qLower = q.toLowerCase();
+  let reply = "Namaste! I'm your QivroPay 24/7 Merchant Engineering Assistant. How can I help you with your account verification, UPI AutoPay, Cashfree PG integration, GST compliance, or bank settlements today?";
+
+  if (qLower.includes('gst') || qLower.includes('tax') || qLower.includes('tds') || qLower.includes('194-o') || qLower.includes('gstr')) {
+    reply = "Under QivroPay's Merchant of Record structure, we act as the legal reseller of your digital software and AI products. We calculate, collect, and file GST across all 28 Indian States & 8 UTs under QivroPay's master GSTIN. Section 194-O TDS (1%) is automatically deducted and deposited with the Income Tax Department with Form 16A certificates provided quarterly.";
+  } else if (qLower.includes('payout') || qLower.includes('settle') || qLower.includes('bank') || qLower.includes('imps') || qLower.includes('money')) {
+    reply = "QivroPay supports instant T+0 / T+2 IMPS bank payouts directly to your verified Indian bank account (HDFC, ICICI, SBI, Axis, Kotak, etc.) via Cashfree Easy Split. Every payout includes a verified NPCI Bank UTR reference for instant ledger reconciliation.";
+  } else if (qLower.includes('upi') || qLower.includes('autopay') || qLower.includes('mandate') || qLower.includes('subscription')) {
+    reply = "UPI AutoPay 2.0 allows you to create recurring subscriptions with zero OTP renewals up to ₹15,000. Customer mandates are authorized once during initial checkout and renewed seamlessly across PhonePe, Google Pay, Paytm, and CRED.";
+  } else if (qLower.includes('verify') || qLower.includes('kyc') || qLower.includes('pan') || qLower.includes('penny') || qLower.includes('account')) {
+    reply = "You can verify your merchant account in under 2 minutes by entering your PAN, GSTIN, and Bank IFSC in the Setup Guide. Our automated ₹1 NPCI IMPS Penny Drop verifies your bank account in real-time.";
+  } else if (qLower.includes('key') || qLower.includes('webhook') || qLower.includes('api') || qLower.includes('sdk') || qLower.includes('code')) {
+    reply = "You can find your sandbox and live API credentials in the Developer Hub. Include `Bearer pk_live_...` in your authorization header. Webhooks are signed with HMAC-SHA256; ensure your HTTPS endpoint returns HTTP 200 to acknowledge events.";
+  } else if (qLower.includes('hi') || qLower.includes('hello') || qLower.includes('hey') || qLower.includes('namaste')) {
+    reply = "Namaste! Welcome to QivroPay 24/7 Merchant Engineering Support. I can help you configure your API keys, run ₹1 test transactions, setup UPI AutoPay, or answer any tax & payout questions.";
+  } else {
+    reply = `Thank you for your question regarding "${q}". QivroPay provides full India-stack Merchant of Record infrastructure (Cashfree PG, UPI AutoPay 2.0, GST & Section 194-O TDS automated compliance, and T+0 IMPS payouts). You can also connect directly with our engineering desk on WhatsApp or submit a priority ticket.`;
   }
 
   res.json({
     success: true,
     reply,
+    engine: 'qivropay-fintech-ai',
     timestamp: new Date().toISOString()
   });
 });

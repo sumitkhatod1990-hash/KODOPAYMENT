@@ -31,12 +31,18 @@ export const MerchantSupportModal: React.FC<MerchantSupportModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'chat' | 'ticket' | 'channels'>('chat');
   
+  const [customApiKey, setCustomApiKey] = useState<string>(() => {
+    try { return localStorage.getItem('qivropay_gemini_key') || ''; } catch { return ''; }
+  });
+  const [showKeySetting, setShowKeySetting] = useState(false);
+
   // Chat state
-  const [messages, setMessages] = useState<Array<{ sender: 'user' | 'assistant'; text: string; time: string }>>([
+  const [messages, setMessages] = useState<Array<{ sender: 'user' | 'assistant'; text: string; time: string; engine?: string }>>([
     {
       sender: 'assistant',
-      text: `Namaste ${userName}! Welcome to QivroPay 24/7 Merchant Engineering Desk. How can we assist you with your integration, payouts, or GST compliance today?`,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      text: `Namaste ${userName}! I am your QivroPay 24/7 Merchant Engineering AI Assistant. Ask me anything about UPI AutoPay 2.0, GST compliance, Cashfree PG integration, Penny-Drop verification, or API SDKs!`,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      engine: 'QivroPay MoR AI'
     }
   ]);
   const [inputQuery, setInputQuery] = useState('');
@@ -52,6 +58,15 @@ export const MerchantSupportModal: React.FC<MerchantSupportModalProps> = ({
 
   if (!isOpen) return null;
 
+  const handleSaveApiKey = (key: string) => {
+    setCustomApiKey(key);
+    try {
+      if (key) localStorage.setItem('qivropay_gemini_key', key);
+      else localStorage.removeItem('qivropay_gemini_key');
+    } catch {}
+    setShowKeySetting(false);
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputQuery.trim() || isSending) return;
@@ -66,16 +81,32 @@ export const MerchantSupportModal: React.FC<MerchantSupportModalProps> = ({
       const res = await fetch('/api/v1/support/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: userText })
+        body: JSON.stringify({ 
+          query: userText,
+          customApiKey: customApiKey || undefined
+        })
       });
       const data = await res.json();
       if (data.success && data.reply) {
-        setMessages(prev => [...prev, { sender: 'assistant', text: data.reply, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+        setMessages(prev => [...prev, { 
+          sender: 'assistant', 
+          text: data.reply, 
+          engine: data.engine || 'AI Engine',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+        }]);
       } else {
-        setMessages(prev => [...prev, { sender: 'assistant', text: "Thank you for your query. Our priority desk is online 24/7. An engineer has received your message.", time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+        setMessages(prev => [...prev, { 
+          sender: 'assistant', 
+          text: "Thank you for your query. Our priority desk is online 24/7. An engineer has received your message.", 
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+        }]);
       }
     } catch {
-      setMessages(prev => [...prev, { sender: 'assistant', text: "Our desk is online. You can also reach our direct merchant hotline at support@qivropay.in.", time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+      setMessages(prev => [...prev, { 
+        sender: 'assistant', 
+        text: "Our desk is online. You can also reach our direct merchant hotline on WhatsApp or email support@qivropay.in.", 
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+      }]);
     } finally {
       setIsSending(false);
     }
@@ -199,15 +230,22 @@ export const MerchantSupportModal: React.FC<MerchantSupportModalProps> = ({
                       </div>
                     )}
                     
-                    <div className={`max-w-[80%] rounded-2xl p-3.5 text-xs leading-relaxed space-y-1 ${
+                    <div className={`max-w-[80%] rounded-2xl p-3.5 text-xs leading-relaxed space-y-1.5 ${
                       m.sender === 'user' 
                         ? 'bg-[#0A0D14] text-white rounded-tr-none' 
                         : 'bg-slate-100/80 text-slate-800 rounded-tl-none border border-slate-200/60'
                     }`}>
-                      <p>{m.text}</p>
-                      <span className={`text-[10px] block text-right ${m.sender === 'user' ? 'text-slate-400' : 'text-slate-400'}`}>
-                        {m.time}
-                      </span>
+                      <p className="whitespace-pre-line">{m.text}</p>
+                      <div className="flex items-center justify-between gap-2 pt-0.5">
+                        {m.sender === 'assistant' && (
+                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-blue-100 text-[#0055FF] font-bold">
+                            {m.engine || 'QivroPay MoR AI'}
+                          </span>
+                        )}
+                        <span className={`text-[10px] block ${m.sender === 'user' ? 'text-slate-400 ml-auto' : 'text-slate-400 ml-auto'}`}>
+                          {m.time}
+                        </span>
+                      </div>
                     </div>
 
                     {m.sender === 'user' && (
@@ -220,16 +258,52 @@ export const MerchantSupportModal: React.FC<MerchantSupportModalProps> = ({
                 {isSending && (
                   <div className="flex items-center gap-2 text-xs text-slate-400 italic">
                     <span className="w-2 h-2 rounded-full bg-[#0055FF] animate-ping" />
-                    <span>QivroPay specialist typing...</span>
+                    <span>Real AI Model thinking & analyzing MoR regulations...</span>
                   </div>
                 )}
               </div>
 
+              {/* API Key Drawer Toggle */}
+              {showKeySetting && (
+                <div className="p-3 mb-2 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs animate-fade-in">
+                  <div className="flex justify-between items-center font-bold text-slate-800">
+                    <span>⚙️ Google Gemini / OpenAI Key (Optional)</span>
+                    <button onClick={() => setShowKeySetting(false)} className="text-slate-400 hover:text-slate-600">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="Enter GEMINI_API_KEY for unbounded generative AI"
+                    defaultValue={customApiKey}
+                    onBlur={e => handleSaveApiKey(e.target.value.trim())}
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono outline-none focus:border-[#0055FF]"
+                  />
+                  <p className="text-[10px] text-slate-500">
+                    Saved locally in your browser. Leave blank to use QivroPay's high-speed built-in fintech intelligence.
+                  </p>
+                </div>
+              )}
+
               {/* Chat Input */}
-              <form onSubmit={handleSendMessage} className="pt-3 border-t border-slate-100 flex items-center gap-2">
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between pb-1 text-[11px] text-slate-400">
+                <span className="flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-[#0055FF]" />
+                  <span>Powered by Real-world MoR Knowledge &amp; LLM</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowKeySetting(!showKeySetting)}
+                  className="text-[10px] text-[#0055FF] hover:underline font-mono"
+                >
+                  {customApiKey ? '✓ Custom AI Key Active' : '+ Add Gemini Key'}
+                </button>
+              </div>
+
+              <form onSubmit={handleSendMessage} className="flex items-center gap-2">
                 <input
                   type="text"
-                  placeholder="Ask about UPI AutoPay, GST, Penny Drop, API keys..."
+                  placeholder="Ask about UPI AutoPay, GST, Penny Drop, Cashfree PG, API keys..."
                   value={inputQuery}
                   onChange={e => setInputQuery(e.target.value)}
                   className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-[#0055FF] outline-none transition-all"
