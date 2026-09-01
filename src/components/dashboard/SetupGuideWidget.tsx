@@ -74,23 +74,45 @@ export const SetupGuideWidget: React.FC<SetupGuideProps> = ({
     };
   });
 
-  // Sync verification status with completedSteps
+  // Sync with backend API on mount
   useEffect(() => {
-    if (verificationData && !completedSteps.verification) {
-      setCompletedSteps(prev => {
-        const next = { ...prev, verification: true };
-        try { localStorage.setItem('qivropay_setup_guide_completed', JSON.stringify(next)); } catch (e) {}
-        return next;
-      });
-    }
+    fetch('/api/v1/setup-guide/status')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.completedSteps) {
+          setCompletedSteps(prev => ({
+            ...prev,
+            ...data.completedSteps,
+            verification: !!(data.completedSteps.verification || verificationData)
+          }));
+          try {
+            localStorage.setItem('qivropay_setup_guide_completed', JSON.stringify({
+              ...data.completedSteps,
+              verification: !!(data.completedSteps.verification || verificationData)
+            }));
+          } catch (e) {}
+        }
+      })
+      .catch(err => console.warn('Setup guide backend sync error', err));
   }, [verificationData]);
 
-  const toggleStep = (stepKey: keyof typeof completedSteps) => {
+  const toggleStep = async (stepKey: keyof typeof completedSteps) => {
+    const nextVal = !completedSteps[stepKey];
     setCompletedSteps(prev => {
-      const next = { ...prev, [stepKey]: !prev[stepKey] };
+      const next = { ...prev, [stepKey]: nextVal };
       try { localStorage.setItem('qivropay_setup_guide_completed', JSON.stringify(next)); } catch (e) {}
       return next;
     });
+
+    try {
+      await fetch('/api/v1/setup-guide/step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stepKey, completed: nextVal })
+      });
+    } catch (err) {
+      console.warn('Backend setup step update error', err);
+    }
   };
 
   // Calculate dynamic progress percentage

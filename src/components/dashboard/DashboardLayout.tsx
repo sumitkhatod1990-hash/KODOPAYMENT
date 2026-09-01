@@ -282,6 +282,21 @@ export const DashboardLayout: React.FC = () => {
     return null;
   });
 
+  // Sync verification status from backend API on mount
+  useEffect(() => {
+    fetch('/api/v1/verification/status')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.verification && data.verification.status === 'approved') {
+          setVerificationData(data.verification);
+          try {
+            localStorage.setItem('qivropay_account_verification', JSON.stringify(data.verification));
+          } catch (e) {}
+        }
+      })
+      .catch(err => console.warn('Verification status fetch error', err));
+  }, []);
+
   const toggleDarkMode = () => {
     const nextMode = !isDarkMode;
     setIsDarkMode(nextMode);
