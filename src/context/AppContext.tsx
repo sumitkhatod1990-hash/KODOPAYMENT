@@ -19,6 +19,7 @@ import {
   DashboardTabType,
   CurrentViewType 
 } from '../types';
+import { useAuth } from './AuthContext';
 
 interface AppContextType {
   // Navigation
@@ -77,6 +78,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const initialCheckoutId = typeof window !== 'undefined' ? window.location.pathname.match(/^\/checkout\/([^/]+)/)?.[1] : null;
   const [currentView, setCurrentViewInternal] = useState<CurrentViewType>(initialCheckoutId ? 'checkout' : 'landing');
   const [dashboardTab, setDashboardTab] = useState<DashboardTabType>('home');
@@ -114,6 +116,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const refreshData = async () => {
+    // The bundled db.json contains the review/demo workspace. New merchants
+    // must start with an empty workspace until their own records are created.
+    // This prevents demo data from leaking across accounts in the dashboard.
+    if (user && user.email !== 'demo@qivropay.com') {
+      setProducts([]); setTransactions([]); setSubscriptions([]); setCustomers([]);
+      setDiscounts([]); setLicenses([]); setPayouts([]); setMeters([]); setApiKeys([]);
+      setWebhooks([]); setBrands([]); setAffiliates([]); setAgentWallets([]); setTeamMembers([]);
+      setAuditLogs([]); setAnalytics({ totalVolume: 0, totalFees: 0, totalNet: 0, mrr: 0, activeSubscriptions: 0, activeCustomers: 0, conversionRate: '0%', chargebackRate: '0%' });
+      setLoading(false);
+      return;
+    }
     try {
       const [
         prodsRes, txsRes, subsRes, custsRes, discsRes, 
@@ -178,7 +191,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     refreshData();
-  }, []);
+  }, [user?.id]);
 
   const createProduct = async (productData: Partial<Product>) => {
     try {
