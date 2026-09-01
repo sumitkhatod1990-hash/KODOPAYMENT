@@ -1,6 +1,8 @@
 import { Transaction } from '../types';
 
 export function printOrDownloadInvoice(tx: Transaction, businessName = 'KODO AI Technologies Inc.') {
+  const currency = 'INR';
+  const symbol = '₹';
   const invoiceNumber = `INV-${tx.id.replace('tx_kodo_', '').toUpperCase()}`;
   const invoiceDate = new Date(tx.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -203,8 +205,8 @@ export function printOrDownloadInvoice(tx: Transaction, businessName = 'KODO AI 
             <span style="font-size: 11px; color: #86868b;">Payment Rail: ${tx.paymentMethod.toUpperCase().replace('_', ' ')} ${tx.cardLast4 ? `(•${tx.cardLast4})` : ''}</span>
           </td>
           <td>1</td>
-          <td class="table-right">$${tx.amount.toFixed(2)}</td>
-          <td class="table-right"><strong>$${tx.amount.toFixed(2)} USD</strong></td>
+          <td class="table-right">${symbol}${tx.amount.toFixed(2)}</td>
+          <td class="table-right"><strong>${symbol}${tx.amount.toFixed(2)} ${currency}</strong></td>
         </tr>
       </tbody>
     </table>
@@ -212,15 +214,15 @@ export function printOrDownloadInvoice(tx: Transaction, businessName = 'KODO AI 
     <div class="total-box">
       <div class="total-row">
         <span>Subtotal</span>
-        <span>$${tx.amount.toFixed(2)} USD</span>
+        <span>${symbol}${tx.amount.toFixed(2)} ${currency}</span>
       </div>
       <div class="total-row">
         <span>VAT / Sales Tax</span>
-        <span style="color: #2e7d32; font-weight: 600;">$0.00 (MoR Auto-Remitted)</span>
+        <span style="color: #2e7d32; font-weight: 600;">${symbol}0.00 (MoR Auto-Remitted)</span>
       </div>
       <div class="grand-total">
         <span>Total Paid</span>
-        <span>$${tx.amount.toFixed(2)} USD</span>
+        <span>${symbol}${tx.amount.toFixed(2)} ${currency}</span>
       </div>
     </div>
 
