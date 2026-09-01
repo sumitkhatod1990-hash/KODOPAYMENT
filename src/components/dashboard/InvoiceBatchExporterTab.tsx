@@ -44,16 +44,16 @@ export const InvoiceBatchExporterTab: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-[#0A0D14] font-heading flex items-center gap-2">
             <FolderDown className="w-6 h-6 text-[#0055FF]" />
-            <span>1-Click Multi-Currency Invoice PDF Bulk Batch Exporter</span>
+            <span>Invoice exports</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
-            Export thousands of statutory tax invoice PDFs bundled into a single organized ZIP archive filtered by date, currency, or corporate entity for external accounting audits.
+            Download your India GST invoices and export batches for accounting.
           </p>
         </div>
 
         <div className="opp-badge self-start sm:self-auto text-emerald-700 font-bold bg-emerald-50 border-emerald-200">
           <Archive className="w-4 h-4 text-emerald-600" />
-          <span>ZIP ARCHIVE GENERATOR READY</span>
+          <span>{batches.length ? 'EXPORTS READY' : 'NO INVOICES YET'}</span>
         </div>
       </div>
 
@@ -61,7 +61,7 @@ export const InvoiceBatchExporterTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Invoices Ready for Export</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">1,240 Invoices</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">{batches.reduce((sum, b) => sum + b.invoiceCount, 0).toLocaleString('en-IN')} Invoices</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Fully compiled tax PDFs
           </div>
@@ -69,14 +69,14 @@ export const InvoiceBatchExporterTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Archived Billing Volume</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">$284,500.00 USD</div>
-          <div className="text-[11px] text-[#8C90A0] font-mono">100% segregated tax records</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹{batches.reduce((sum, b) => sum + Number(String(b.totalVolume).replace(/[^0-9.]/g, '') || 0), 0).toLocaleString('en-IN')} INR</div>
+          <div className="text-[11px] text-[#8C90A0] font-mono">India billing volume</div>
         </div>
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Export Packaging Speed</div>
-          <div className="text-2xl font-bold font-mono text-[#0A0D14]">&lt; 1.8s</div>
-          <div className="text-[11px] text-purple-700 font-mono">Streamed ZIP compression</div>
+          <div className="text-2xl font-bold font-mono text-[#0A0D14]">On demand</div>
+          <div className="text-[11px] text-purple-700 font-mono">Secure PDF export</div>
         </div>
       </div>
 
@@ -95,6 +95,9 @@ export const InvoiceBatchExporterTab: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-black/[0.05]">
+              {batches.length === 0 && (
+                <tr><td colSpan={6} className="p-10 text-center text-sm text-[#8C90A0]">No invoices available yet.</td></tr>
+              )}
               {batches.map((b) => (
                 <tr key={b.id} className="hover:bg-[#F4F5F8] transition-colors">
                   <td className="p-4 font-mono font-bold text-[#0A0D14]">

@@ -31,16 +31,16 @@ export const SettingsTab: React.FC = () => {
   const [domain, setDomain] = useState(currentBrand?.domain || 'kodo.in');
   
   // Cashfree PG & Easy Split Settings
-  const [cashfreeAppId, setCashfreeAppId] = useState('TEST110559449949df01b9dff3b901f544955011');
+  const [cashfreeAppId, setCashfreeAppId] = useState('');
   const [cashfreeSecretKey, setCashfreeSecretKey] = useState('');
   const [showSecret, setShowSecret] = useState(false);
-  const [cfEnv, setCfEnv] = useState<'TEST' | 'PROD'>('TEST');
+  const [cfEnv] = useState<'TEST' | 'PROD'>('PROD');
   
   // Bank Beneficiary Details (IMPS T+0)
-  const [beneficiaryName, setBeneficiaryName] = useState('KODO Labs Technologies India Pvt Ltd');
-  const [beneficiaryAccount, setBeneficiaryAccount] = useState('50200088192019');
-  const [beneficiaryIfsc, setBeneficiaryIfsc] = useState('HDFC0000240');
-  const [beneficiaryBank, setBeneficiaryBank] = useState('HDFC Bank Ltd (Koramangala, Bengaluru)');
+  const [beneficiaryName, setBeneficiaryName] = useState('');
+  const [beneficiaryAccount, setBeneficiaryAccount] = useState('');
+  const [beneficiaryIfsc, setBeneficiaryIfsc] = useState('');
+  const [beneficiaryBank, setBeneficiaryBank] = useState('');
   
   // State
   const [verifying, setVerifying] = useState(false);
@@ -96,7 +96,7 @@ export const SettingsTab: React.FC = () => {
           <span>Merchant Settings &amp; Cashfree Gateway Hub</span>
         </h2>
         <p className="text-xs sm:text-sm text-[#8C90A0]">
-          Configure your legal entity profile, live Cashfree Payment Gateway credentials, Easy Split payout bank accounts, and statutory tax parameters.
+          Configure your legal entity profile and production payment settings. Secrets are stored server-side only.
         </p>
       </div>
 
@@ -117,35 +117,14 @@ export const SettingsTab: React.FC = () => {
                   </span>
                 </h3>
                 <p className="text-xs text-[#8C90A0]">
-                  Direct API handshake with Cashfree for instant UPI intent &amp; Easy Split T+0 settlements
+                  Production Cashfree Orders API connection for INR payments
                 </p>
               </div>
             </div>
 
-            {/* Environment Toggle Switch */}
+            {/* Environment indicator: switching environments is controlled by deployment configuration. */}
             <div className="flex items-center p-1 bg-[#F4F5F8] rounded-xl border border-black/[0.06] text-xs font-mono">
-              <button
-                type="button"
-                onClick={() => setCfEnv('TEST')}
-                className={`px-3 py-1.5 rounded-lg transition-all font-bold ${
-                  cfEnv === 'TEST' 
-                    ? 'bg-amber-100 text-amber-900 shadow-xs' 
-                    : 'text-[#8C90A0] hover:text-[#0A0D14]'
-                }`}
-              >
-                TEST (Sandbox)
-              </button>
-              <button
-                type="button"
-                onClick={() => setCfEnv('PROD')}
-                className={`px-3 py-1.5 rounded-lg transition-all font-bold ${
-                  cfEnv === 'PROD' 
-                    ? 'bg-emerald-600 text-white shadow-xs' 
-                    : 'text-[#8C90A0] hover:text-[#0A0D14]'
-                }`}
-              >
-                LIVE (Production)
-              </button>
+              <span className="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 font-bold">{cfEnv === 'PROD' ? 'LIVE (Production)' : 'TEST (Sandbox)'}</span>
             </div>
           </div>
 
@@ -156,7 +135,7 @@ export const SettingsTab: React.FC = () => {
                 type="text"
                 value={cashfreeAppId}
                 onChange={(e) => setCashfreeAppId(e.target.value)}
-                placeholder="e.g. TEST10091823ab912809182 or CF_LIVE_..."
+                placeholder="Configured securely in your hosting environment"
                 className="w-full p-3 rounded-xl border border-black/[0.08] bg-[#FAFBFD] text-[#0A0D14] focus:border-[#0055FF] outline-none font-mono"
               />
             </div>
@@ -168,7 +147,7 @@ export const SettingsTab: React.FC = () => {
                   type={showSecret ? "text" : "password"}
                   value={cashfreeSecretKey}
                   onChange={(e) => setCashfreeSecretKey(e.target.value)}
-                  placeholder="Enter Cashfree Secret Key..."
+                placeholder="Enter only for a one-time server-side verification"
                   className="w-full p-3 pr-10 rounded-xl border border-black/[0.08] bg-[#FAFBFD] text-[#0A0D14] focus:border-[#0055FF] outline-none font-mono"
                 />
                 <button
@@ -195,7 +174,7 @@ export const SettingsTab: React.FC = () => {
 
               <div className="text-[11px] font-mono text-[#8C90A0] flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>AES-256 Cloud HSM Encrypted Storage</span>
+                <span>Secret never exposed to the browser</span>
               </div>
             </div>
 
@@ -287,7 +266,7 @@ export const SettingsTab: React.FC = () => {
 
           <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs font-mono text-emerald-800 flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>₹1 Penny-Drop Bank KYC Verified (NPCI IMPS UTR: 62910482910)</span>
+            <span>Bank details are not verified yet. Save your own beneficiary details and complete verification before payouts.</span>
           </div>
         </div>
 
