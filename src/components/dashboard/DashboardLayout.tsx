@@ -538,10 +538,10 @@ export const DashboardLayout: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col md:flex-row font-sans">
+    <div className="min-h-screen bg-[#f5f5f7] dark:bg-[#07090E] text-[#1d1d1f] dark:text-slate-100 flex flex-col md:flex-row font-sans transition-colors duration-300">
       
       {/* Sidebar */}
-      <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-black/10 bg-white flex flex-col justify-between shrink-0 shadow-sm">
+      <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-black/10 dark:border-white/10 bg-white dark:bg-[#0C0F17] flex flex-col justify-between shrink-0 shadow-sm transition-colors duration-300">
         
         <div className="p-4 space-y-5">
           
@@ -550,7 +550,7 @@ export const DashboardLayout: React.FC = () => {
             <Logo size="sm" onClick={() => setCurrentView('landing')} />
             <button
               onClick={() => setCurrentView('landing')}
-              className="text-xs text-[#86868b] hover:text-[#1d1d1f] md:hidden font-medium"
+              className="text-xs text-[#86868b] dark:text-slate-400 hover:text-[#1d1d1f] dark:hover:text-white md:hidden font-medium"
             >
               Exit
             </button>
@@ -560,32 +560,32 @@ export const DashboardLayout: React.FC = () => {
           <div className="relative">
             <button
               onClick={() => setBrandDropdownOpen(!brandDropdownOpen)}
-              className="w-full p-2 rounded-2xl bg-[#f5f5f7] border border-black/5 flex items-center justify-between text-xs hover:bg-[#e8e8ed] transition-colors"
+              className="w-full p-2 rounded-2xl bg-[#f5f5f7] dark:bg-[#141824] border border-black/5 dark:border-white/10 flex items-center justify-between text-xs hover:bg-[#e8e8ed] dark:hover:bg-[#1C2333] transition-colors"
             >
               <div className="flex items-center gap-2 text-left truncate">
-                <div className="w-6 h-6 rounded-lg bg-black text-white flex items-center justify-center font-bold text-[10px]">
+                <div className="w-6 h-6 rounded-lg bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-bold text-[10px]">
                   {currentBrand?.name.charAt(0) || 'Q'}
                 </div>
                 <div className="truncate">
-                  <div className="font-bold text-[#1d1d1f] truncate">{currentBrand?.name || 'QivroPay (by Neocraft LLP)'}</div>
-                  <div className="text-[10px] text-[#86868b] font-mono">{currentBrand?.domain || 'qivropay.in'}</div>
+                  <div className="font-bold text-[#1d1d1f] dark:text-white truncate">{currentBrand?.name || 'QivroPay (by Neocraft LLP)'}</div>
+                  <div className="text-[10px] text-[#86868b] dark:text-slate-400 font-mono">{currentBrand?.domain || 'qivropay.in'}</div>
                 </div>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-[#86868b] shrink-0" />
+              <ChevronDown className="w-3.5 h-3.5 text-[#86868b] dark:text-slate-400 shrink-0" />
             </button>
 
             {brandDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 p-1.5 rounded-2xl bg-white border border-black/10 shadow-xl z-50 text-xs space-y-1 animate-fade-in">
+              <div className="absolute top-full left-0 right-0 mt-1.5 p-1.5 rounded-2xl bg-white dark:bg-[#0E121B] border border-black/10 dark:border-white/10 shadow-xl z-50 text-xs space-y-1 animate-fade-in">
                 {brands.map((b) => (
                   <div
                     key={b.id}
                     onClick={() => { setCurrentBrand(b); setBrandDropdownOpen(false); }}
                     className={`p-2 rounded-xl flex items-center justify-between cursor-pointer ${
-                      currentBrand?.id === b.id ? 'bg-[#f5f5f7] font-bold text-[#0071e3]' : 'text-[#6e6e73] hover:bg-[#fafafc]'
+                      currentBrand?.id === b.id ? 'bg-[#f5f5f7] dark:bg-white/10 font-bold text-[#0071e3] dark:text-blue-400' : 'text-[#6e6e73] dark:text-slate-300 hover:bg-[#fafafc] dark:hover:bg-white/5'
                     }`}
                   >
                     <span>{b.name}</span>
-                    {b.default && <span className="text-[9px] px-1.5 py-0.5 rounded bg-black text-white">DEFAULT</span>}
+                    {b.default && <span className="text-[9px] px-1.5 py-0.5 rounded bg-black dark:bg-white text-white dark:text-black">DEFAULT</span>}
                   </div>
                 ))}
               </div>
@@ -593,16 +593,16 @@ export const DashboardLayout: React.FC = () => {
           </div>
 
           {/* Test / Live Mode Toggle */}
-          <div className="p-2 rounded-2xl bg-[#f5f5f7] border border-black/5 flex items-center justify-between">
+          <div className="p-2 rounded-2xl bg-[#f5f5f7] dark:bg-[#141824] border border-black/5 dark:border-white/10 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${isTestMode ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`}></span>
-              <span className="text-[11px] font-mono font-bold text-[#1d1d1f]">
+              <span className="text-[11px] font-mono font-bold text-[#1d1d1f] dark:text-white">
                 {isTestMode ? 'SANDBOX (TEST)' : 'LIVE RAILS'}
               </span>
             </div>
             <button
               onClick={() => setIsTestMode(!isTestMode)}
-              className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white text-[#6e6e73] hover:text-[#1d1d1f] border border-black/10 shadow-sm font-semibold"
+              className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white dark:bg-[#1C2333] text-[#6e6e73] dark:text-slate-300 hover:text-[#1d1d1f] dark:hover:text-white border border-black/10 dark:border-white/10 shadow-sm font-semibold"
             >
               Switch
             </button>
@@ -612,7 +612,7 @@ export const DashboardLayout: React.FC = () => {
           <nav className="space-y-4 max-h-[calc(100vh-280px)] overflow-y-auto pr-1">
             {navigationGroups.map((grp) => (
               <div key={grp.group} className="space-y-1">
-                <div className="px-3 text-[9px] font-mono font-bold uppercase tracking-wider text-[#86868b]">
+                <div className="px-3 text-[9px] font-mono font-bold uppercase tracking-wider text-[#86868b] dark:text-slate-400">
                   {grp.group}
                 </div>
                 {grp.items.map((item) => {
@@ -624,11 +624,11 @@ export const DashboardLayout: React.FC = () => {
                       onClick={() => setDashboardTab(item.id as any)}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                         isActive
-                          ? 'bg-[#1d1d1f] text-white shadow-sm'
-                          : 'text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#f5f5f7]'
+                          ? 'bg-[#1d1d1f] dark:bg-white text-white dark:text-black shadow-sm'
+                          : 'text-[#6e6e73] dark:text-slate-400 hover:text-[#1d1d1f] dark:hover:text-white hover:bg-[#f5f5f7] dark:hover:bg-white/5'
                       }`}
                     >
-                      <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-[#6e6e73]'}`} />
+                      <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white dark:text-black' : 'text-[#6e6e73] dark:text-slate-400'}`} />
                       <span className="truncate">{item.label}</span>
                     </button>
                   );
@@ -640,18 +640,18 @@ export const DashboardLayout: React.FC = () => {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-3 border-t border-black/5 space-y-1.5">
+        <div className="p-3 border-t border-black/5 dark:border-white/10 space-y-1.5">
           <button
             onClick={() => setCurrentView('docs')}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-[#f5f5f7] text-[#1d1d1f] text-xs hover:bg-[#e8e8ed] transition-colors font-semibold"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-[#f5f5f7] dark:bg-[#141824] text-[#1d1d1f] dark:text-white text-xs hover:bg-[#e8e8ed] dark:hover:bg-[#1C2333] transition-colors font-semibold"
           >
-            <BookOpen className="w-3.5 h-3.5 text-[#0071e3]" />
+            <BookOpen className="w-3.5 h-3.5 text-[#0071e3] dark:text-blue-400" />
             <span>Developer Docs</span>
           </button>
 
           <button
             onClick={() => setCurrentView('landing')}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[#86868b] hover:text-[#1d1d1f] text-xs font-medium transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-[#86868b] dark:text-slate-400 hover:text-[#1d1d1f] dark:hover:text-white text-xs font-medium transition-colors"
           >
             <ArrowLeft className="w-3 h-3" />
             <span>QIVROPAY Home</span>
@@ -659,7 +659,7 @@ export const DashboardLayout: React.FC = () => {
 
           <button
             onClick={() => { signOut(); if (typeof window !== 'undefined') window.localStorage.removeItem('qivropay_last_view'); setCurrentView('landing'); }}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-[#6e6e73] hover:text-rose-600 hover:bg-rose-50 text-xs font-semibold transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-[#6e6e73] dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-semibold transition-colors"
           >
             Sign out
           </button>
@@ -671,27 +671,27 @@ export const DashboardLayout: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0">
         
         {/* App Topbar Header */}
-        <header className="h-16 border-b border-black/10 bg-white px-6 sm:px-8 flex items-center justify-between shadow-sm">
+        <header className="h-16 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#0C0F17] px-6 sm:px-8 flex items-center justify-between shadow-sm transition-colors duration-300">
           <div className="flex items-center gap-3">
-            <h1 className="font-bold text-[#1d1d1f] text-lg capitalize font-heading">
+            <h1 className="font-bold text-[#1d1d1f] dark:text-white text-lg capitalize font-heading">
               {dashboardTab.replace('-', ' ')}
             </h1>
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-bold">
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-mono text-emerald-800 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-2.5 py-0.5 rounded-full font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
               QIVROPAY MoR Active
             </span>
           </div>
 
-          {/* Topbar Right Action Bar (Image 2) */}
+          {/* Topbar Right Action Bar */}
           <div className="flex items-center gap-2">
             
             {/* Setup Guide Button with Circular Progress Ring */}
             <button
               onClick={() => setSetupGuideOpen(!setupGuideOpen)}
-              className={`h-10 px-3.5 rounded-2xl flex items-center gap-2 text-xs font-semibold border transition-all ${
+              className={`h-10 px-3.5 rounded-2xl flex items-center gap-2 text-xs font-semibold border transition-all duration-300 ${
                 setupGuideOpen
-                  ? 'bg-slate-100 text-slate-900 border-slate-300 shadow-sm'
-                  : 'bg-[#F4F5F8] hover:bg-[#EBECEF] text-[#334155] border-black/5'
+                  ? 'bg-slate-100 dark:bg-[#1C2333] text-slate-900 dark:text-white border-slate-300 dark:border-white/20 shadow-sm'
+                  : 'bg-[#F4F5F8] dark:bg-[#141824] hover:bg-[#EBECEF] dark:hover:bg-[#1C2333] text-[#334155] dark:text-slate-200 border-black/5 dark:border-white/10'
               }`}
               title="Toggle Setup Guide"
             >
@@ -725,46 +725,49 @@ export const DashboardLayout: React.FC = () => {
               <span>Setup guide</span>
             </button>
 
-            {/* Dark Mode / Theme Toggle Button (Moon Icon) */}
+            {/* Dark Mode / Theme Toggle Button (Moon / Sun with 3D Flip & Spin Animation) */}
             <button
               onClick={toggleDarkMode}
-              className="w-10 h-10 rounded-2xl bg-[#F4F5F8] hover:bg-[#EBECEF] text-[#1E293B] border border-black/5 flex items-center justify-center transition-all"
+              className="relative w-10 h-10 rounded-2xl bg-[#F4F5F8] dark:bg-[#141824] hover:bg-[#EBECEF] dark:hover:bg-[#1E2436] text-[#1E293B] dark:text-amber-400 border border-black/5 dark:border-white/10 flex items-center justify-center transition-all duration-300 transform active:scale-90 hover:scale-105 shadow-sm group overflow-hidden cursor-pointer"
               title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label="Toggle Theme"
             >
-              {isDarkMode ? (
-                <Sun className="w-4 h-4 text-amber-500" />
-              ) : (
-                <Moon className="w-4 h-4 text-[#1E293B]" />
-              )}
+              <div className={`transition-all duration-500 ease-out flex items-center justify-center ${isDarkMode ? 'rotate-180 scale-110' : 'rotate-0 scale-100'}`}>
+                {isDarkMode ? (
+                  <Sun className="w-4 h-4 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] transition-all" />
+                ) : (
+                  <Moon className="w-4 h-4 text-[#1E293B] group-hover:rotate-12 transition-transform" />
+                )}
+              </div>
             </button>
 
             {/* Notifications Bell Button */}
             <button
               onClick={() => setNotifDrawerOpen(true)}
-              className="relative w-10 h-10 rounded-2xl bg-[#F4F5F8] hover:bg-[#EBECEF] text-[#1E293B] border border-black/5 flex items-center justify-center transition-all"
+              className="relative w-10 h-10 rounded-2xl bg-[#F4F5F8] dark:bg-[#141824] hover:bg-[#EBECEF] dark:hover:bg-[#1E2436] text-[#1E293B] dark:text-slate-200 border border-black/5 dark:border-white/10 flex items-center justify-center transition-all cursor-pointer"
               title="Notifications"
             >
-              <Bell className="w-4 h-4 text-[#1E293B]" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white" />
+              <Bell className="w-4 h-4 text-[#1E293B] dark:text-slate-200" />
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#141824]" />
             </button>
 
             {/* User Profile Avatar Button */}
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="w-10 h-10 rounded-2xl bg-[#F4F5F8] hover:bg-[#EBECEF] text-[#1E293B] border border-black/5 flex items-center justify-center transition-all"
+                className="w-10 h-10 rounded-2xl bg-[#F4F5F8] dark:bg-[#141824] hover:bg-[#EBECEF] dark:hover:bg-[#1E2436] text-[#1E293B] dark:text-slate-200 border border-black/5 dark:border-white/10 flex items-center justify-center transition-all cursor-pointer"
                 title="Account & Profile"
               >
-                <UserIcon className="w-4 h-4 text-[#1E293B]" />
+                <UserIcon className="w-4 h-4 text-[#1E293B] dark:text-slate-200" />
               </button>
 
               {/* User Profile Dropdown */}
               {userMenuOpen && (
-                <div className="absolute top-full right-0 mt-2 w-56 p-2 rounded-2xl bg-white border border-slate-200/90 shadow-2xl z-50 text-xs font-sans space-y-1 animate-scale-up">
-                  <div className="p-2.5 border-b border-slate-100">
-                    <div className="font-bold text-slate-900 truncate">{user?.name || 'Merchant'}</div>
-                    <div className="text-[11px] text-slate-500 truncate">{user?.email || 'admin@qivropay.in'}</div>
-                    <div className="text-[10px] text-[#0055FF] font-semibold mt-0.5">{user?.company || 'QivroPay account'}</div>
+                <div className="absolute top-full right-0 mt-2 w-56 p-2 rounded-2xl bg-white dark:bg-[#0E121B] border border-slate-200/90 dark:border-white/10 shadow-2xl z-50 text-xs font-sans space-y-1 animate-scale-up">
+                  <div className="p-2.5 border-b border-slate-100 dark:border-white/5">
+                    <div className="font-bold text-slate-900 dark:text-white truncate">{user?.name || 'Merchant'}</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{user?.email || 'admin@qivropay.in'}</div>
+                    <div className="text-[10px] text-[#0055FF] dark:text-blue-400 font-semibold mt-0.5">{user?.company || 'QivroPay account'}</div>
                   </div>
 
                   <button
@@ -808,7 +811,7 @@ export const DashboardLayout: React.FC = () => {
         </header>
 
         {/* Dynamic Route Container */}
-        <main className="flex-1 p-6 sm:p-8 lg:p-10 overflow-y-auto max-w-7xl">
+        <main className="flex-1 p-6 sm:p-8 lg:p-10 overflow-y-auto max-w-7xl bg-[#f5f5f7] dark:bg-[#07090E] text-[#1d1d1f] dark:text-slate-100 transition-colors duration-300">
           {dashboardTab === 'home' && <OverviewTab onNavigateTab={setDashboardTab} />}
           {dashboardTab === 'copilot' && <AICopilotTab />}
           {dashboardTab === 'payments' && <PaymentsTab />}

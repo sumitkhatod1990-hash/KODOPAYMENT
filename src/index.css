@@ -26,12 +26,40 @@
     --radius: 1.5rem;
   }
 
+  .dark {
+    --background: 222 47% 4%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 7%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 7%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 222 47% 11%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 47% 11%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 222 47% 11%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 221 83% 53%;
+  }
+
   body {
     background-color: #FAFAFC;
     color: #0A0D14;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .dark body {
+    background-color: #07090E;
+    color: #F8FAFC;
   }
 
   h1, h2, h3, h4, .font-heading {
@@ -54,15 +82,31 @@
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.dark .opp-card {
+  background: #0E121B;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.5);
+}
+
 .opp-card:hover {
   border-color: rgba(10, 13, 20, 0.14);
   box-shadow: 0 12px 32px -8px rgba(10, 13, 20, 0.08);
+}
+
+.dark .opp-card:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.7);
 }
 
 .opp-card-subtle {
   background: #F4F5F8;
   border: 1px solid rgba(10, 13, 20, 0.05);
   border-radius: 24px;
+}
+
+.dark .opp-card-subtle {
+  background: #141824;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .opp-badge {
@@ -80,6 +124,12 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
+.dark .opp-badge {
+  background: #161B26;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #F8FAFC;
+}
+
 .opp-btn-primary {
   display: inline-flex;
   align-items: center;
@@ -95,10 +145,21 @@
   box-shadow: 0 2px 8px rgba(10, 13, 20, 0.12);
 }
 
+.dark .opp-btn-primary {
+  background: #FFFFFF;
+  color: #0A0D14;
+  box-shadow: 0 2px 12px rgba(255, 255, 255, 0.15);
+}
+
 .opp-btn-primary:hover {
   background: #202430;
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(10, 13, 20, 0.16);
+}
+
+.dark .opp-btn-primary:hover {
+  background: #E2E8F0;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
 }
 
 .opp-btn-secondary {
@@ -117,9 +178,20 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
+.dark .opp-btn-secondary {
+  background: #141824;
+  color: #F8FAFC;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
 .opp-btn-secondary:hover {
   background: #F4F5F8;
   border-color: rgba(10, 13, 20, 0.2);
+}
+
+.dark .opp-btn-secondary:hover {
+  background: #1C2333;
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 /* Animations */
