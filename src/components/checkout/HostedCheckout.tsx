@@ -53,7 +53,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   const [customerEmail, setCustomerEmail] = useState('alex.chen@synthflow.ai');
   const [customerPhone, setCustomerPhone] = useState('9999999999');
   const [paymentRail, setPaymentRail] = useState<PaymentRail>('upi');
-  const [paymentCategory] = useState<'asia_latam'>('asia_latam');
+  const [paymentCategory, setPaymentCategory] = useState<'asia_latam' | 'cards' | 'bnpl' | 'wallets' | 'europe' | 'crypto'>('asia_latam');
   const [indiaPaymentMode, setIndiaPaymentMode] = useState<'upi' | 'card'>('upi');
   
   // Country & PPP State
