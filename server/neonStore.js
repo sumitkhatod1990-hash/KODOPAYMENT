@@ -42,6 +42,17 @@ export async function recordPaymentOrder(order) {
   `;
 }
 
+export async function getPaymentOrderForSession(sessionToken) {
+  await ensurePaymentStore();
+  const sql = sqlClient();
+  const rows = await sql`
+    SELECT payload FROM qivropay_payment_events
+    WHERE kind = 'order_created' AND payload->>'sessionToken' = ${String(sessionToken || '')}
+    ORDER BY created_at DESC LIMIT 1
+  `;
+  return rows[0]?.payload || null;
+}
+
 export async function recordCashfreeWebhook(eventId, event) {
   await ensurePaymentStore();
   const sql = sqlClient();
