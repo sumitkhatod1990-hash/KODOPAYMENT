@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { 
   ShieldAlert, 
   ShieldCheck, 
@@ -15,7 +16,8 @@ import {
 import confetti from 'canvas-confetti';
 
 export const DisputesTab: React.FC = () => {
-  const [disputesList, setDisputesList] = useState([
+  const { user } = useAuth();
+  const [disputesList, setDisputesList] = useState(() => user?.email === 'demo@qivropay.com' ? [
     {
       id: 'dp_kodo_01',
       transactionId: 'tx_kodo_9881',
@@ -28,7 +30,7 @@ export const DisputesTab: React.FC = () => {
       disputeDeadline: 'In 4 days',
       evidenceScore: '98% Win Probability (3DS 2.0 Biometric + Server Log Trace)'
     }
-  ]);
+  ] : []);
 
   const [submittingId, setSubmittingId] = useState<string | null>(null);
 
