@@ -145,7 +145,10 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   
   const isInrSession = (sessionData?.currency || '').toUpperCase() === 'INR';
   const displayCurrency = isInrSession ? 'INR' : 'USD';
-  const displaySymbol = isInrSession ? '₹' : '  let finalUsdAmount = isInrSession ? basePrice : (enablePPP ? pppDetails.discountedUsd : basePrice);
+  const displaySymbol = isInrSession ? '₹' : '$';
+  const receiptCurrency = String(completedTx?.currency || displayCurrency).toUpperCase();
+  const receiptSymbol = receiptCurrency === 'INR' ? '₹' : '$';
+  let finalUsdAmount = isInrSession ? basePrice : (enablePPP ? pppDetails.discountedUsd : basePrice);
   if (discountApplied) {
     finalUsdAmount = finalUsdAmount * 0.5;
   }
