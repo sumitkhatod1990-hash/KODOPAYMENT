@@ -55,4 +55,3 @@ export async function recordCashfreeWebhook(eventId, event) {
   `;
   return rows.length > 0;
 }
-
