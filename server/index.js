@@ -107,6 +107,12 @@ app.post('/api/v1/auth/login', async (req, res) => {
   if (!normalizedEmail || !password) return res.status(400).json({ success: false, error: 'Email and password are required' });
   try {
     let user = await findUserByEmail(normalizedEmail);
+    // Demo access is intentionally credentials-only; there is no public UI shortcut.
+    const demoEmail = String(process.env.DEMO_ACCOUNT_EMAIL || 'demo@qivropay.com').trim().toLowerCase();
+    const demoPassword = String(process.env.DEMO_ACCOUNT_PASSWORD || 'QivroDemo2026!');
+    if (!user && normalizedEmail === demoEmail && password === demoPassword) {
+      user = await createUser({ email: demoEmail, password: demoPassword, name: 'Demo Merchant', company: 'QivroPay Demo Workspace' });
+    }
     if (!user || !checkUserPassword(password, user.password_hash)) return res.status(401).json({ success: false, error: 'Invalid email or password' });
     const session = await createAuthSession(user.id);
     res.setHeader('Set-Cookie', authCookieOptions(60 * 60 * 24 * 30).replace('qivropay_session=;', `qivropay_session=${encodeURIComponent(session.token)}`));
