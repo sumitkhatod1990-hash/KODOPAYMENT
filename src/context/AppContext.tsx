@@ -117,75 +117,64 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const refreshData = async () => {
-    // The bundled db.json contains the review/demo workspace. New merchants
-    // must start with an empty workspace until their own records are created.
-    // This prevents demo data from leaking across accounts in the dashboard.
-    if (user && user.email !== 'demo@qivropay.com') {
-      setProducts([]); setTransactions([]); setSubscriptions([]); setCustomers([]);
-      setDiscounts([]); setLicenses([]); setPayouts([]); setMeters([]); setApiKeys([]);
-      setWebhooks([]); setBrands([]); setAffiliates([]); setAgentWallets([]); setTeamMembers([]);
-      setAuditLogs([]); setAnalytics({ totalVolume: 0, totalFees: 0, totalNet: 0, mrr: 0, activeSubscriptions: 0, activeCustomers: 0, conversionRate: '0%', chargebackRate: '0%' });
-      setLoading(false);
-      return;
-    }
+  const safeFetch = async (url: string) => {
     try {
-      const [
-        prodsRes, txsRes, subsRes, custsRes, discsRes, 
-        licsRes, posRes, mtrsRes, keysRes, whsRes, brsRes, 
-        affRes, walRes, teamRes, auditRes, analRes
-      ] = await Promise.all([
-        fetch('/api/v1/products'),
-        fetch('/api/v1/transactions'),
-        fetch('/api/v1/subscriptions'),
-        fetch('/api/v1/customers'),
-        fetch('/api/v1/discounts'),
-        fetch('/api/v1/licenses'),
-        fetch('/api/v1/payouts'),
-        fetch('/api/v1/meters'),
-        fetch('/api/v1/keys'),
-        fetch('/api/v1/webhooks'),
-        fetch('/api/v1/brands'),
-        fetch('/api/v1/affiliates'),
-        fetch('/api/v1/wallets'),
-        fetch('/api/v1/team'),
-        fetch('/api/v1/audit-logs'),
-        fetch('/api/v1/analytics')
-      ]);
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
 
+  const refreshData = async () => {
+    try {
       const [
         prods, txs, subs, custs, discs, 
         lics, pos, mtrs, keys, whs, brs, 
         aff, wal, team, audit, anal
       ] = await Promise.all([
-        prodsRes.json(), txsRes.json(), subsRes.json(), custsRes.json(), discsRes.json(),
-        licsRes.json(), posRes.json(), mtrsRes.json(), keysRes.json(), whsRes.json(), brsRes.json(),
-        affRes.json(), walRes.json(), teamRes.json(), auditRes.json(), analRes.json()
+        safeFetch('/api/v1/products'),
+        safeFetch('/api/v1/transactions'),
+        safeFetch('/api/v1/subscriptions'),
+        safeFetch('/api/v1/customers'),
+        safeFetch('/api/v1/discounts'),
+        safeFetch('/api/v1/licenses'),
+        safeFetch('/api/v1/payouts'),
+        safeFetch('/api/v1/meters'),
+        safeFetch('/api/v1/keys'),
+        safeFetch('/api/v1/webhooks'),
+        safeFetch('/api/v1/brands'),
+        safeFetch('/api/v1/affiliates'),
+        safeFetch('/api/v1/wallets'),
+        safeFetch('/api/v1/team'),
+        safeFetch('/api/v1/audit-logs'),
+        safeFetch('/api/v1/analytics')
       ]);
 
-      if (prods.success) setProducts(prods.products);
-      if (txs.success) setTransactions(txs.transactions);
-      if (subs.success) setSubscriptions(subs.subscriptions);
-      if (custs.success) setCustomers(custs.customers);
-      if (discs.success) setDiscounts(discs.discounts);
-      if (lics.success) setLicenses(lics.licenses);
-      if (pos.success) setPayouts(pos.payouts);
-      if (mtrs.success) setMeters(mtrs.meters);
-      if (keys.success) setApiKeys(keys.apiKeys);
-      if (whs.success) setWebhooks(whs.webhooks);
-      if (aff.success) setAffiliates(aff.affiliates);
-      if (wal.success) setAgentWallets(wal.agentWallets);
-      if (team.success) setTeamMembers(team.teamMembers);
-      if (audit.success) setAuditLogs(audit.auditLogs);
-      if (brs.success) {
+      if (prods && prods.success && Array.isArray(prods.products)) setProducts(prods.products);
+      if (txs && txs.success && Array.isArray(txs.transactions)) setTransactions(txs.transactions);
+      if (subs && subs.success && Array.isArray(subs.subscriptions)) setSubscriptions(subs.subscriptions);
+      if (custs && custs.success && Array.isArray(custs.customers)) setCustomers(custs.customers);
+      if (discs && discs.success && Array.isArray(discs.discounts)) setDiscounts(discs.discounts);
+      if (lics && lics.success && Array.isArray(lics.licenses)) setLicenses(lics.licenses);
+      if (pos && pos.success && Array.isArray(pos.payouts)) setPayouts(pos.payouts);
+      if (mtrs && mtrs.success && Array.isArray(mtrs.meters)) setMeters(mtrs.meters);
+      if (keys && keys.success && Array.isArray(keys.apiKeys)) setApiKeys(keys.apiKeys);
+      if (whs && whs.success && Array.isArray(whs.webhooks)) setWebhooks(whs.webhooks);
+      if (aff && aff.success && Array.isArray(aff.affiliates)) setAffiliates(aff.affiliates);
+      if (wal && wal.success && Array.isArray(wal.agentWallets)) setAgentWallets(wal.agentWallets);
+      if (team && team.success && Array.isArray(team.teamMembers)) setTeamMembers(team.teamMembers);
+      if (audit && audit.success && Array.isArray(audit.auditLogs)) setAuditLogs(audit.auditLogs);
+      if (brs && brs.success && Array.isArray(brs.brands)) {
         setBrands(brs.brands);
         if (!currentBrand && brs.brands.length > 0) {
           setCurrentBrand(brs.brands[0]);
         }
       }
-      if (anal.success) setAnalytics(anal.analytics);
+      if (anal && anal.success && anal.analytics) setAnalytics(anal.analytics);
     } catch (err) {
-      console.error('Error fetching data from QIVROPAY API:', err);
+      console.warn('Data fetch warning:', err);
     } finally {
       setLoading(false);
     }
