@@ -36,7 +36,7 @@ export const PricingCalculator: React.FC = () => {
             Calculate your net earnings with QIVROPAY.
           </h2>
           <p className="text-base sm:text-lg text-[#6e6e73] max-w-2xl mx-auto">
-            No monthly subscription fees, no minimums, no surprise charges. Just simple 4% + 40¢ per transaction.
+            No monthly subscription fees, no minimums, no surprise charges. Just simple 4% + ₹0.40 per transaction.
           </p>
         </div>
 
@@ -117,7 +117,7 @@ export const PricingCalculator: React.FC = () => {
 
               <div className="space-y-3 text-xs border-t border-black/5 pt-4 text-[#6e6e73] font-mono">
                 <div className="flex justify-between">
-                  <span>Platform Fee (4% + 40¢):</span>
+                  <span>Platform Fee (4% + ₹0.40):</span>
                   <span className="text-[#1d1d1f] font-bold">₹{Math.round(qivropayFee).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
@@ -125,7 +125,7 @@ export const PricingCalculator: React.FC = () => {
                   <span className="text-emerald-600 font-bold">Included (₹0)</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Global Tax Remittance:</span>
+                  <span>GST & tax records:</span>
                   <span className="text-emerald-600 font-bold">Included (₹0)</span>
                 </div>
               </div>
@@ -145,7 +145,7 @@ export const PricingCalculator: React.FC = () => {
 
               <div className="space-y-3 text-xs border-t border-black/5 pt-4 text-[#6e6e73] font-mono">
                 <div className="flex justify-between">
-                  <span>Fee (5% + 50¢):</span>
+                  <span>Fee (5% + ₹0.50):</span>
                   <span className="text-[#1d1d1f]">₹{Math.round(lsFee).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-amber-600">
