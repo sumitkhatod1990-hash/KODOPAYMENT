@@ -4,6 +4,8 @@ import { Building, TrendingUp, CheckCircle2, Clock, Plus, Download, FileSpreadsh
 
 export const PayoutsTab: React.FC = () => {
   const { payouts, requestPayout, analytics, transactions } = useApp();
+  const availableForPayout = Math.max(0, Number(analytics?.totalNet || 0) * 0.75);
+  const hasSettlement = availableForPayout > 0 || payouts.length > 0;
   const [showModal, setShowModal] = useState(false);
   const [amount, setAmount] = useState(1500);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,6 +66,7 @@ export const PayoutsTab: React.FC = () => {
 
           <button
             onClick={() => setShowModal(true)}
+            disabled={!hasSettlement}
             className="apple-btn-black px-5 py-2.5 text-xs font-semibold flex items-center gap-2 shadow-sm"
           >
             <Plus className="w-4 h-4" />
@@ -77,15 +80,15 @@ export const PayoutsTab: React.FC = () => {
         <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-sm space-y-1">
           <span className="text-xs text-[#86868b] font-medium">Available for Payout</span>
           <div className="text-3xl font-extrabold text-emerald-700 font-mono">
-            ₹{analytics?.totalNet ? (analytics.totalNet * 0.75).toFixed(2) : '1,240.00'}
+            ₹{availableForPayout.toFixed(2)}
           </div>
-          <span className="text-[11px] text-[#86868b]">Auto-settling on schedule</span>
+          <span className="text-[11px] text-[#86868b]">{hasSettlement ? 'Auto-settling on schedule' : 'No settled funds yet'}</span>
         </div>
 
         <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-sm space-y-1">
           <span className="text-xs text-[#86868b] font-medium">Payout Destination Bank</span>
-          <div className="text-base font-bold text-[#1d1d1f] mt-1">Verified Indian bank account</div>
-          <span className="text-xs text-[#86868b] font-mono">Settlement destination active</span>
+          <div className="text-base font-bold text-[#1d1d1f] mt-1">{hasSettlement ? 'Verified Indian bank account' : 'Connect a bank account'}</div>
+          <span className="text-xs text-[#86868b] font-mono">{hasSettlement ? 'Settlement destination active' : 'Available after your first payment'}</span>
         </div>
 
         <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-sm space-y-1">
