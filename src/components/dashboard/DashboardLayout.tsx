@@ -585,6 +585,13 @@ export const DashboardLayout: React.FC = () => {
             <ArrowLeft className="w-3 h-3" />
             <span>KODO Home</span>
           </button>
+
+          <button
+            onClick={() => { signOut(); if (typeof window !== 'undefined') window.localStorage.removeItem('qivropay_last_view'); setCurrentView('landing'); }}
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-[#6e6e73] hover:text-rose-600 hover:bg-rose-50 text-xs font-semibold transition-colors"
+          >
+            Sign out
+          </button>
         </div>
 
       </aside>
