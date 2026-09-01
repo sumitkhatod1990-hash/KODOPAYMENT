@@ -150,7 +150,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
   if (discountApplied) {
     finalUsdAmount = finalUsdAmount * 0.5;
   }
-  if (orderBumpSelected) {
+  if (orderBumpSelected && !isInrSession) {
     finalUsdAmount += 19.00;
   }
 
@@ -418,7 +418,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                     <Globe2 className="w-3.5 h-3.5 text-[#0055FF]" />
                     <span>Your Billing Region</span>
                   </label>
-                  {pppDetails.discountPercentage > 0 && (
+                  {!isInrSession && pppDetails.discountPercentage > 0 && (
                     <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
                       {pppDetails.discountPercentage}% PPP Active
                     </span>
@@ -437,7 +437,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                   ))}
                 </select>
 
-                {pppDetails.discountPercentage > 0 && (
+                {!isInrSession && pppDetails.discountPercentage > 0 && (
                   <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-100 text-xs text-[#0055FF] font-mono flex items-center gap-2">
                     <Sparkles className="w-4 h-4 shrink-0" />
                     <span>Purchasing Power Parity adjusted to <strong>{pppDetails.formattedLocal}</strong></span>
@@ -446,7 +446,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
               </div>
 
               {/* Dynamic In-Checkout Order Bump */}
-              <div 
+              {!isInrSession && <div 
                 onClick={() => setOrderBumpSelected(!orderBumpSelected)}
                 className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-1.5 ${
                   orderBumpSelected ? 'bg-blue-50/70 border-[#0055FF] ring-2 ring-[#0055FF]/10' : 'bg-[#FAFBFD] border-black/10 hover:border-black/20'
@@ -467,7 +467,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                 <p className="text-[11px] text-[#6E717D] pl-6">
                   Guarantees sub-50ms TTFT (Time-To-First-Token) & 24/7 dedicated enterprise throughput SLA.
                 </p>
-              </div>
+              </div>}
 
               {/* B2B Reverse Charge VAT / Tax ID */}
               <div className="space-y-2 pt-2 border-t border-black/[0.06]">
@@ -534,13 +534,13 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                   <span>Base Price</span>
                   <span>{displaySymbol}{basePrice.toFixed(2)} {displayCurrency}</span>
                 </div>
-                {orderBumpSelected && (
+                {orderBumpSelected && !isInrSession && (
                   <div className="flex justify-between text-[#0055FF] font-bold">
                     <span>Priority GPU Queue Add-On</span>
                     <span>+$19.00 USD</span>
                   </div>
                 )}
-                {pppDetails.discountPercentage > 0 && (
+                {!isInrSession && pppDetails.discountPercentage > 0 && (
                   <div className="flex justify-between text-emerald-700 font-bold">
                     <span>PPP Regional Discount ({pppDetails.discountPercentage}%)</span>
                     <span>-${(basePrice * (pppDetails.discountPercentage / 100)).toFixed(2)} USD</span>
