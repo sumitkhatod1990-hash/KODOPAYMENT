@@ -12,7 +12,7 @@ export const ProductsTab: React.FC = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState<number>(29);
-  const [currency, setCurrency] = useState('USD');
+  const currency = 'INR';
   const [type, setType] = useState<ProductType>('credits');
   const [credits, setCredits] = useState<number>(5000000);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -133,7 +133,7 @@ export const ProductsTab: React.FC = () => {
 
               <div className="pt-2">
                 <div className="text-2xl font-black text-[#1d1d1f] font-mono">
-                  ${product.price.toFixed(2)} <span className="text-xs font-normal text-[#86868b]">{product.currency}</span>
+                  ₹{product.price.toFixed(2)} <span className="text-xs font-normal text-[#86868b]">INR</span>
                 </div>
                 {product.type === 'credits' && (
                   <div className="text-xs font-semibold text-[#0071e3] mt-0.5">
@@ -240,7 +240,7 @@ export const ProductsTab: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="font-semibold text-[#1d1d1f]">Price ($ USD)</label>
+                  <label className="font-semibold text-[#1d1d1f]">Price (₹ INR)</label>
                   <input
                     type="number"
                     step="0.01"
