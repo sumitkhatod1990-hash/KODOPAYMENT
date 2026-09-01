@@ -1,4 +1,3 @@
-sed: --: No such file or directory
 import React, { useEffect } from 'react';
 import { useApp } from './context/AppContext';
 import { Navbar } from './components/common/Navbar';

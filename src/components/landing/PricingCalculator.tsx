@@ -1,4 +1,3 @@
-sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ArrowRight, Sparkles } from 'lucide-react';

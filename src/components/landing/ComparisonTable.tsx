@@ -1,4 +1,3 @@
-sed: --: No such file or directory
 import React from 'react';
 import { Check, X } from 'lucide-react';
 

@@ -1,4 +1,3 @@
-sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Terminal, Copy, CheckCircle2, Play, Code2, ArrowRight } from 'lucide-react';

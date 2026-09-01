@@ -1,4 +1,3 @@
-sed: --: No such file or directory
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';

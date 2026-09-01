@@ -1,4 +1,3 @@
-sed: --: No such file or directory
 import { jsPDF } from 'jspdf';
 import { Transaction } from '../types';
 

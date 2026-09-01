@@ -1,4 +1,3 @@
-sed: --: No such file or directory
 export interface FraudAssessment {
   riskScore: number; // 0 - 100
   riskLevel: 'low' | 'elevated' | 'high';

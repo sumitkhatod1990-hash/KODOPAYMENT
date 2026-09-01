@@ -134,4 +134,3 @@ export const InvoiceBatchExporterTab: React.FC = () => {
     </div>
   );
 };
-sed: --: No such file or directory
