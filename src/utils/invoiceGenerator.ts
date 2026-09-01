@@ -3,6 +3,7 @@ import { Transaction } from '../types';
 export function printOrDownloadInvoice(tx: Transaction, businessName = 'KODO AI Technologies Inc.') {
   const currency = 'INR';
   const symbol = '₹';
+  const country = String(tx.country || 'IN').toUpperCase();
   const invoiceNumber = `INV-${tx.id.replace('tx_kodo_', '').toUpperCase()}`;
   const invoiceDate = new Date(tx.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -176,7 +177,7 @@ export function printOrDownloadInvoice(tx: Transaction, businessName = 'KODO AI 
         <div class="value">
           <strong>${tx.customerName}</strong><br />
           ${tx.customerEmail}<br />
-          Jurisdiction: ${tx.country.toUpperCase()}
+          Jurisdiction: ${country}
         </div>
       </div>
       <div>
