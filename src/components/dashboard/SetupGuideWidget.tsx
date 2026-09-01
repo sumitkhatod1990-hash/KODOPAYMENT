@@ -150,9 +150,46 @@ export const SetupGuideWidget: React.FC<SetupGuideProps> = ({
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
-  const handleSimulateTestPayment = () => {
-    toggleStep('testPayment');
+  const handleSimulateTestPayment = async () => {
+    try {
+      await fetch('/api/v1/payments/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: 500,
+          currency: 'INR',
+          paymentMethod: 'UPI AutoPay 2.0',
+          customerName: 'Test Sandbox Buyer',
+          customerEmail: 'sandbox@qivropay.in',
+          productName: 'Sandbox Test Simulation'
+        })
+      });
+    } catch (e) {
+      console.warn('Sandbox payment simulation', e);
+    }
+    await toggleStep('testPayment');
     confetti({ particleCount: 50, spread: 50, origin: { y: 0.8 } });
+  };
+
+  const handleLiveTestPayment = async () => {
+    try {
+      await fetch('/api/v1/payments/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: 1,
+          currency: 'INR',
+          paymentMethod: 'RuPay / UPI Live',
+          customerName: 'Live Verification Buyer',
+          customerEmail: 'live@qivropay.in',
+          productName: 'Live ₹1 Activation Test'
+        })
+      });
+    } catch (e) {
+      console.warn('Live payment test', e);
+    }
+    await toggleStep('livePayment');
+    confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
   };
 
   const handleActivateGoLive = () => {
@@ -482,10 +519,7 @@ export const SetupGuideWidget: React.FC<SetupGuideProps> = ({
                     <div className="flex items-center justify-between">
                       <span className="font-semibold text-slate-800">3. Live ₹1 Test Payment</span>
                       <button
-                        onClick={() => {
-                          toggleStep('livePayment');
-                          confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
-                        }}
+                        onClick={handleLiveTestPayment}
                         className="px-2.5 py-1 rounded-lg bg-slate-900 text-white hover:bg-black text-[11px] font-semibold flex items-center gap-1 shadow-sm"
                       >
                         <Sparkles className="w-3 h-3 text-amber-400" />
