@@ -4,16 +4,20 @@ export function printOrDownloadInvoice(tx: Transaction, businessName = 'KODO AI 
   const currency = 'INR';
   const symbol = '₹';
   const country = String(tx.country || 'IN').toUpperCase();
-  const invoiceNumber = `INV-${tx.id.replace('tx_kodo_', '').toUpperCase()}`;
+  const amount = Number(tx.amount || 0);
+  const transactionId = String(tx.id || `qv_${Date.now()}`);
+  const invoiceNumber = `INV-${transactionId.replace('tx_kodo_', '').toUpperCase()}`;
   const invoiceDate = new Date(tx.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
 
+  // Open synchronously from the click handler so browsers do not classify it
+  // as a popup. The new document can be saved as a real PDF via print dialog.
   const printWindow = window.open('', '_blank');
   if (!printWindow) {
-    alert('Please allow popups to download or print your invoice.');
+    alert('Invoice window blocked. Please allow pop-ups for qivropay.com, then click the invoice button again.');
     return;
   }
 
@@ -206,8 +210,8 @@ export function printOrDownloadInvoice(tx: Transaction, businessName = 'KODO AI 
             <span style="font-size: 11px; color: #86868b;">Payment Rail: ${tx.paymentMethod.toUpperCase().replace('_', ' ')} ${tx.cardLast4 ? `(•${tx.cardLast4})` : ''}</span>
           </td>
           <td>1</td>
-          <td class="table-right">${symbol}${tx.amount.toFixed(2)}</td>
-          <td class="table-right"><strong>${symbol}${tx.amount.toFixed(2)} ${currency}</strong></td>
+          <td class="table-right">${symbol}${amount.toFixed(2)}</td>
+          <td class="table-right"><strong>${symbol}${amount.toFixed(2)} ${currency}</strong></td>
         </tr>
       </tbody>
     </table>
@@ -215,7 +219,7 @@ export function printOrDownloadInvoice(tx: Transaction, businessName = 'KODO AI 
     <div class="total-box">
       <div class="total-row">
         <span>Subtotal</span>
-        <span>${symbol}${tx.amount.toFixed(2)} ${currency}</span>
+        <span>${symbol}${amount.toFixed(2)} ${currency}</span>
       </div>
       <div class="total-row">
         <span>VAT / Sales Tax</span>
@@ -223,7 +227,7 @@ export function printOrDownloadInvoice(tx: Transaction, businessName = 'KODO AI 
       </div>
       <div class="grand-total">
         <span>Total Paid</span>
-        <span>${symbol}${tx.amount.toFixed(2)} ${currency}</span>
+        <span>${symbol}${amount.toFixed(2)} ${currency}</span>
       </div>
     </div>
 
@@ -244,4 +248,8 @@ export function printOrDownloadInvoice(tx: Transaction, businessName = 'KODO AI 
   printWindow.document.open();
   printWindow.document.write(invoiceHtml);
   printWindow.document.close();
+  printWindow.focus();
+  window.setTimeout(() => {
+    try { printWindow.print(); } catch {}
+  }, 350);
 }
