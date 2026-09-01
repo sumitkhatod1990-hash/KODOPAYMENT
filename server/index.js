@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
-import { ensurePaymentStore, recordCashfreeWebhook, recordPaymentOrder } from './neonStore.js';
+import { ensurePaymentStore, recordCashfreeWebhook, recordPaymentOrder, getPaymentOrderForSession } from './neonStore.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -2238,7 +2238,7 @@ app.post('/api/v1/india/cashfree/create-order', async (req, res) => {
 
     if (cfResponse.ok && cfData.payment_session_id) {
       if (CASHFREE_ENV === 'PROD' || CASHFREE_ENV === 'PRODUCTION') {
-        await recordPaymentOrder({ orderId, cfOrderId: cfData.cf_order_id, orderAmount: cfData.order_amount, orderCurrency: cfData.order_currency, orderStatus: cfData.order_status, customerEmail: normalizedEmail });
+        await recordPaymentOrder({ orderId, cfOrderId: cfData.cf_order_id, orderAmount: cfData.order_amount, orderCurrency: cfData.order_currency, orderStatus: cfData.order_status, customerEmail: normalizedEmail, customerPhone: normalizedPhone, sessionToken: req.body.sessionToken || null, orderNote });
       }
       return res.json({
         success: true,
@@ -2262,6 +2262,21 @@ app.post('/api/v1/india/cashfree/create-order', async (req, res) => {
       error: err.message || 'Failed to communicate with Cashfree'
     });
   }
+});
+
+app.get('/api/v1/india/cashfree/session/:sessionToken/status', async (req, res) => {
+  const token = String(req.params.sessionToken || '');
+  if (!token) return res.status(400).json({ success: false, error: 'Missing checkout session' });
+  try {
+    const stored = await getPaymentOrderForSession(token);
+    if (!stored?.orderId) return res.json({ success: true, found: false });
+    const { appId, secretKey } = cashfreeCredentials();
+    if (!appId || !secretKey) return res.status(503).json({ success: false, error: 'Cashfree credentials are not configured' });
+    const cfResponse = await fetch(`${cashfreeBaseUrl()}/orders/${encodeURIComponent(stored.orderId)}`, { headers: { 'x-api-version': CASHFREE_API_VERSION, 'x-client-id': appId, 'x-client-secret': secretKey, 'Content-Type': 'application/json' } });
+    const cfData = await cfResponse.json();
+    if (!cfResponse.ok) return res.status(cfResponse.status).json({ success: false, error: cfData.message || 'Cashfree order lookup failed' });
+    res.json({ success: true, found: true, orderId: stored.orderId, orderStatus: cfData.order_status, orderAmount: cfData.order_amount, orderCurrency: cfData.order_currency, customerEmail: stored.customerEmail });
+  } catch (err) { res.status(503).json({ success: false, error: err.message || 'Payment status restore failed' }); }
 });
 
 // Verify the payment server-to-server after the browser returns from Cashfree.
