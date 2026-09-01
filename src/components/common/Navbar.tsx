@@ -57,10 +57,10 @@ export const Navbar: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setCurrentView('dashboard')}
+            onClick={() => setCurrentView('auth')}
             className="opp-btn-primary py-2 px-5 text-xs font-semibold gap-1.5 shadow-sm"
           >
-            <span>Dashboard</span>
+            <span>Start building</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
