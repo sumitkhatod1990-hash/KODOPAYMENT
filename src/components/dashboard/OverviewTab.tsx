@@ -212,10 +212,10 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
                     {tx.productName}
                   </td>
                   <td className="py-3.5 font-bold text-[#1d1d1f] font-mono">
-                    ${tx.amount.toFixed(2)}
+                    ₹{(Number(tx.amount) || 0).toFixed(2)}
                   </td>
                   <td className="py-3.5 font-mono text-emerald-700 font-bold">
-                    ${tx.net.toFixed(2)}
+                    ₹{(Number(tx.net) || 0).toFixed(2)}
                   </td>
                   <td className="py-3.5">
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px] border border-emerald-200">
