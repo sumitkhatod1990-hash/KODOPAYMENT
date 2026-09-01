@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { 
   FolderDown, 
   Download, 
@@ -13,7 +14,8 @@ import {
 import confetti from 'canvas-confetti';
 
 export const InvoiceBatchExporterTab: React.FC = () => {
-  const [batches, setBatches] = useState([
+  const { user } = useAuth();
+  const [batches, setBatches] = useState(() => user?.email === 'demo@qivropay.com' ? [
     {
       id: 'batch_2026_q2_all',
       period: '2026 Q2 Full Quarter',
@@ -22,7 +24,7 @@ export const InvoiceBatchExporterTab: React.FC = () => {
       format: 'ZIP Archive (1,240 Validated PDFs)',
       downloadStatus: 'ready_to_export'
     }
-  ]);
+  ] : []);
 
   const [exporting, setExporting] = useState<string | null>(null);
 
