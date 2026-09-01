@@ -624,7 +624,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
               <div className={`space-y-3 ${checkoutStep === 1 ? 'hidden' : ''}`}>
                 <div className="flex items-center justify-between text-xs font-semibold text-[#8C90A0]">
                   <span>SELECT PAYMENT METHOD</span>
-                  <span className="text-[10px] text-emerald-700 font-bold">● India · UPI</span>
+                  <span className="text-[10px] text-emerald-700 font-bold">● India · UPI + Cards</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
@@ -916,7 +916,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                   {isProcessing ? 'Opening secure Cashfree checkout...' : `Pay ${isInrSession ? '₹' : '$'}${finalUsdAmount.toFixed(2)} ${isInrSession ? 'INR' : 'USD'} via ${paymentRail.toUpperCase().replace('_', ' ')}`}
                 </button>
 
-                {isInrSession && (
+                {isInrSession && indiaPaymentMode === 'upi' && (
                   <div className="mt-4 rounded-2xl border border-black/10 bg-white p-5 text-center" aria-label="QivroPay secure UPI payment">
                     <p className="text-sm font-bold text-[#0A0D14]">Scan & pay securely with any UPI app</p>
                     <p className="mt-1 text-[11px] text-[#8C90A0]">Your payment stays on QivroPay. No redirect.</p>
