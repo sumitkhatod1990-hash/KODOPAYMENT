@@ -91,6 +91,13 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
       setLoading(true);
       try {
         const sid = sessionId || 'demo_session';
+        try {
+          const savedReceipt = localStorage.getItem(`qivropay:receipt:${sid}`);
+          if (savedReceipt) {
+            setCompletedTx(JSON.parse(savedReceipt));
+            setCheckoutStep(2);
+          }
+        } catch {}
         const res = await fetch(`/api/v1/payments/session/${sid}`);
         const data = await res.json();
         if (data.success && data.session) {
@@ -98,6 +105,27 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
           if (String(data.session.currency || '').toUpperCase() === 'INR') {
             setPaymentRail('upi');
             if (data.session.customerEmail) setCustomerEmail(data.session.customerEmail);
+          }
+          try {
+            const restoreRes = await fetch(`/api/v1/india/cashfree/session/${encodeURIComponent(sid)}/status`);
+            const restore = await restoreRes.json();
+            if (restore.found && ['PAID', 'SUCCESS'].includes(restore.orderStatus)) {
+              setCompletedTx({
+                id: restore.orderId,
+                amount: Number(restore.orderAmount || data.session.amount || 0),
+                currency: restore.orderCurrency || 'INR',
+                status: 'succeeded',
+                customerEmail: restore.customerEmail || data.session.customerEmail || '',
+                customerName: 'Customer',
+                productName: data.session.title || 'QivroPay payment',
+                credits: Number(data.session.credits || 0),
+                paymentMethod: 'upi',
+                createdAt: new Date().toISOString()
+              });
+              setCheckoutStep(2);
+            }
+          } catch (restoreError) {
+            console.warn('Payment receipt restore skipped:', restoreError);
           }
         } else {
           const p = products[0] || { name: 'AI Token Starter Pack', price: 29.00, currency: 'INR', credits: 5000000 };
@@ -178,7 +206,8 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
             orderAmount: finalUsdAmount,
             customerEmail,
             customerPhone,
-            orderNote: sessionData?.title || 'QivroPay payment'
+            orderNote: sessionData?.title || 'QivroPay payment',
+            sessionToken: sessionId || ''
           })
         });
         const orderData = await orderRes.json();
@@ -238,6 +267,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
               createdAt: new Date().toISOString()
             };
             setCompletedTx(transaction);
+            try { localStorage.setItem(`qivropay:receipt:${sessionId || 'checkout'}`, JSON.stringify(transaction)); } catch {}
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             break;
           }
