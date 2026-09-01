@@ -138,7 +138,8 @@ app.use('/api/v1', async (req, res, next) => {
     '/india/cashfree/create-order', '/india/cashfree/session/', '/webhooks/cashfree',
     '/verification', '/setup-guide', '/support'
   ];
-  if (publicPaths.some((pathPrefix) => req.path === pathPrefix || req.path.startsWith(pathPrefix))) return next();
+  const currentPath = req.path || req.url || '';
+  if (publicPaths.some((pathPrefix) => currentPath === pathPrefix || currentPath.startsWith(pathPrefix) || (req.originalUrl && req.originalUrl.includes(pathPrefix)))) return next();
   try {
     const user = await getUserForSession(readCookie(req, 'qivropay_session'));
     if (!user) return res.status(401).json({ success: false, error: 'Authentication required' });
