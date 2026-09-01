@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+import { MerchantSupportModal } from './MerchantSupportModal';
+
 interface SetupGuideProps {
   isOpen: boolean;
   onClose: () => void;
@@ -46,6 +48,7 @@ export const SetupGuideWidget: React.FC<SetupGuideProps> = ({
   const [openSection, setOpenSection] = useState<'none' | 'test' | 'live'>('none');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [helpOpen, setHelpOpen] = useState<boolean>(false);
+  const [supportModalOpen, setSupportModalOpen] = useState<boolean>(false);
 
   // Completed steps tracking stored in localStorage
   const [completedSteps, setCompletedSteps] = useState<{
@@ -241,13 +244,16 @@ export const SetupGuideWidget: React.FC<SetupGuideProps> = ({
                   <span>AI Checkout Copilot</span>
                 </button>
 
-                <a
-                  href="mailto:support@qivropay.in"
-                  className="w-full p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 flex items-center gap-2.5 text-left transition-colors font-medium text-slate-800"
+                <button
+                  onClick={() => {
+                    setSupportModalOpen(true);
+                    setHelpOpen(false);
+                  }}
+                  className="w-full p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 flex items-center gap-2.5 text-left transition-colors font-medium text-slate-800 cursor-pointer"
                 >
                   <MessageSquare className="w-4 h-4 text-emerald-600" />
                   <span>Contact 24/7 Merchant Support</span>
-                </a>
+                </button>
               </div>
 
               <div className="text-[11px] text-slate-400 text-center font-mono">
@@ -256,6 +262,14 @@ export const SetupGuideWidget: React.FC<SetupGuideProps> = ({
             </div>
           )}
         </div>
+
+        {/* Support Modal */}
+        <MerchantSupportModal
+          isOpen={supportModalOpen}
+          onClose={() => setSupportModalOpen(false)}
+          userName={verificationData?.fullName || 'Merchant'}
+          userEmail={verificationData?.website ? `support@${verificationData.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}` : 'merchant@qivropay.in'}
+        />
       </>
     );
   }
@@ -601,6 +615,14 @@ export const SetupGuideWidget: React.FC<SetupGuideProps> = ({
         </div>
 
       </div>
+
+      {/* Support Modal */}
+      <MerchantSupportModal
+        isOpen={supportModalOpen}
+        onClose={() => setSupportModalOpen(false)}
+        userName={verificationData?.fullName || 'Merchant'}
+        userEmail={verificationData?.website ? `support@${verificationData.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}` : 'merchant@qivropay.in'}
+      />
     </>
   );
 };

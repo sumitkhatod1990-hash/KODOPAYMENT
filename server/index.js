@@ -136,7 +136,7 @@ app.use('/api/v1', async (req, res, next) => {
     '/health', '/auth/me', '/auth/login', '/auth/signup', '/auth/logout',
     '/payments/create-session', '/payments/process', '/payments/refund',
     '/india/cashfree/create-order', '/india/cashfree/session/', '/webhooks/cashfree',
-    '/verification', '/setup-guide'
+    '/verification', '/setup-guide', '/support'
   ];
   if (publicPaths.some((pathPrefix) => req.path === pathPrefix || req.path.startsWith(pathPrefix))) return next();
   try {
@@ -361,6 +361,83 @@ app.post('/api/v1/setup-guide/step', (req, res) => {
     success: true,
     completedSteps: steps,
     progress: Math.min(100, Math.round(score))
+  });
+});
+
+// -------------------------------------------------------------
+// 0.5. 24/7 MERCHANT SUPPORT & TICKET API
+// -------------------------------------------------------------
+app.get('/api/v1/support/tickets', (req, res) => {
+  const db = readDB();
+  const userId = req.user?.id || 'default';
+  const userTickets = (db.supportTickets || []).filter(t => t.userId === userId || !t.userId);
+  res.json({ success: true, tickets: userTickets });
+});
+
+app.post('/api/v1/support/tickets', (req, res) => {
+  const { name, email, subject, category, message, priority = 'normal' } = req.body || {};
+  if (!subject || !message) {
+    return res.status(400).json({ success: false, error: 'Subject and message are required' });
+  }
+
+  const db = readDB();
+  const userId = req.user?.id || 'default';
+  const ticketId = `TICK-${Date.now().toString().slice(-6)}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
+
+  const newTicket = {
+    id: ticketId,
+    userId,
+    name: name || req.user?.name || 'Merchant',
+    email: email || req.user?.email || 'merchant@qivropay.in',
+    subject,
+    category: category || 'General Support',
+    message,
+    priority,
+    status: 'open',
+    responseSLA: priority === 'urgent' ? '< 15 mins' : '< 1 hour',
+    createdAt: new Date().toISOString(),
+    replies: [
+      {
+        sender: 'QivroPay Priority Desk',
+        message: `Namaste ${name || 'Merchant'}! Your ticket #${ticketId} has been registered with our 24/7 Merchant Engineering Desk. An India-based MoR specialist has been assigned.`,
+        timestamp: new Date().toISOString()
+      }
+    ]
+  };
+
+  db.supportTickets = db.supportTickets || [];
+  db.supportTickets.unshift(newTicket);
+  writeDB(db);
+
+  res.status(201).json({
+    success: true,
+    ticket: newTicket,
+    message: `Support ticket #${ticketId} created successfully.`
+  });
+});
+
+app.post('/api/v1/support/chat', (req, res) => {
+  const { query, category } = req.body || {};
+  const q = String(query || '').toLowerCase();
+
+  let reply = "Namaste! I'm the QivroPay Merchant Assistant. How can I help you with your account, payment gateways, GST compliance, or bank settlements today?";
+
+  if (q.includes('gst') || q.includes('tax') || q.includes('tds')) {
+    reply = "Under QivroPay's Merchant of Record structure, we act as the legal reseller of your digital products. We calculate, collect, and file GST across all 28 Indian States & 8 UTs under our GSTIN. Section 194-O TDS (1%) is automatically deducted and deposited with the Income Tax Department.";
+  } else if (q.includes('payout') || q.includes('settle') || q.includes('bank') || q.includes('imps')) {
+    reply = "QivroPay supports instant T+0 / T+2 IMPS bank payouts directly to your verified Indian bank account (HDFC, ICICI, SBI, Axis, etc.) via Cashfree Easy Split with verified Bank UTR numbers.";
+  } else if (q.includes('upi') || q.includes('autopay') || q.includes('mandate')) {
+    reply = "UPI AutoPay 2.0 allows you to create recurring subscriptions with zero OTP renewals up to ₹15,000. Customer mandates are authorized once and renewed seamlessly across PhonePe, GPay, Paytm, and CRED.";
+  } else if (q.includes('verify') || q.includes('kyc') || q.includes('pan') || q.includes('penny')) {
+    reply = "You can verify your merchant account in under 2 minutes by entering your PAN, GSTIN, and Bank IFSC in the Setup Guide. Our automated ₹1 NPCI IMPS Penny Drop verifies your bank account instantly.";
+  } else if (q.includes('key') || q.includes('webhook') || q.includes('api') || q.includes('sdk')) {
+    reply = "You can find your sandbox and live API credentials in the Developer Hub. Include `Bearer pk_live_...` in your authorization headers. Webhook endpoints must respond with HTTP 200 to confirm receipt.";
+  }
+
+  res.json({
+    success: true,
+    reply,
+    timestamp: new Date().toISOString()
   });
 });
 
