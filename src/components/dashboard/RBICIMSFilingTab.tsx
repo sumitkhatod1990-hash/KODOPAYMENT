@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -19,7 +20,7 @@ export const RBICIMSFilingTab: React.FC = () => {
       filingCategory: 'Payment Aggregator (PA) Statutory Returns',
       reportingQuarter: 'Q2 FY 2026-27 (XBRL Taxonomy v4.2)',
       escrowBalanceAudited: '₹142,50,00,000.00 INR (100% Capital Adequacy)',
-      crossBorderInflowUsd: '$18,450,000.00 USD Realized',
+      crossBorderInflowUsd: '₹18,450,000.00 INR Realized',
       cimsFilingStatus: 'Digitally Signed & Validated with RBI CIMS Portal',
       status: 'rbi_cims_acknowledged'
     }
@@ -58,7 +59,7 @@ export const RBICIMSFilingTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Cross-Border Realization Inflows</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">$18,450,000.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹18,450,000.00 INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Real-time FEMA export compliance</div>
         </div>
 

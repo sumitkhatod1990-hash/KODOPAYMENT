@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -21,7 +22,7 @@ export const AbandonedCheckoutsTab: React.FC = () => {
       customerEmail: 'marcus.vance@axonlabs.io',
       productName: 'Pro Intelligence SaaS',
       amount: 99.00,
-      currency: 'USD',
+      currency: 'INR',
       lastStep: 'Card Information Entry',
       abandonedAt: '15 mins ago',
       recoveryStatus: 'email_sent',
@@ -32,7 +33,7 @@ export const AbandonedCheckoutsTab: React.FC = () => {
       customerEmail: 'charlotte@creativespark.design',
       productName: 'AI Token Starter Pack',
       amount: 29.00,
-      currency: 'USD',
+      currency: 'INR',
       lastStep: 'Payment Method Select',
       abandonedAt: '45 mins ago',
       recoveryStatus: 'pending',
@@ -43,7 +44,7 @@ export const AbandonedCheckoutsTab: React.FC = () => {
       customerEmail: 'dev.lead@robomind.ai',
       productName: 'Self-Hosted Agent Runtime',
       amount: 499.00,
-      currency: 'USD',
+      currency: 'INR',
       lastStep: 'Email Entry',
       abandonedAt: '2 hours ago',
       recoveryStatus: 'pending',
@@ -88,7 +89,7 @@ export const AbandonedCheckoutsTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Recoverable Revenue Pipeline</div>
-          <div className="text-2xl font-bold font-mono text-[#0A0D14]">${totalLost.toFixed(2)} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0A0D14]">₹{totalLost.toFixed(2)} INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Captured across {abandonedList.length} shoppers</div>
         </div>
 
@@ -102,7 +103,7 @@ export const AbandonedCheckoutsTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Recovered Revenue This Month</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">$1,842.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹1,842.00 INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Direct MoR checkout conversions</div>
         </div>
       </div>
@@ -132,7 +133,7 @@ export const AbandonedCheckoutsTab: React.FC = () => {
                     {item.productName}
                   </td>
                   <td className="p-4 font-mono font-bold text-[#0A0D14]">
-                    ${item.amount.toFixed(2)} USD
+                    ${item.amount.toFixed(2)} INR
                   </td>
                   <td className="p-4 text-[#6E717D]">
                     {item.lastStep}

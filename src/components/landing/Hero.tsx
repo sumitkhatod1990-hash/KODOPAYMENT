@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -136,7 +137,7 @@ export const Hero: React.FC = () => {
                   <Smartphone className="w-4 h-4 text-[#0055FF]" />
                 </div>
                 <div className="space-y-2">
-                  <div className="text-xl font-bold font-mono text-[#0A0D14]">$49.00 USD</div>
+                  <div className="text-xl font-bold font-mono text-[#0A0D14]">₹49.00 INR</div>
                   <div className="text-xs text-[#6E717D]">
                     Customer paying via <strong>Apple Pay</strong> / <strong>iDEAL</strong>
                   </div>
@@ -164,11 +165,11 @@ export const Hero: React.FC = () => {
                 <div className="space-y-2 text-xs font-mono">
                   <div className="flex justify-between">
                     <span className="text-[#8C90A0]">Gross:</span>
-                    <span className="font-bold text-[#0A0D14]">$49.00</span>
+                    <span className="font-bold text-[#0A0D14]">₹49.00</span>
                   </div>
                   <div className="flex justify-between text-purple-700">
                     <span>Platform Fee (4%+40¢):</span>
-                    <span>-$2.36</span>
+                    <span>-₹2.36</span>
                   </div>
                   <div className="flex justify-between text-emerald-700">
                     <span>VAT/Sales Tax:</span>
@@ -190,7 +191,7 @@ export const Hero: React.FC = () => {
                   <Building className="w-4 h-4 text-emerald-600" />
                 </div>
                 <div className="space-y-2">
-                  <div className="text-xl font-bold font-mono text-emerald-700">$46.64 USD</div>
+                  <div className="text-xl font-bold font-mono text-emerald-700">₹46.64 INR</div>
                   <div className="text-xs text-[#6E717D]">
                     Direct deposit to <strong>Silicon Valley Bank</strong>
                   </div>
@@ -208,7 +209,7 @@ export const Hero: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                 <span className="text-emerald-400 font-bold">LIVE TRANSACTION STREAM:</span>
-                <span className="text-neutral-300 truncate">tx_qivropay_9881 • $49.00 USD via Apple Pay • Net $46.64 credited</span>
+                <span className="text-neutral-300 truncate">tx_qivropay_9881 • ₹49.00 INR via Apple Pay • Net ₹46.64 credited</span>
               </div>
               <span className="text-[11px] text-neutral-400">Latency: 14ms</span>
             </div>

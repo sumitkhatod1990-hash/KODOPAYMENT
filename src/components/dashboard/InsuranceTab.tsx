@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -18,10 +19,10 @@ export const InsuranceTab: React.FC = () => {
   const policy = {
     policyNumber: 'POL-QIVROPAY-LLOYDS-99482',
     underwriter: 'Lloyds & QIVROPAY Risk Syndication LLC',
-    coverageLimit: '$2,500,000.00 USD',
+    coverageLimit: '₹2,500,000.00 INR',
     status: 'active',
     reimbursementRate: '100% Guaranteed Reimbursement',
-    totalClaimsPaid: '$0.00 (Zero Unrecovered Fraud)',
+    totalClaimsPaid: '₹0.00 (Zero Unrecovered Fraud)',
     effectiveDate: 'Jan 01, 2026',
     expiresDate: 'Dec 31, 2027'
   };

@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -103,7 +104,7 @@ export const MarketplaceConnectTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Marketplace Gross Volume</div>
-          <div className="text-2xl font-bold font-mono text-[#0A0D14]">${totalGross.toLocaleString()} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0A0D14]">₹{totalGross.toLocaleString()} INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <TrendingUp className="w-3 h-3" /> Across {vendors.length} connected vendors
           </div>
@@ -111,13 +112,13 @@ export const MarketplaceConnectTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Platform Net Commission Earned</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">${totalCommission.toLocaleString()} USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹{totalCommission.toLocaleString()} INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">100% pure profit retained</div>
         </div>
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Vendor Payouts Pending</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">${totalVendorDue.toLocaleString()} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹{totalVendorDue.toLocaleString()} INR</div>
           <div className="text-[11px] text-purple-700 font-mono">Automated T+2 bank deposits</div>
         </div>
       </div>
@@ -151,7 +152,7 @@ export const MarketplaceConnectTab: React.FC = () => {
                     ${vendor.grossSales.toFixed(2)}
                   </td>
                   <td className="p-4 font-mono font-bold text-emerald-700">
-                    +${vendor.platformCommissionEarned.toFixed(2)}
+                    +₹{vendor.platformCommissionEarned.toFixed(2)}
                   </td>
                   <td className="p-4 font-mono font-bold text-[#0055FF]">
                     ${vendor.vendorPayoutDue.toFixed(2)}

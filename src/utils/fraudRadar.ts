@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 export interface FraudAssessment {
   riskScore: number; // 0 - 100
   riskLevel: 'low' | 'elevated' | 'high';
@@ -31,7 +32,7 @@ export function evaluateTransactionRisk(params: {
   // 2. Check high transaction velocity / amount
   if (params.amount > 2000) {
     score += 25;
-    reasons.push('High transaction value anomaly (> $2,000)');
+    reasons.push('High transaction value anomaly (> ₹2,000)');
   } else if (params.amount > 500) {
     score += 10;
   }

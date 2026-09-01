@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -22,9 +23,9 @@ export const AICopilotTab: React.FC = () => {
   const [copiedLink, setCopiedLink] = useState(false);
 
   const samplePrompts = [
-    "Create a $49/mo Pro AI plan with 50M tokens and 50% India PPP discount",
-    "Generate a $199 perpetual license key for self-hosted agent clusters",
-    "Provision a $19 dedicated GPU priority compute queue with 1-click checkout"
+    "Create a ₹49/mo Pro AI plan with 50M tokens and 50% India PPP discount",
+    "Generate a ₹199 perpetual license key for self-hosted agent clusters",
+    "Provision a ₹19 dedicated GPU priority compute queue with 1-click checkout"
   ];
 
   const handleGenerate = async (e?: React.FormEvent) => {
@@ -81,7 +82,7 @@ export const AICopilotTab: React.FC = () => {
           <div className="relative">
             <textarea
               rows={3}
-              placeholder="e.g. Create a $79/mo subscription for Enterprise AI Developers with 14-day trial, automated EU VAT deduction, and 50% discount for India and Brazil..."
+              placeholder="e.g. Create a ₹79/mo subscription for Enterprise AI Developers with 14-day trial, automated EU VAT deduction, and 50% discount for India and Brazil..."
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               className="w-full p-4 rounded-2xl bg-[#F4F5F8] border border-black/10 text-xs sm:text-sm text-[#0A0D14] outline-none focus:border-[#0055FF] transition-all resize-none pr-28"
@@ -143,7 +144,7 @@ export const AICopilotTab: React.FC = () => {
             </div>
             <div className="p-4 rounded-2xl bg-[#F4F5F8] border border-black/5">
               <span className="text-[#8C90A0]">Base Price:</span>
-              <div className="font-bold text-sm text-emerald-700 mt-1">${generationResult.product.price.toFixed(2)} USD</div>
+              <div className="font-bold text-sm text-emerald-700 mt-1">₹{generationResult.product.price.toFixed(2)} INR</div>
             </div>
           </div>
 

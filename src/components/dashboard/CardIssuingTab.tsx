@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -108,13 +109,13 @@ export const CardIssuingTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Monthly Spend Limit Pool</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">${cards.reduce((acc, c) => acc + c.spendLimitMonthly, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹{cards.reduce((acc, c) => acc + c.spendLimitMonthly, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })} INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Real-time spend controls</div>
         </div>
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Spent This Month</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">${cards.reduce((acc, c) => acc + c.spentThisMonth, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹{cards.reduce((acc, c) => acc + c.spentThisMonth, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })} INR</div>
           <div className="text-[11px] text-purple-700 font-mono">0% FX markup on global spend</div>
         </div>
       </div>
@@ -151,7 +152,7 @@ export const CardIssuingTab: React.FC = () => {
               </div>
               <div>
                 <span className="text-[9px] uppercase opacity-60 block">MONTHLY SPEND</span>
-                <span className="text-emerald-400 font-bold">${card.spentThisMonth.toFixed(2)} / ${card.spendLimitMonthly.toFixed(2)}</span>
+                <span className="text-emerald-400 font-bold">₹{card.spentThisMonth.toFixed(2)} / ${card.spendLimitMonthly.toFixed(2)}</span>
               </div>
               <button
                 onClick={() => toggleFreeze(card.id)}
@@ -189,7 +190,7 @@ export const CardIssuingTab: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#0A0D14]">Monthly Spend Limit ($)</label>
+                  <label className="font-semibold text-[#0A0D14]">Monthly Spend Limit (₹)</label>
                   <input
                     type="number"
                     value={spendLimitMonthly}

@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -21,7 +22,7 @@ export const GiftCardsTab: React.FC = () => {
       code: 'GIFT-QIVROPAY-9812-PRO',
       initialAmount: 100.00,
       currentBalance: 71.00,
-      currency: 'USD',
+      currency: 'INR',
       recipientEmail: 'sarah.dev@promptworks.io',
       senderName: 'Alex Founder',
       status: 'active',
@@ -32,7 +33,7 @@ export const GiftCardsTab: React.FC = () => {
       code: 'GIFT-QIVROPAY-4410-VIP',
       initialAmount: 50.00,
       currentBalance: 50.00,
-      currency: 'USD',
+      currency: 'INR',
       recipientEmail: 'jason@hyperstack.ai',
       senderName: 'Elena Marketing',
       status: 'active',
@@ -55,10 +56,10 @@ export const GiftCardsTab: React.FC = () => {
 
     const newCard = {
       id: `gc_qivropay_${Date.now().toString().slice(-4)}`,
-      code: `GIFT-QIVROPAY-${Math.floor(1000 + Math.random() * 9000)}-VIP`,
+      code: `GIFT-QIVROPAY-₹{Math.floor(1000 + Math.random() * 9000)}-VIP`,
       initialAmount: Number(amount),
       currentBalance: Number(amount),
-      currency: 'USD',
+      currency: 'INR',
       recipientEmail,
       senderName,
       status: 'active',
@@ -104,7 +105,7 @@ export const GiftCardsTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Gift Volume Issued</div>
-          <div className="text-2xl font-bold font-mono text-[#0A0D14]">${totalIssued.toFixed(2)} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0A0D14]">₹{totalIssued.toFixed(2)} INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Across {giftCards.length} recipients
           </div>
@@ -112,7 +113,7 @@ export const GiftCardsTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Outstanding Unclaimed Balance</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">${totalBalance.toFixed(2)} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹{totalBalance.toFixed(2)} INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Store credit liability in MoR</div>
         </div>
 
@@ -157,10 +158,10 @@ export const GiftCardsTab: React.FC = () => {
                     {gc.senderName}
                   </td>
                   <td className="p-4 font-mono font-bold text-[#0A0D14]">
-                    ${gc.initialAmount.toFixed(2)} USD
+                    ${gc.initialAmount.toFixed(2)} INR
                   </td>
                   <td className="p-4 font-mono font-bold text-emerald-700">
-                    ${gc.currentBalance.toFixed(2)} USD
+                    ${gc.currentBalance.toFixed(2)} INR
                   </td>
                   <td className="p-4">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px] border border-emerald-200">
@@ -207,7 +208,7 @@ export const GiftCardsTab: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#0A0D14]">Gift Amount ($)</label>
+                  <label className="font-semibold text-[#0A0D14]">Gift Amount (₹)</label>
                   <input
                     type="number"
                     min={5}

@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -21,7 +22,7 @@ export const MultiEntityTab: React.FC = () => {
       jurisdiction: 'Delaware, United States',
       taxId: 'US-EIN-94-3829104',
       role: 'Parent Global Holding Entity',
-      annualVolume: '$4,280,000.00 USD'
+      annualVolume: '₹4,280,000.00 INR'
     },
     {
       id: 'ent_qivropay_102',
@@ -29,7 +30,7 @@ export const MultiEntityTab: React.FC = () => {
       jurisdiction: 'Dublin, Ireland',
       taxId: 'IE99382104M',
       role: 'EU & UK MoR Operating Subsidiary',
-      annualVolume: '€2,490,000.00 EUR'
+      annualVolume: '€2,490,000.00 INR'
     },
     {
       id: 'ent_qivropay_103',
@@ -37,7 +38,7 @@ export const MultiEntityTab: React.FC = () => {
       jurisdiction: 'Singapore',
       taxId: 'SG202601928K',
       role: 'APAC Regional Gateway Entity',
-      annualVolume: 'S$1,820,000.00 SGD'
+      annualVolume: '₹1,820,000.00 INR'
     }
   ]);
 
@@ -57,7 +58,7 @@ export const MultiEntityTab: React.FC = () => {
       jurisdiction,
       taxId: taxId || 'PENDING-TAX-ID',
       role,
-      annualVolume: '$0.00 USD'
+      annualVolume: '₹0.00 INR'
     };
 
     setEntities([...entities, newEnt]);
@@ -94,7 +95,7 @@ export const MultiEntityTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Consolidated Group Volume</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$8,590,000.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹8,590,000.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Across {entities.length} operating subsidiaries
           </div>

@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -25,7 +26,7 @@ export const WebComponentTab: React.FC = () => {
 <qivropay-checkout
   product-id="${productId}"
   theme="${theme}"
-  currency="USD"
+  currency="INR"
   mor-nexus="true"
   on-success="handlePaymentSuccess"
 ></qivropay-checkout>
@@ -120,7 +121,7 @@ export const WebComponentTab: React.FC = () => {
             <div className="flex justify-between items-center">
               <div>
                 <h4 className="font-bold text-sm text-[#0A0D14]">Pro Developer Plan</h4>
-                <p className="text-xs text-[#8C90A0]">$49.00 USD / month • Auto-renews</p>
+                <p className="text-xs text-[#8C90A0]">₹49.00 INR / month • Auto-renews</p>
               </div>
               <span className="opp-badge text-emerald-700 bg-emerald-50 border-emerald-200">0% TAX (MoR)</span>
             </div>
@@ -134,7 +135,7 @@ export const WebComponentTab: React.FC = () => {
               />
               <button className="w-full opp-btn-primary py-2.5 font-semibold text-xs flex items-center justify-center gap-2">
                 <CreditCard className="w-3.5 h-3.5" />
-                <span>Pay $49.00 USD (1-Click Apple Pay)</span>
+                <span>Pay ₹49.00 INR (1-Click Apple Pay)</span>
               </button>
             </div>
           </div>

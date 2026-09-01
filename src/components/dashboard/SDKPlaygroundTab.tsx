@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { 
   Terminal, 
@@ -62,7 +63,7 @@ const qivro = new QivroPay({
 // Create 1-Click INR Checkout Session with 18% GST & Section 194-O TDS
 const session = await qivro.checkout.createSession({
   title: "Pro AI SaaS Monthly (UPI AutoPay)",
-  amount: ${orderAmount}.00,
+  amount: ₹{orderAmount}.00,
   currency: "INR",
   customerEmail: "${customerEmail}",
   customerGstin: "${customerGstin}", // Dynamic B2B Input Tax Credit
@@ -120,7 +121,7 @@ export default function PricingCard() {
   -H "Authorization: Bearer qivro_live_india_991820" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "amount": ${orderAmount}.00,
+    "amount": ₹{orderAmount}.00,
     "currency": "INR",
     "customerEmail": "${customerEmail}",
     "customerGstin": "${customerGstin}",

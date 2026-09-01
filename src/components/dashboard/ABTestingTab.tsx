@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -19,8 +20,8 @@ export const ABTestingTab: React.FC = () => {
     {
       id: 'test_01',
       name: 'Checkout Pricing Structure Experiment',
-      variantA: 'One-Time Payment ($49.00 USD)',
-      variantB: 'Monthly Subscription ($19.00/mo)',
+      variantA: 'One-Time Payment (₹49.00 INR)',
+      variantB: 'Monthly Subscription (₹19.00/mo)',
       trafficSplit: '50% / 50%',
       viewsA: 1420,
       conversionsA: 82,

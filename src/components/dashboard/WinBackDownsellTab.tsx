@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -17,9 +18,9 @@ export const WinBackDownsellTab: React.FC = () => {
     {
       id: 'wb_off_101',
       customerName: 'Marcus Sterling',
-      originalPlan: 'Enterprise Scale ($299/mo)',
-      downsellOffer: 'Pro Growth ($99/mo for 6 months)',
-      retainedMrr: '$99.00 / mo',
+      originalPlan: 'Enterprise Scale (₹299/mo)',
+      downsellOffer: 'Pro Growth (₹99/mo for 6 months)',
+      retainedMrr: '₹99.00 / mo',
       acceptedAt: 'Aug 29, 2026',
       status: 'successfully_retained'
     }
@@ -58,7 +59,7 @@ export const WinBackDownsellTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Retained MRR Run-Rate</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">+$18,711.00 / mo</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">+₹18,711.00 / mo</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Preserved recurring revenue</div>
         </div>
 

@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -26,8 +27,8 @@ export const TaxNexusTab: React.FC = () => {
     {
       region: 'United States (Economic Nexus)',
       flag: '🇺🇸',
-      nexusThreshold: '$100,000 / 200 txs per state',
-      currentVolume: '$142,800 / yr',
+      nexusThreshold: '₹100,000 / 200 txs per state',
+      currentVolume: '₹142,800 / yr',
       status: 'Fully Compliant & Insulated',
       taxRateApplied: 'State & Local Sales Tax Managed by QIVROPAY',
       nexusId: 'US-EIN-94-3829104'
@@ -53,8 +54,8 @@ export const TaxNexusTab: React.FC = () => {
     {
       region: 'Australia (ATO GST)',
       flag: '🇦🇺',
-      nexusThreshold: 'A$75,000',
-      currentVolume: 'A$28,400 / yr',
+      nexusThreshold: '₹75,000',
+      currentVolume: '₹28,400 / yr',
       status: 'Compliant & Registered',
       taxRateApplied: '10% GST',
       nexusId: 'ARN30009812'

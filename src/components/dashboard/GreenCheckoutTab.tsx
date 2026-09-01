@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -15,7 +16,7 @@ import confetti from 'canvas-confetti';
 export const GreenCheckoutTab: React.FC = () => {
   const [climate] = useState({
     totalCo2RemovedTons: '142.8 Tons CO2',
-    totalMerchantContribution: '$18,450.00 USD',
+    totalMerchantContribution: '₹18,450.00 INR',
     activeProjects: 'Frontier Biochar & Direct Air Capture (DAC)',
     greenBadgeParticipationRate: '84.2%'
   });

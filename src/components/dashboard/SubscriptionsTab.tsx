@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Subscription } from '../../types';
@@ -46,7 +47,7 @@ export const SubscriptionsTab: React.FC = () => {
         </div>
         <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-sm space-y-1">
           <span className="text-xs text-[#86868b] font-medium">Monthly Recurring Revenue</span>
-          <div className="text-3xl font-extrabold text-[#0071e3] font-mono">${mrrTotal.toFixed(2)}</div>
+          <div className="text-3xl font-extrabold text-[#0071e3] font-mono">₹{mrrTotal.toFixed(2)}</div>
         </div>
         <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-sm space-y-1">
           <span className="text-xs text-[#86868b] font-medium">Dunning & Churn Protection</span>

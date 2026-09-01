@@ -20,7 +20,7 @@ export const InvoiceBatchExporterTab: React.FC = () => {
       id: 'batch_2026_q2_all',
       period: '2026 Q2 Full Quarter',
       invoiceCount: 1240,
-      totalVolume: '$284,500.00 USD',
+      totalVolume: '₹284,500.00 INR',
       format: 'ZIP Archive (1,240 Validated PDFs)',
       downloadStatus: 'ready_to_export'
     }
@@ -134,3 +134,4 @@ export const InvoiceBatchExporterTab: React.FC = () => {
     </div>
   );
 };
+sed: --: No such file or directory

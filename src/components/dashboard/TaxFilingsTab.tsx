@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -19,7 +20,7 @@ export const TaxFilingsTab: React.FC = () => {
       id: 'tax_fl_2026_q2_eu',
       jurisdiction: 'EU VAT One-Stop Shop (OSS)',
       period: '2026 Q2',
-      taxCollected: '€18,420.00 EUR',
+      taxCollected: '€18,420.00 INR',
       filingStatus: 'ready_to_remit',
       deadline: 'Sep 30, 2026',
       format: 'XML & CSV Schema'
@@ -28,7 +29,7 @@ export const TaxFilingsTab: React.FC = () => {
       id: 'tax_fl_2026_q2_uk',
       jurisdiction: 'UK HMRC VAT Return',
       period: '2026 Q2',
-      taxCollected: '£11,280.00 GBP',
+      taxCollected: '£11,280.00 INR',
       filingStatus: 'ready_to_remit',
       deadline: 'Oct 07, 2026',
       format: 'MTD VAT JSON'
@@ -37,7 +38,7 @@ export const TaxFilingsTab: React.FC = () => {
       id: 'tax_fl_2026_q2_us',
       jurisdiction: 'US Multi-State DOR Summary',
       period: '2026 Q2',
-      taxCollected: '$24,650.00 USD',
+      taxCollected: '₹24,650.00 INR',
       filingStatus: 'remitted_settled',
       deadline: 'Aug 20, 2026',
       format: 'NACHA & State CSV'
@@ -79,7 +80,7 @@ export const TaxFilingsTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Tax Remitted Under QIVROPAY MoR</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$54,350.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹54,350.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Segregated in QIVROPAY Escrow Trust
           </div>

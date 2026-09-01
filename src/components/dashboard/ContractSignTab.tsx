@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -19,7 +20,7 @@ export const ContractSignTab: React.FC = () => {
       id: 'cnt_qivropay_881',
       title: 'Enterprise Master Services Agreement (MSA) & 99.99% SLA',
       clientName: 'Synthetix Global Corp',
-      contractValue: '$120,000.00 / yr',
+      contractValue: '₹120,000.00 / yr',
       status: 'signed_active',
       signerEmail: 'legal@synthetix.com',
       sha256Hash: '9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e',
@@ -30,7 +31,7 @@ export const ContractSignTab: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [clientName, setClientName] = useState('');
   const [signerEmail, setSignerEmail] = useState('');
-  const [contractValue, setContractValue] = useState('$50,000.00 / yr');
+  const [contractValue, setContractValue] = useState('₹50,000.00 / yr');
   const [signatureName, setSignatureName] = useState('Alex Founder');
 
   const handleGenerateAndSign = (e: React.FormEvent) => {
@@ -83,7 +84,7 @@ export const ContractSignTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Executed Contract Value</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$120,000.00 / yr</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹120,000.00 / yr</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Cryptographically Sealed
           </div>
@@ -187,7 +188,7 @@ export const ContractSignTab: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#0A0D14]">Annual Value ($)</label>
+                  <label className="font-semibold text-[#0A0D14]">Annual Value (₹)</label>
                   <input
                     type="text"
                     value={contractValue}

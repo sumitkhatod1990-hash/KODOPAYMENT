@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -18,7 +19,7 @@ export const SmartRoutingTab: React.FC = () => {
     {
       id: 'acq_01',
       name: 'JPMorgan Chase Direct',
-      region: 'North America (USD)',
+      region: 'North America (INR)',
       authRate: '97.4%',
       priority: 1,
       latency: '42ms',
@@ -27,7 +28,7 @@ export const SmartRoutingTab: React.FC = () => {
     {
       id: 'acq_02',
       name: 'Adyen Global Rail',
-      region: 'Europe & UK (EUR/GBP)',
+      region: 'Europe & UK (INR/INR)',
       authRate: '96.8%',
       priority: 2,
       latency: '55ms',
@@ -36,7 +37,7 @@ export const SmartRoutingTab: React.FC = () => {
     {
       id: 'acq_03',
       name: 'Barclays Merchant Rail',
-      region: 'UK & Commonwealth (GBP)',
+      region: 'UK & Commonwealth (INR)',
       authRate: '95.9%',
       priority: 3,
       latency: '61ms',
@@ -45,7 +46,7 @@ export const SmartRoutingTab: React.FC = () => {
     {
       id: 'acq_04',
       name: 'Checkout.com Multi-Currency',
-      region: 'APAC & MENA (SGD/AED/AUD)',
+      region: 'APAC & MENA (INR/AED/INR)',
       authRate: '96.2%',
       priority: 4,
       latency: '68ms',
@@ -104,7 +105,7 @@ export const SmartRoutingTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Cascade Recovery Velocity</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">$64,900.00 / mo</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹64,900.00 / mo</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Rescued from false declines</div>
         </div>
 

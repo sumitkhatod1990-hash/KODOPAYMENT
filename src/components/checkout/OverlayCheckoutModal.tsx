@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Logo } from '../common/Logo';
@@ -38,7 +39,7 @@ export const OverlayCheckoutModal: React.FC<OverlayModalProps> = ({ isOpen, onCl
     id: 'prod_overlay_demo',
     name: 'AI Token Starter Pack (5M Credits)',
     price: 29.00,
-    currency: 'USD'
+    currency: 'INR'
   };
 
   const handlePay = async (e: React.FormEvent) => {
@@ -104,7 +105,7 @@ export const OverlayCheckoutModal: React.FC<OverlayModalProps> = ({ isOpen, onCl
               </div>
               <div className="flex justify-between">
                 <span className="text-[#86868b]">Amount:</span>
-                <span className="text-[#0071e3] font-bold">${completedTx.amount.toFixed(2)} USD</span>
+                <span className="text-[#0071e3] font-bold">₹{completedTx.amount.toFixed(2)} INR</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-[#86868b]">Method:</span>
@@ -143,7 +144,7 @@ export const OverlayCheckoutModal: React.FC<OverlayModalProps> = ({ isOpen, onCl
                 { id: 'paypal', label: 'PayPal', icon: DollarSign },
                 { id: 'ideal', label: 'iDEAL 🇳🇱', icon: Building2 },
                 { id: 'upi', label: 'UPI 🇮🇳', icon: QrCode },
-                { id: 'crypto', label: 'USDC', icon: Coins }
+                { id: 'crypto', label: 'INR', icon: Coins }
               ].map(rail => (
                 <button
                   key={rail.id}
@@ -205,7 +206,7 @@ export const OverlayCheckoutModal: React.FC<OverlayModalProps> = ({ isOpen, onCl
                 className="apple-btn-black w-full py-3.5 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-md active:scale-95"
               >
                 <Lock className="w-3.5 h-3.5" />
-                {isProcessing ? 'Authorizing...' : `Pay $${currentProduct.price.toFixed(2)} USD`}
+                {isProcessing ? 'Authorizing...' : `Pay ₹${currentProduct.price.toFixed(2)} INR`}
               </button>
             </form>
 

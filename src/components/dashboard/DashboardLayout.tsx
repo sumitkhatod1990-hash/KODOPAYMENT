@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -306,7 +307,7 @@ export const DashboardLayout: React.FC = () => {
         { id: 'india-mfi-shg', label: 'MFI & SHG e-Kist Rail', icon: Users },
         { id: 'india-jjm-water', label: 'JJM Rural IoT Smart Water', icon: Droplets },
         { id: 'india-sez-lut', label: 'SEZ & STPI Zero-GST LUT', icon: Building2 },
-        { id: 'india-gift-city', label: 'GIFT City (IFSC) USD Rail', icon: Landmark },
+        { id: 'india-gift-city', label: 'GIFT City (IFSC) INR Rail', icon: Landmark },
         { id: 'india-pacb-ebrc', label: 'RBI PA-CB & DGFT e-BRC', icon: Globe2 },
         { id: 'india-sebi-aif', label: 'SEBI AIF & Angel Capital', icon: Building2 },
         { id: 'india-semiconductor-dli', label: 'ISM Semiconductor DLI', icon: Cpu },

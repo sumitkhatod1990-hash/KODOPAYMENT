@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Transaction } from '../../types';
@@ -90,7 +91,7 @@ export const TransactionsTab: React.FC = () => {
                     ${tx.amount.toFixed(2)}
                   </td>
                   <td className="p-4 font-mono text-[#86868b]">
-                    -${tx.fee.toFixed(2)}
+                    -₹{tx.fee.toFixed(2)}
                   </td>
                   <td className="p-4 font-mono text-emerald-700 font-bold">
                     ${tx.net.toFixed(2)}
@@ -153,15 +154,15 @@ export const TransactionsTab: React.FC = () => {
               <div className="pt-3 border-t border-black/5 space-y-1.5">
                 <div className="flex justify-between text-[#86868b]">
                   <span>Gross Charged:</span>
-                  <span className="font-mono text-[#1d1d1f] font-semibold">${selectedTx.amount.toFixed(2)} USD</span>
+                  <span className="font-mono text-[#1d1d1f] font-semibold">₹{selectedTx.amount.toFixed(2)} INR</span>
                 </div>
                 <div className="flex justify-between text-[#86868b]">
                   <span>MoR Platform Fee:</span>
-                  <span className="font-mono text-[#1d1d1f]">-${selectedTx.fee.toFixed(2)} USD</span>
+                  <span className="font-mono text-[#1d1d1f]">-₹{selectedTx.fee.toFixed(2)} INR</span>
                 </div>
                 <div className="flex justify-between font-bold text-sm pt-2 border-t border-black/5 text-[#1d1d1f]">
                   <span>Net Settled Payout:</span>
-                  <span className="font-mono text-emerald-700">${selectedTx.net.toFixed(2)} USD</span>
+                  <span className="font-mono text-emerald-700">₹{selectedTx.net.toFixed(2)} INR</span>
                 </div>
               </div>
             </div>

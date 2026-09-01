@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -17,22 +18,22 @@ export const RevenueForecastTab: React.FC = () => {
 
   const forecasts = {
     conservative: {
-      mrr3: '$38,400',
-      arr12: '$520,000',
+      mrr3: '₹38,400',
+      arr12: '₹520,000',
       nrrExpected: '115%',
       confidence: '95% Confidence Interval',
       curve: [24, 27, 31, 35, 38, 42, 45, 48, 51, 55, 59, 64]
     },
     expected: {
-      mrr3: '$46,200',
-      arr12: '$740,000',
+      mrr3: '₹46,200',
+      arr12: '₹740,000',
       nrrExpected: '128%',
       confidence: '85% Confidence Interval',
       curve: [24, 29, 36, 42, 49, 56, 64, 72, 81, 91, 102, 114]
     },
     aggressive: {
-      mrr3: '$58,900',
-      arr12: '$1,120,000',
+      mrr3: '₹58,900',
+      arr12: '₹1,120,000',
       nrrExpected: '142%',
       confidence: '70% High-Velocity Model',
       curve: [24, 33, 44, 57, 72, 89, 108, 129, 153, 180, 210, 245]

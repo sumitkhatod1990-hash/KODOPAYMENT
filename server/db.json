@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 {
   "brands": [
     {
@@ -21,9 +22,9 @@
     {
       "id": "prod_copilot_c2debd",
       "name": "Pro AI Supercharge Plan",
-      "description": "Auto-generated from natural language prompt: \"Create a $49/mo Pro AI plan with 50M tokens and 50% India PPP discount\"",
+      "description": "Auto-generated from natural language prompt: \"Create a ₹49/mo Pro AI plan with 50M tokens and 50% India PPP discount\"",
       "price": 49,
-      "currency": "USD",
+      "currency": "INR",
       "type": "credits",
       "active": true,
       "createdAt": "2026-08-30T23:31:27.581Z"
@@ -31,9 +32,9 @@
     {
       "id": "prod_copilot_e6a5ed",
       "name": "AI Copilot Generated Product",
-      "description": "Auto-generated from natural language prompt: \"Create a $79/mo subscription for Enterprise AI Developers\"",
+      "description": "Auto-generated from natural language prompt: \"Create a ₹79/mo subscription for Enterprise AI Developers\"",
       "price": 79,
-      "currency": "USD",
+      "currency": "INR",
       "type": "subscription",
       "active": true,
       "createdAt": "2026-08-30T23:18:24.612Z"
@@ -43,7 +44,7 @@
       "name": "AI Token Starter Pack",
       "description": "5,000,000 GPT-4o & Claude 3.5 Sonnet tokens with zero rate-limit constraints.",
       "price": 29,
-      "currency": "USD",
+      "currency": "INR",
       "type": "credits",
       "credits": 5000000,
       "active": true,
@@ -54,7 +55,7 @@
       "name": "Pro Intelligence SaaS",
       "description": "Monthly subscription with 50M tokens, automated smart dunning, and dedicated GPU priority queue.",
       "price": 99,
-      "currency": "USD",
+      "currency": "INR",
       "type": "subscription",
       "interval": "month",
       "active": true,
@@ -65,7 +66,7 @@
       "name": "Self-Hosted Agent Runtime (Perpetual)",
       "description": "Commercial node license with offline cryptographic key verification.",
       "price": 499,
-      "currency": "USD",
+      "currency": "INR",
       "type": "license",
       "licenseType": "perpetual",
       "active": true,
@@ -76,7 +77,7 @@
     {
       "id": "tx_qivropay_aad396bb",
       "amount": 29,
-      "currency": "USD",
+      "currency": "INR",
       "status": "succeeded",
       "customerEmail": "alex.chen@synthflow.ai",
       "customerName": "Alex Chen",
@@ -91,7 +92,7 @@
     {
       "id": "tx_qivropay_9881",
       "amount": 49,
-      "currency": "USD",
+      "currency": "INR",
       "fee": 2.36,
       "net": 46.64,
       "status": "succeeded",
@@ -107,7 +108,7 @@
     {
       "id": "tx_qivropay_9882",
       "amount": 99,
-      "currency": "USD",
+      "currency": "INR",
       "fee": 4.36,
       "net": 94.64,
       "status": "succeeded",
@@ -123,7 +124,7 @@
     {
       "id": "tx_qivropay_9883",
       "amount": 29,
-      "currency": "USD",
+      "currency": "INR",
       "fee": 1.56,
       "net": 27.44,
       "status": "succeeded",
@@ -209,7 +210,7 @@
     {
       "id": "po_qivropay_401",
       "amount": 3480.5,
-      "currency": "USD",
+      "currency": "INR",
       "status": "paid",
       "destination": "Silicon Valley Bank (••••9812)",
       "schedule": "T+2_Rolling",
@@ -281,7 +282,7 @@
       "id": "wallet_agent_c5575c",
       "agentName": "kl",
       "balance": 400,
-      "currency": "USD",
+      "currency": "INR",
       "autoRefillThreshold": 10,
       "autoRefillAmount": 50,
       "status": "active",
@@ -292,7 +293,7 @@
       "id": "wallet_agent_01",
       "agentName": "ResearchCrawler-Agent-V4",
       "balance": 84.5,
-      "currency": "USD",
+      "currency": "INR",
       "autoRefillThreshold": 10,
       "autoRefillAmount": 50,
       "status": "active",
@@ -303,7 +304,7 @@
       "id": "wallet_agent_02",
       "agentName": "CustomerSupport-LLM-Worker",
       "balance": 142.2,
-      "currency": "USD",
+      "currency": "INR",
       "autoRefillThreshold": 20,
       "autoRefillAmount": 100,
       "status": "active",
@@ -356,7 +357,7 @@
       "id": "log_8803",
       "action": "Bank Payout Batch Initiated",
       "user": "MoR Settlement Engine",
-      "details": "Batched $3,480.50 for rolling T+2 direct deposit to SVB",
+      "details": "Batched ₹3,480.50 for rolling T+2 direct deposit to SVB",
       "timestamp": "2026-08-30T22:00:00Z"
     }
   ],
@@ -366,7 +367,7 @@
       "customerEmail": "marcus.vance@axonlabs.io",
       "productName": "Pro Intelligence SaaS",
       "amount": 99,
-      "currency": "USD",
+      "currency": "INR",
       "lastStep": "card_entry",
       "abandonedAt": "2026-08-30T21:30:00Z",
       "recoveryStatus": "email_sent",
@@ -377,7 +378,7 @@
       "customerEmail": "charlotte@creativespark.design",
       "productName": "AI Token Starter Pack",
       "amount": 29,
-      "currency": "USD",
+      "currency": "INR",
       "lastStep": "payment_method_select",
       "abandonedAt": "2026-08-30T20:15:00Z",
       "recoveryStatus": "pending",
@@ -468,7 +469,7 @@
       "productId": "custom",
       "title": "Custom AI Payment Link",
       "amount": 49,
-      "currency": "USD",
+      "currency": "INR",
       "customerEmail": "",
       "credits": 5000000,
       "type": "credits",
@@ -480,7 +481,7 @@
       "id": "dp_qivropay_01",
       "transactionId": "tx_qivropay_9881",
       "amount": 49,
-      "currency": "USD",
+      "currency": "INR",
       "reason": "fraudulent_claim",
       "status": "under_review",
       "evidenceStatus": "ai_compiled_ready",
@@ -495,7 +496,7 @@
       "companyName": "Synthetix Global Corp",
       "taxId": "US-EIN-94-3829104",
       "amount": 12500,
-      "currency": "USD",
+      "currency": "INR",
       "terms": "Net 30",
       "status": "sent",
       "dueDate": "2026-09-30",
@@ -510,7 +511,7 @@
       "companyName": "Nordic Autonomous Systems AB",
       "taxId": "SE556012345601",
       "amount": 8400,
-      "currency": "EUR",
+      "currency": "INR",
       "terms": "Net 15",
       "status": "paid",
       "dueDate": "2026-08-25",
@@ -526,7 +527,7 @@
       "code": "GIFT-QIVROPAY-9812-PRO",
       "initialAmount": 100,
       "currentBalance": 71,
-      "currency": "USD",
+      "currency": "INR",
       "recipientEmail": "sarah.dev@promptworks.io",
       "senderName": "Alex Founder",
       "status": "active",
@@ -537,7 +538,7 @@
       "code": "GIFT-QIVROPAY-4410-VIP",
       "initialAmount": 50,
       "currentBalance": 50,
-      "currency": "USD",
+      "currency": "INR",
       "recipientEmail": "jason@hyperstack.ai",
       "senderName": "Elena Marketing",
       "status": "active",
@@ -548,7 +549,7 @@
     {
       "id": "test_01",
       "name": "Checkout Pricing Structure Experiment",
-      "variantA": "One-Time Payment (.00 USD)",
+      "variantA": "One-Time Payment (.00 INR)",
       "variantB": "Monthly Subscription (.00/mo)",
       "trafficSplit": "50% / 50%",
       "viewsA": 1420,
@@ -656,28 +657,28 @@
   ],
   "treasuryBalances": [
     {
-      "currency": "USD",
+      "currency": "INR",
       "amount": 84250,
       "symbol": "$",
       "name": "US Dollar"
     },
     {
-      "currency": "EUR",
+      "currency": "INR",
       "amount": 38100,
       "symbol": "€",
       "name": "Euro"
     },
     {
-      "currency": "GBP",
+      "currency": "INR",
       "amount": 14500,
       "symbol": "£",
       "name": "British Pound"
     },
     {
-      "currency": "USDC",
+      "currency": "INR",
       "amount": 22000,
-      "symbol": "USDC",
-      "name": "USD Coin (Solana/Base)"
+      "symbol": "INR",
+      "name": "INR Coin (Solana/Base)"
     }
   ],
   "fxRates": {
@@ -713,7 +714,7 @@
     {
       "id": "notif_01",
       "title": "New B2B Wire Received",
-      "message": "$12,500.00 USD received via vIBAN from Synthetix Global Corp.",
+      "message": "₹12,500.00 INR received via vIBAN from Synthetix Global Corp.",
       "type": "payment",
       "read": false,
       "createdAt": "5 mins ago"
@@ -739,9 +740,9 @@
     {
       "meterName": "AI Inference Tokens (Millions)",
       "includedUnits": "50M Tokens",
-      "tier1": "0 - 50M: Included in $49/mo Base",
-      "tier2": "50M - 200M: $0.0008 / 1k Tokens",
-      "tier3": "200M+: $0.0005 / 1k Tokens (Volume Discount)",
+      "tier1": "0 - 50M: Included in ₹49/mo Base",
+      "tier2": "50M - 200M: ₹0.0008 / 1k Tokens",
+      "tier3": "200M+: ₹0.0005 / 1k Tokens (Volume Discount)",
       "autoBumpThreshold": "250M Tokens (Auto-upgrades to Enterprise Cluster)",
       "status": "active"
     },
@@ -749,8 +750,8 @@
       "meterName": "Dedicated GPU Node Hours",
       "includedUnits": "100 Hours",
       "tier1": "0 - 100 Hrs: Included in Base",
-      "tier2": "100 - 500 Hrs: $0.45 / GPU Hour",
-      "tier3": "500+ Hrs: $0.35 / GPU Hour",
+      "tier2": "100 - 500 Hrs: ₹0.45 / GPU Hour",
+      "tier3": "500+ Hrs: ₹0.35 / GPU Hour",
       "autoBumpThreshold": "600 Hrs (Auto-upgrades to Dedicated Rack)",
       "status": "active"
     }
@@ -798,7 +799,7 @@
     {
       "id": "pout_inst_901",
       "amount": 8500,
-      "currency": "EUR",
+      "currency": "INR",
       "rail": "SEPA Instant (EU)",
       "recipientBank": "Deutsche Bank AG (DE89 3704 ...)",
       "fee": 1.5,
@@ -809,7 +810,7 @@
     {
       "id": "pout_inst_902",
       "amount": 4200,
-      "currency": "GBP",
+      "currency": "INR",
       "rail": "Faster Payments (UK)",
       "recipientBank": "Barclays Bank UK (GB29 BUKB ...)",
       "fee": 1,
@@ -835,7 +836,7 @@
       "jurisdiction": "Delaware, United States",
       "taxId": "US-EIN-94-3829104",
       "role": "Parent Global Holding Entity",
-      "annualVolume": ",280,000.00 USD"
+      "annualVolume": ",280,000.00 INR"
     },
     {
       "id": "ent_qivropay_102",
@@ -843,7 +844,7 @@
       "jurisdiction": "Dublin, Ireland",
       "taxId": "IE99382104M",
       "role": "EU & UK MoR Operating Subsidiary",
-      "annualVolume": "€2,490,000.00 EUR"
+      "annualVolume": "€2,490,000.00 INR"
     },
     {
       "id": "ent_qivropay_103",
@@ -851,7 +852,7 @@
       "jurisdiction": "Singapore",
       "taxId": "SG202601928K",
       "role": "APAC Regional Gateway Entity",
-      "annualVolume": "S,820,000.00 SGD"
+      "annualVolume": "S,820,000.00 INR"
     }
   ],
   "contracts": [
@@ -893,7 +894,7 @@
   "insurancePolicy": {
     "policyNumber": "POL-QIVROPAY-LLOYDS-99482",
     "underwriter": "Lloyds & QIVROPAY Risk Syndication LLC",
-    "coverageLimit": ",500,000.00 USD",
+    "coverageLimit": ",500,000.00 INR",
     "status": "active",
     "reimbursementRate": "100% Guaranteed",
     "totalClaimsPaid": "zsh.00 (Zero Unrecovered Fraud)",
@@ -906,7 +907,7 @@
       "beneficiary": "Founder 1 (Delaware LLC)",
       "share": "45.0%",
       "bankAccount": "Chase Private Client (...9921)",
-      "totalDistributed": ",200.00 USD",
+      "totalDistributed": ",200.00 INR",
       "status": "active"
     },
     {
@@ -914,7 +915,7 @@
       "beneficiary": "Founder 2 (Tech Lead)",
       "share": "35.0%",
       "bankAccount": "Silicon Valley Bank (...4012)",
-      "totalDistributed": ",480.00 USD",
+      "totalDistributed": ",480.00 INR",
       "status": "active"
     },
     {
@@ -922,7 +923,7 @@
       "beneficiary": "Seed Investor Pool / LP Syndicate",
       "share": "20.0%",
       "bankAccount": "First Republic Trust (...1190)",
-      "totalDistributed": ",420.00 USD",
+      "totalDistributed": ",420.00 INR",
       "status": "active"
     }
   ],
@@ -930,7 +931,7 @@
     {
       "id": "acq_01",
       "name": "JPMorgan Chase Direct",
-      "region": "North America (USD)",
+      "region": "North America (INR)",
       "authRate": "97.4%",
       "priority": 1,
       "latency": "42ms",
@@ -939,7 +940,7 @@
     {
       "id": "acq_02",
       "name": "Adyen Global Rail",
-      "region": "Europe & UK (EUR/GBP)",
+      "region": "Europe & UK (INR/INR)",
       "authRate": "96.8%",
       "priority": 2,
       "latency": "55ms",
@@ -948,7 +949,7 @@
     {
       "id": "acq_03",
       "name": "Barclays Merchant Rail",
-      "region": "UK & Commonwealth (GBP)",
+      "region": "UK & Commonwealth (INR)",
       "authRate": "95.9%",
       "priority": 3,
       "latency": "61ms",
@@ -957,7 +958,7 @@
     {
       "id": "acq_04",
       "name": "Checkout.com Multi-Currency",
-      "region": "APAC & MENA (SGD/AED/AUD)",
+      "region": "APAC & MENA (INR/AED/INR)",
       "authRate": "96.2%",
       "priority": 4,
       "latency": "68ms",
@@ -981,7 +982,7 @@
       "id": "tax_fl_2026_q2_eu",
       "jurisdiction": "EU VAT One-Stop Shop (OSS)",
       "period": "2026 Q2",
-      "taxCollected": "€18,420.00 EUR",
+      "taxCollected": "€18,420.00 INR",
       "filingStatus": "ready_to_remit",
       "deadline": "Sep 30, 2026",
       "format": "XML & CSV Schema"
@@ -990,7 +991,7 @@
       "id": "tax_fl_2026_q2_uk",
       "jurisdiction": "UK HMRC VAT Return",
       "period": "2026 Q2",
-      "taxCollected": "£11,280.00 GBP",
+      "taxCollected": "£11,280.00 INR",
       "filingStatus": "ready_to_remit",
       "deadline": "Oct 07, 2026",
       "format": "MTD VAT JSON"
@@ -999,7 +1000,7 @@
       "id": "tax_fl_2026_q2_us",
       "jurisdiction": "US Multi-State DOR Summary",
       "period": "2026 Q2",
-      "taxCollected": ",650.00 USD",
+      "taxCollected": ",650.00 INR",
       "filingStatus": "remitted_settled",
       "deadline": "Aug 20, 2026",
       "format": "NACHA & State CSV"
@@ -1020,7 +1021,7 @@
       "recipientCompany": "Milano AI Software S.r.l.",
       "recipientTaxId": "IT10293840192",
       "sdiCode": "M5UXCR1",
-      "amount": "€1,200.00 EUR",
+      "amount": "€1,200.00 INR",
       "clearanceStatus": "cleared_delivered",
       "irnHash": "SDI-IT-2026-9981029381",
       "clearedAt": "2026-08-25"
@@ -1073,8 +1074,8 @@
       "id": "ref_cmp_01",
       "name": "Viral Customer Drip Program (Give 20%, Get  Credit)",
       "activeAdvocates": 184,
-      "referralSalesGenerated": ",280.00 USD",
-      "creditsDistributed": ",840.00 USD",
+      "referralSalesGenerated": ",280.00 INR",
+      "creditsDistributed": ",840.00 INR",
       "status": "active"
     }
   ],
@@ -1098,13 +1099,13 @@
         "risk": "mitigated"
       }
     ],
-    "preventedLosses": ",900.00 USD"
+    "preventedLosses": ",900.00 INR"
   },
   "disputeRebuttals": [
     {
       "id": "reb_qivropay_781",
       "disputeId": "disp_001_fraudulent",
-      "amount": ".00 USD",
+      "amount": ".00 INR",
       "reason": "Fraudulent Transaction (Claimed Unauthorized)",
       "evidenceCompiled": [
         "IP Geolocation Match (98.4% Confidence)",
@@ -1133,7 +1134,7 @@
       "id": "po_inv_9901",
       "poNumber": "PO-ENTERPRISE-2026-8812",
       "enterpriseClient": "Deloitte Global Tax & Advisory Ltd",
-      "amount": ",000.00 USD",
+      "amount": ",000.00 INR",
       "terms": "Net-30 Days",
       "dueDate": "2026-09-28",
       "status": "pending_wire_settlement"
@@ -1152,9 +1153,9 @@
   "fxHedges": [
     {
       "id": "hdg_eur_01",
-      "pair": "EUR / USD",
+      "pair": "INR / INR",
       "lockedRate": "1.0920",
-      "forwardVolume": "€250,000.00 EUR",
+      "forwardVolume": "€250,000.00 INR",
       "duration": "90 Days Forward",
       "expiresAt": "2026-11-25",
       "status": "locked_active"
@@ -1233,7 +1234,7 @@
       "id": "batch_2026_q2_all",
       "period": "2026 Q2 Full Quarter",
       "invoiceCount": 1240,
-      "totalVolume": ",500.00 USD",
+      "totalVolume": ",500.00 INR",
       "format": "ZIP Archive (1,240 Validated PDFs)",
       "downloadStatus": "ready_to_export"
     }
@@ -1282,7 +1283,7 @@
       "guaranteedUptime": "99.99%",
       "actualMonthlyUptime": "99.94% (26 min incident)",
       "creditPercentage": "10.00% Invoice Credit",
-      "creditAmount": ",500.00 USD",
+      "creditAmount": ",500.00 INR",
       "appliedToInvoice": "inv_deloitte_aug_2026",
       "status": "auto_credited"
     }
@@ -1292,7 +1293,7 @@
       "id": "alt_ethoca_882",
       "network": "Mastercard Ethoca Alert",
       "cardLast4": "8841",
-      "amount": ".00 USD",
+      "amount": ".00 INR",
       "issuerBank": "Barclays UK",
       "actionTaken": "auto_refunded_within_3m",
       "chargebackAvoided": true,
@@ -1302,7 +1303,7 @@
       "id": "alt_verifi_991",
       "network": "Visa Verifi CDRN",
       "cardLast4": "1120",
-      "amount": ".00 USD",
+      "amount": ".00 INR",
       "issuerBank": "JPMorgan Chase",
       "actionTaken": "auto_refunded_within_2m",
       "chargebackAvoided": true,
@@ -1313,10 +1314,10 @@
     {
       "id": "esc_deal_401",
       "clientName": "Palantir Solutions Group",
-      "totalContract": ",000.00 USD",
-      "heldInEscrow": ",000.00 USD",
+      "totalContract": ",000.00 INR",
+      "heldInEscrow": ",000.00 INR",
       "nextMilestone": "Phase 2 API Integration Signoff",
-      "milestoneAmount": ",000.00 USD",
+      "milestoneAmount": ",000.00 INR",
       "status": "milestone_ready_to_release"
     }
   ],
@@ -1333,7 +1334,7 @@
   ],
   "carbonOffsets": {
     "totalCo2RemovedTons": "142.8 Tons CO2",
-    "totalMerchantContribution": ",450.00 USD",
+    "totalMerchantContribution": ",450.00 INR",
     "activeProjects": "Frontier Biochar & Direct Air Capture (DAC)",
     "greenBadgeParticipationRate": "84.2%"
   },
@@ -1452,7 +1453,7 @@
     {
       "id": "lrs_remit_441",
       "purpose": "Foreign Cloud Infra (AWS / OpenAI US)",
-      "remittanceUsd": ",500.00 USD",
+      "remittanceUsd": ",500.00 INR",
       "equivalentInr": "₹10,43,750.00 INR",
       "tcsCollected": "₹52,187.50 INR (5.00% TCS under Sec 206C)",
       "formA2Status": "Form A2 & 15CB Generated via Authorized Dealer (AD)",
@@ -1577,7 +1578,7 @@
       "id": "ifsc_tx_7701",
       "ifscEntity": "QIVROPAY Global FinTech IFSC Unit (GIFT City Gandhinagar)",
       "ifscaLicenseNo": "IFSCA/BF/2026/0091",
-      "settlementCurrency": "USD (,500.00 USD)",
+      "settlementCurrency": "INR (,500.00 INR)",
       "inrEquivalent": "₹40,49,750.00 INR",
       "withholdingTax": "0.00% (Tax-Free Export under Section 80LA)",
       "nostroBank": "Standard Chartered Bank IFSC Branch",
@@ -1734,7 +1735,7 @@
     {
       "id": "pacb_ebrc_9901",
       "foreignBuyer": "Vortex Global Labs LLC (California)",
-      "inwardRemittanceUsd": ",500.00 USD",
+      "inwardRemittanceUsd": ",500.00 INR",
       "inrRealized": "₹20,45,750.00 INR",
       "eBrcNumber": "DGFT-EBRC-881920198",
       "fircCertNo": "SCB-FIRC-2026-99018",
@@ -1866,7 +1867,7 @@
       "filingCategory": "Payment Aggregator (PA) Statutory Returns",
       "reportingQuarter": "Q2 FY 2026-27 (XBRL Taxonomy v4.2)",
       "escrowBalanceAudited": "₹142,50,00,000.00 INR (100% Capital Adequacy)",
-      "crossBorderInflowUsd": ",450,000.00 USD Realized",
+      "crossBorderInflowUsd": ",450,000.00 INR Realized",
       "cimsFilingStatus": "Digitally Signed & Validated with RBI CIMS Portal",
       "status": "rbi_cims_acknowledged"
     }

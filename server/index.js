@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
@@ -207,7 +208,7 @@ app.get('/api/v1/products', (req, res) => {
 });
 
 app.post('/api/v1/products', (req, res) => {
-  const { name, description, price, currency = 'USD', type = 'credits', credits = 0, billingType = 'one_time', interval = 'one_time' } = req.body;
+  const { name, description, price, currency = 'INR', type = 'credits', credits = 0, billingType = 'one_time', interval = 'one_time' } = req.body;
   if (!name || !price) {
     return res.status(400).json({ error: 'Name and price are required' });
   }
@@ -316,7 +317,7 @@ app.post('/api/v1/licenses/generate', (req, res) => {
   const { productName, customerEmail, maxActivations = 3 } = req.body;
   const db = readDB();
 
-  const key = `QIVROPAY-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(1).toString('hex').toUpperCase()}`;
+  const key = `QIVROPAY-₹{crypto.randomBytes(2).toString('hex').toUpperCase()}-₹{crypto.randomBytes(2).toString('hex').toUpperCase()}-₹{crypto.randomBytes(2).toString('hex').toUpperCase()}-₹{crypto.randomBytes(1).toString('hex').toUpperCase()}`;
   const newLicense = {
     id: `lic_qivropay_${crypto.randomBytes(3).toString('hex')}`,
     productName: productName || 'QIVROPAY Desktop Agent Pro License',
@@ -362,7 +363,7 @@ app.post('/api/v1/payouts/request', (req, res) => {
   const newPayout = {
     id: `po_qivropay_${crypto.randomBytes(3).toString('hex')}`,
     amount: Number(amount) || 1000,
-    currency: 'USD',
+    currency: 'INR',
     status: 'in_transit',
     destination: 'Silicon Valley Bank (••••9812)',
     arrivalDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
@@ -471,7 +472,7 @@ app.post('/api/v1/payments/process', (req, res) => {
   let session = (db.sessions || {})[sessionId] || {
     title: 'AI Token Starter Pack',
     amount: 29.00,
-    currency: 'USD',
+    currency: 'INR',
     type: 'credits'
   };
 
@@ -488,7 +489,7 @@ app.post('/api/v1/payments/process', (req, res) => {
   const transaction = {
     id: transactionId,
     amount: grossAmount,
-    currency: session.currency || 'USD',
+    currency: session.currency || 'INR',
     status: 'succeeded',
     customerEmail: customerEmail || 'developer@qivropay.io',
     customerName: customerName || 'Alex Chen',
@@ -532,7 +533,7 @@ app.post('/api/v1/payments/process', (req, res) => {
       customerEmail: customerEmail,
       planName: session.title,
       amount: grossAmount,
-      currency: session.currency || 'USD',
+      currency: session.currency || 'INR',
       interval: 'month',
       status: 'active',
       currentPeriodStart: new Date().toISOString(),
@@ -548,7 +549,7 @@ app.post('/api/v1/payments/process', (req, res) => {
       id: `lic_qivropay_${crypto.randomBytes(3).toString('hex')}`,
       productName: session.title,
       customerEmail: customerEmail,
-      key: `QIVROPAY-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`,
+      key: `QIVROPAY-₹{crypto.randomBytes(2).toString('hex').toUpperCase()}-₹{crypto.randomBytes(2).toString('hex').toUpperCase()}-₹{crypto.randomBytes(2).toString('hex').toUpperCase()}`,
       activations: 0,
       maxActivations: 3,
       status: 'active',
@@ -712,7 +713,7 @@ app.post('/api/v1/wallets/create', (req, res) => {
     id: `wallet_agent_${crypto.randomBytes(3).toString('hex')}`,
     agentName,
     balance: Number(initialBalance),
-    currency: 'USD',
+    currency: 'INR',
     autoRefillThreshold: Number(autoRefillThreshold),
     autoRefillAmount: Number(autoRefillAmount),
     status: 'active',
@@ -791,7 +792,7 @@ app.post('/api/v1/proxy/chat/completions', (req, res) => {
   const { model = 'gpt-4o', messages = [], customerId = 'cus_qivropay_9910' } = req.body;
   const db = readDB();
 
-  // Deduct fractional micro-fee ($0.002) and record telemetry
+  // Deduct fractional micro-fee (₹0.002) and record telemetry
   const promptTokens = (messages[0]?.content?.length || 50) * 2;
   const completionTokens = 120;
   const microCost = 0.0024;
@@ -826,7 +827,7 @@ app.post('/api/v1/proxy/chat/completions', (req, res) => {
     },
     qivropay_settlement: {
       micro_charge_usd: microCost,
-      currency: 'USD',
+      currency: 'INR',
       status: 'debited_from_meter',
       latency_ms: 8
     }
@@ -1016,7 +1017,7 @@ app.post('/api/v1/copilot/generate', (req, res) => {
     name: title,
     description: `Auto-generated from natural language prompt: "${prompt}"`,
     price,
-    currency: 'USD',
+    currency: 'INR',
     type,
     active: true,
     createdAt: new Date().toISOString()
@@ -1027,14 +1028,14 @@ app.post('/api/v1/copilot/generate', (req, res) => {
   writeDB(db);
 
   const checkoutUrl = `http://localhost:4000/checkout/${newProd.id}`;
-  const embedSnippet = `<script src="http://localhost:4000/checkout.js"></script>\n<button onclick="QivroPay.openCheckout('${newProd.id}')">Pay $${price} USD</button>`;
+  const embedSnippet = `<script src="http://localhost:4000/checkout.js"></script>\n<button onclick="QivroPay.openCheckout('${newProd.id}')">Pay ₹${price} INR</button>`;
 
   res.json({
     success: true,
     product: newProd,
     checkoutUrl,
     embedSnippet,
-    reasoning: `Extracted ${type} model priced at $${price} USD with instant global MoR tax routing.`
+    reasoning: `Extracted ${type} model priced at ₹${price} INR with instant global MoR tax routing.`
   });
 });
 
@@ -1071,7 +1072,7 @@ app.get('/api/v1/b2b/invoices', (req, res) => {
 });
 
 app.post('/api/v1/b2b/create-invoice', (req, res) => {
-  const { companyName, taxId, amount, currency = 'USD', terms = 'Net 30', items = [] } = req.body;
+  const { companyName, taxId, amount, currency = 'INR', terms = 'Net 30', items = [] } = req.body;
   const db = readDB();
   const newInv = {
     id: `inv_b2b_${crypto.randomBytes(3).toString('hex')}`,
@@ -1104,10 +1105,10 @@ app.post('/api/v1/gift-cards/create', (req, res) => {
   const db = readDB();
   const newCard = {
     id: `gc_qivropay_${crypto.randomBytes(3).toString('hex')}`,
-    code: `GIFT-QIVROPAY-${crypto.randomBytes(2).toString('hex').toUpperCase()}-VIP`,
+    code: `GIFT-QIVROPAY-₹{crypto.randomBytes(2).toString('hex').toUpperCase()}-VIP`,
     initialAmount: Number(initialAmount),
     currentBalance: Number(initialAmount),
-    currency: 'USD',
+    currency: 'INR',
     recipientEmail,
     senderName,
     status: 'active',
@@ -1240,7 +1241,7 @@ app.post('/api/v1/treasury/convert', (req, res) => {
 
   res.json({
     success: true,
-    message: `Successfully converted ${amount} ${fromCurrency} to ${convertedAmount.toFixed(2)} ${toCurrency} at interbank rate 1:${rate}`,
+    message: `Successfully converted ${amount} ${fromCurrency} to ${convertedAmount.toFixed(2)} ${toCurrency} at interbank rate 1: ₹{rate}`,
     balances
   });
 });
@@ -1362,7 +1363,7 @@ app.post('/api/v1/credit-notes/issue', (req, res) => {
 // 34. INSTANT T+0 MULTI-CURRENCY PAYOUTS API
 // -------------------------------------------------------------
 app.post('/api/v1/payouts/instant', (req, res) => {
-  const { amount, currency = 'USD', rail = 'Local Fast Rail', recipientBank } = req.body;
+  const { amount, currency = 'INR', rail = 'Local Fast Rail', recipientBank } = req.body;
   const db = readDB();
   const newPayout = {
     id: `pout_inst_${crypto.randomBytes(3).toString('hex')}`,
@@ -1429,7 +1430,7 @@ app.post('/api/v1/contracts/sign', (req, res) => {
     id: `cnt_qivropay_${crypto.randomBytes(3).toString('hex')}`,
     title: title || 'Enterprise Master Services Agreement (MSA) & 99.99% SLA',
     clientName,
-    contractValue: contractValue || '$120,000.00 / yr',
+    contractValue: contractValue || '₹120,000.00 / yr',
     status: 'signed_active',
     signerEmail: signerEmail || 'legal@client.com',
     sha256Hash: crypto.randomBytes(32).toString('hex'),
@@ -1911,7 +1912,7 @@ app.get('/api/v1/india/sez-lut', (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 91. INDIA: GIFT CITY (IFSC) USD OFFSHORE RAIL API
+// 91. INDIA: GIFT CITY (IFSC) INR OFFSHORE RAIL API
 // -------------------------------------------------------------
 app.get('/api/v1/india/gift-city-ifsc', (req, res) => {
   const db = readDB();
@@ -2513,7 +2514,7 @@ if (fs.existsSync(distPath)) {
 // local Docker/VM deployments, but never open a port inside a Vercel function.
 if (process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
-    console.log(`⚡ QivroPay Payments Engine running on http://localhost:${PORT}`);
+    console.log(`⚡ QivroPay Payments Engine running on http://localhost: ₹{PORT}`);
   });
 }
 

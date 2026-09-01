@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -73,7 +74,7 @@ export const AffiliatesTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Referred Revenue</div>
-          <div className="text-2xl font-bold font-mono text-[#0A0D14]">${totalReferred.toLocaleString()} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0A0D14]">₹{totalReferred.toLocaleString()} INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <TrendingUp className="w-3 h-3" /> +18.4% this month
           </div>
@@ -81,7 +82,7 @@ export const AffiliatesTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Unpaid Commissions Due</div>
-          <div className="text-2xl font-bold font-mono text-purple-700">${totalUnpaid.toLocaleString()} USD</div>
+          <div className="text-2xl font-bold font-mono text-purple-700">₹{totalUnpaid.toLocaleString()} INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Auto-segregated in MoR ledger</div>
         </div>
 

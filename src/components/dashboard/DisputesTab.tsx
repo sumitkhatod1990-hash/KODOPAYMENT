@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -22,7 +23,7 @@ export const DisputesTab: React.FC = () => {
       id: 'dp_qivropay_01',
       transactionId: 'tx_qivropay_9881',
       amount: 49.00,
-      currency: 'USD',
+      currency: 'INR',
       reason: 'Fraudulent Claim (Unrecognized Charge)',
       status: 'under_review',
       evidenceStatus: 'ai_compiled_ready',
@@ -67,7 +68,7 @@ export const DisputesTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Merchant Liability Loss</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$0.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹0.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono">Covered completely by QIVROPAY MoR</div>
         </div>
 
@@ -110,7 +111,7 @@ export const DisputesTab: React.FC = () => {
                     <div className="text-[#0A0D14] font-semibold">{dp.customerEmail}</div>
                   </td>
                   <td className="p-4 font-mono font-bold text-[#0A0D14]">
-                    ${dp.amount.toFixed(2)} USD
+                    ${dp.amount.toFixed(2)} INR
                   </td>
                   <td className="p-4 text-[#6E717D]">
                     {dp.reason}

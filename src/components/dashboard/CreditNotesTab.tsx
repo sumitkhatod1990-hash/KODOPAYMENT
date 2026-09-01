@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -93,7 +94,7 @@ export const CreditNotesTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total VAT Adjusted</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">${creditNotes.reduce((acc, c) => acc + c.adjustmentAmount, 0).toFixed(2)} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹{creditNotes.reduce((acc, c) => acc + c.adjustmentAmount, 0).toFixed(2)} INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Auto-remitted adjustments</div>
         </div>
 
@@ -135,7 +136,7 @@ export const CreditNotesTab: React.FC = () => {
                     {note.taxId}
                   </td>
                   <td className="p-4 font-mono font-bold text-emerald-700">
-                    -${note.adjustmentAmount.toFixed(2)} USD
+                    -₹{note.adjustmentAmount.toFixed(2)} INR
                   </td>
                   <td className="p-4 text-[#6E717D]">
                     {note.reason}
@@ -197,7 +198,7 @@ export const CreditNotesTab: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#0A0D14]">Adjustment Amount ($)</label>
+                <label className="font-semibold text-[#0A0D14]">Adjustment Amount (₹)</label>
                 <input
                   type="number"
                   step="0.01"

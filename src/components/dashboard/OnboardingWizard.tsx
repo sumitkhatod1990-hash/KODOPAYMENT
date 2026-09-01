@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -25,7 +26,7 @@ export const OnboardingWizard: React.FC<WizardProps> = ({ isOpen, onClose }) => 
   const [step, setStep] = useState(1);
   const [brandName, setBrandName] = useState('QIVROPAY AI Technologies Inc.');
   const [statementDescriptor, setStatementDescriptor] = useState('QIVROPAY*AI');
-  const [primaryCurrency, setPrimaryCurrency] = useState('USD');
+  const [primaryCurrency, setPrimaryCurrency] = useState('INR');
   const [bankAccount, setBankAccount] = useState('Silicon Valley Bank (••••9812)');
   const [productTitle, setProductTitle] = useState('AI Inference Credit Pack');
   const [productPrice, setProductPrice] = useState(29);
@@ -139,7 +140,7 @@ export const OnboardingWizard: React.FC<WizardProps> = ({ isOpen, onClose }) => 
                 Merchant of Record & Tax Setup
               </h3>
               <p className="text-xs text-[#6e6e73]">
-                Zero sales tax filing burden. QIVROPAY handles 220+ international jurisdictions automatically.
+                Configure India GST and INR settlement preferences for your QivroPay account.
               </p>
             </div>
 
@@ -151,9 +152,6 @@ export const OnboardingWizard: React.FC<WizardProps> = ({ isOpen, onClose }) => 
                   onChange={(e) => setPrimaryCurrency(e.target.value)}
                   className="w-full p-3 rounded-xl border border-black/10 bg-[#f5f5f7] text-sm text-[#1d1d1f]"
                 >
-                  <option value="USD">USD ($) - United States Dollar</option>
-                  <option value="EUR">EUR (€) - Eurozone</option>
-                  <option value="GBP">GBP (£) - British Pound</option>
                   <option value="INR">INR (₹) - Indian Rupee</option>
                 </select>
               </div>
@@ -164,7 +162,7 @@ export const OnboardingWizard: React.FC<WizardProps> = ({ isOpen, onClose }) => 
                   <span>QIVROPAY Tax Nexus Coverage</span>
                 </div>
                 <p className="text-xs text-[#6e6e73]">
-                  EU VAT, US State Sales Tax, and UK HMRC returns are 100% prepared, collected, and filed by QIVROPAY.
+                  India GST records and Indian-rupee payment activity are available in your QivroPay dashboard.
                 </p>
               </div>
             </div>

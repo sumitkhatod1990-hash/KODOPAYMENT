@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import { neon } from '@neondatabase/serverless';
 import crypto from 'crypto';
 
@@ -38,7 +39,7 @@ export async function recordPaymentOrder(order) {
   const sql = sqlClient();
   await sql`
     INSERT INTO qivropay_payment_events (event_id, kind, order_id, status, payload)
-    VALUES (${`order:${order.orderId}`}, 'order_created', ${order.orderId}, ${order.orderStatus || 'ACTIVE'}, ${JSON.stringify(order)}::jsonb)
+    VALUES (${`order: ₹{order.orderId}`}, 'order_created', ${order.orderId}, ${order.orderStatus || 'ACTIVE'}, ${JSON.stringify(order)}::jsonb)
     ON CONFLICT (event_id) DO NOTHING
   `;
 }
@@ -70,7 +71,7 @@ export async function recordCashfreeWebhook(eventId, event) {
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
   const derived = crypto.scryptSync(password, salt, 64).toString('hex');
-  return `${salt}:${derived}`;
+  return `${salt}: ₹{derived}`;
 }
 
 function verifyPassword(password, stored) {

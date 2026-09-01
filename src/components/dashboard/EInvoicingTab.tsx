@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -20,7 +21,7 @@ export const EInvoicingTab: React.FC = () => {
       recipientCompany: 'Milano AI Software S.r.l.',
       recipientTaxId: 'IT10293840192',
       sdiCode: 'M5UXCR1',
-      amount: '€1,200.00 EUR',
+      amount: '€1,200.00 INR',
       clearanceStatus: 'cleared_delivered',
       irnHash: 'SDI-IT-2026-9981029381',
       clearedAt: 'Aug 25, 2026'

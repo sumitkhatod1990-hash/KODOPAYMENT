@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -385,18 +386,18 @@ export const CashfreeEasySplitTab: React.FC = () => {
         <pre className="p-4 rounded-xl bg-[#0A0D14] text-emerald-400 font-mono text-xs overflow-x-auto leading-relaxed">
 {`{
   "order_id": "order_qivropay_in_881920",
-  "order_amount": ${simAmount}.00,
+  "order_amount": ₹{simAmount}.00,
   "order_currency": "INR",
   "split_type": "PERCENTAGE_AND_TDS_WITHHOLDING",
   "transfers": [
     {
       "vendor_id": "MERCHANT_QIVROPAY_IND_0981",
       "percentage": 97.0,
-      "amount": ${merchantBase}.00,
+      "amount": ₹{merchantBase}.00,
       "tds_deduction": {
         "section": "194-O",
         "rate": 1.0,
-        "amount": ${tds194O}.00
+        "amount": ₹{tds194O}.00
       },
       "payout_mode": "IMPS_INSTANT_T0",
       "beneficiary_account": "HDFC0000060_4829"
@@ -404,11 +405,11 @@ export const CashfreeEasySplitTab: React.FC = () => {
     {
       "vendor_id": "QIVROPAY_PLATFORM_MOR_RESERVE",
       "percentage": 3.0,
-      "amount": ${qivropayFee}.00,
+      "amount": ₹{qivropayFee}.00,
       "tax_invoicing": {
         "sac_code": "998313",
         "gst_rate": 18.0,
-        "gst_amount": ${gstOnFee}.00
+        "gst_amount": ₹{gstOnFee}.00
       }
     }
   ]

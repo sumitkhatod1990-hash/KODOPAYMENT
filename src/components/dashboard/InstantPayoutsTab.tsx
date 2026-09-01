@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -18,7 +19,7 @@ export const InstantPayoutsTab: React.FC = () => {
     {
       id: 'pout_inst_901',
       amount: 8500.00,
-      currency: 'EUR',
+      currency: 'INR',
       rail: 'SEPA Instant (EU)',
       recipientBank: 'Deutsche Bank AG (DE89 3704 ...)',
       fee: 1.50,
@@ -29,7 +30,7 @@ export const InstantPayoutsTab: React.FC = () => {
     {
       id: 'pout_inst_902',
       amount: 4200.00,
-      currency: 'GBP',
+      currency: 'INR',
       rail: 'Faster Payments (UK)',
       recipientBank: 'Barclays Bank UK (GB29 BUKB ...)',
       fee: 1.00,
@@ -41,7 +42,7 @@ export const InstantPayoutsTab: React.FC = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [amount, setAmount] = useState(2500);
-  const [currency, setCurrency] = useState('EUR');
+  const [currency, setCurrency] = useState('INR');
   const [rail, setRail] = useState('SEPA Instant (EU)');
   const [bankAccount, setBankAccount] = useState('DE89 3704 0044 0532 0130 99');
   const [dispatching, setDispatching] = useState(false);
@@ -100,7 +101,7 @@ export const InstantPayoutsTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Instant Payout Volume Settled</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">${totalSettled.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹{totalSettled.toLocaleString(undefined, { minimumFractionDigits: 2 })} INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Sub-10 second delivery SLA
           </div>
@@ -108,7 +109,7 @@ export const InstantPayoutsTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Available Instant Float</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">$84,250.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹84,250.00 INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">0% hold time under QIVROPAY MoR</div>
         </div>
 
@@ -194,15 +195,15 @@ export const InstantPayoutsTab: React.FC = () => {
                     value={currency}
                     onChange={(e) => {
                       setCurrency(e.target.value);
-                      if (e.target.value === 'EUR') setRail('SEPA Instant (EU)');
-                      if (e.target.value === 'GBP') setRail('Faster Payments (UK)');
-                      if (e.target.value === 'USD') setRail('FedNow / RTP (US)');
+                      if (e.target.value === 'INR') setRail('SEPA Instant (EU)');
+                      if (e.target.value === 'INR') setRail('Faster Payments (UK)');
+                      if (e.target.value === 'INR') setRail('FedNow / RTP (US)');
                     }}
                     className="w-full p-2.5 rounded-xl border border-black/10 bg-[#F4F5F8] font-mono text-[#0A0D14]"
                   >
-                    <option value="EUR">EUR (€)</option>
-                    <option value="USD">USD ($)</option>
-                    <option value="GBP">GBP (£)</option>
+                    <option value="INR">INR (€)</option>
+                    <option value="INR">INR (₹)</option>
+                    <option value="INR">INR (£)</option>
                   </select>
                 </div>
               </div>

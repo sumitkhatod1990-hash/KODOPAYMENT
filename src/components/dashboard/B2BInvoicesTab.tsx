@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -22,7 +23,7 @@ export const B2BInvoicesTab: React.FC = () => {
       companyName: 'Synthetix Global Corp',
       taxId: 'US-EIN-94-3829104',
       amount: 12500.00,
-      currency: 'USD',
+      currency: 'INR',
       terms: 'Net 30',
       status: 'sent',
       dueDate: '2026-09-30',
@@ -34,7 +35,7 @@ export const B2BInvoicesTab: React.FC = () => {
       companyName: 'Nordic Autonomous Systems AB',
       taxId: 'SE556012345601',
       amount: 8400.00,
-      currency: 'EUR',
+      currency: 'INR',
       terms: 'Net 15',
       status: 'paid',
       dueDate: '2026-08-25',
@@ -47,7 +48,7 @@ export const B2BInvoicesTab: React.FC = () => {
   const [companyName, setCompanyName] = useState('');
   const [taxId, setTaxId] = useState('');
   const [amount, setAmount] = useState(5000);
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState('INR');
   const [terms, setTerms] = useState('Net 30');
   const [itemName, setItemName] = useState('Custom Enterprise AI Integration');
 
@@ -110,13 +111,13 @@ export const B2BInvoicesTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Outstanding B2B Accounts Receivable</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">${totalOutstanding.toLocaleString()} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹{totalOutstanding.toLocaleString()} INR</div>
           <div className="text-[11px] text-purple-700 font-mono">Net 30 & Net 60 Terms Active</div>
         </div>
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Settled B2B Wire Volume</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">${totalCollected.toLocaleString()} USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹{totalCollected.toLocaleString()} INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Reconciled via vIBAN
           </div>
@@ -247,7 +248,7 @@ export const B2BInvoicesTab: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#0A0D14]">Invoice Amount ($)</label>
+                  <label className="font-semibold text-[#0A0D14]">Invoice Amount (₹)</label>
                   <input
                     type="number"
                     value={amount}
@@ -262,9 +263,9 @@ export const B2BInvoicesTab: React.FC = () => {
                     onChange={(e) => setCurrency(e.target.value)}
                     className="w-full p-2.5 rounded-xl border border-black/10 bg-[#F4F5F8] font-mono text-[#0A0D14]"
                   >
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
+                    <option value="INR">INR (₹)</option>
+                    <option value="INR">INR (€)</option>
+                    <option value="INR">INR (£)</option>
                   </select>
                 </div>
               </div>

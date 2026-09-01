@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -17,7 +18,7 @@ export const SubscriptionPauseTab: React.FC = () => {
     {
       id: 'sub_pause_01',
       customerName: 'Alexander Wright',
-      plan: 'Pro Developer ($49/mo)',
+      plan: 'Pro Developer (₹49/mo)',
       pausedUntil: 'Oct 01, 2026',
       pauseDuration: '2 Billing Cycles',
       churnDeflected: true,
@@ -58,7 +59,7 @@ export const SubscriptionPauseTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Preserved Annual LTV</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">+$83,500.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">+₹83,500.00 INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Protected from permanent churn</div>
         </div>
 

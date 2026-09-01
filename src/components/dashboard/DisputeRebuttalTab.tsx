@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -18,7 +19,7 @@ export const DisputeRebuttalTab: React.FC = () => {
     {
       id: 'reb_qivropay_781',
       disputeId: 'disp_001_fraudulent',
-      amount: '$499.00 USD',
+      amount: '₹499.00 INR',
       reason: 'Fraudulent Transaction (Claimed Unauthorized)',
       evidenceCompiled: [
         'IP Geolocation Match (98.4% Confidence)',
@@ -79,7 +80,7 @@ export const DisputeRebuttalTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Funds Recovered from Chargebacks</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">$31,450.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹31,450.00 INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">100% automated bank submissions</div>
         </div>
 

@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -101,7 +102,7 @@ export const TaxExemptionsTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Tax Exempt Sales Volume</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">$42,900.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹42,900.00 INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">0% sales tax charged</div>
         </div>
 

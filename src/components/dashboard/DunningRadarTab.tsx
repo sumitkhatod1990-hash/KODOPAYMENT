@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -19,7 +20,7 @@ export const DunningRadarTab: React.FC = () => {
     {
       id: 'dun_01',
       customerEmail: 'tech.lead@datanode.cloud',
-      planName: 'Pro Intelligence SaaS ($99/mo)',
+      planName: 'Pro Intelligence SaaS (₹99/mo)',
       failReason: 'insufficient_funds',
       retryCount: 2,
       nextSmartRetry: 'Tomorrow 9:15 AM (ML Payday Window)',
@@ -29,7 +30,7 @@ export const DunningRadarTab: React.FC = () => {
     {
       id: 'dun_02',
       customerEmail: 'finance@vectorflow.ai',
-      planName: 'Pro Intelligence SaaS ($99/mo)',
+      planName: 'Pro Intelligence SaaS (₹99/mo)',
       failReason: 'card_expired',
       retryCount: 1,
       nextSmartRetry: 'Portal Update Link Sent',
@@ -39,7 +40,7 @@ export const DunningRadarTab: React.FC = () => {
     {
       id: 'dun_03',
       customerEmail: 'devin@agenticmesh.io',
-      planName: 'Pro Intelligence SaaS ($99/mo)',
+      planName: 'Pro Intelligence SaaS (₹99/mo)',
       failReason: 'generic_decline',
       retryCount: 1,
       nextSmartRetry: 'Today 3:30 PM (Optimal Card Window)',
@@ -110,7 +111,7 @@ export const DunningRadarTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Recovered MRR This Month</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">$3,420.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹3,420.00 INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Saved from involuntary churn</div>
         </div>
 

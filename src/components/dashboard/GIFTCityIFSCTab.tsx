@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -18,7 +19,7 @@ export const GIFTCityIFSCTab: React.FC = () => {
       id: 'ifsc_tx_7701',
       ifscEntity: 'QIVROPAY Global FinTech IFSC Unit (GIFT City Gandhinagar)',
       ifscaLicenseNo: 'IFSCA/BF/2026/0091',
-      settlementCurrency: 'USD ($48,500.00 USD)',
+      settlementCurrency: 'INR (₹48,500.00 INR)',
       inrEquivalent: '₹40,49,750.00 INR',
       withholdingTax: '0.00% (Tax-Free Export under Section 80LA)',
       nostroBank: 'Standard Chartered Bank IFSC Branch',
@@ -34,7 +35,7 @@ export const GIFTCityIFSCTab: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-[#0A0D14] font-heading flex items-center gap-2">
             <Landmark className="w-6 h-6 text-[#0055FF]" />
-            <span>GIFT City (IFSC) Offshore USD Invoicing &amp; Settlement Rail</span>
+            <span>GIFT City (IFSC) Offshore INR Invoicing &amp; Settlement Rail</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
             IFSCA-regulated offshore banking and foreign currency settlement rail operating from GIFT City IFSC (Gandhinagar), enabling zero withholding tax export billing and multi-currency Nostro accounts.
@@ -50,8 +51,8 @@ export const GIFTCityIFSCTab: React.FC = () => {
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
-          <div className="text-xs font-mono text-[#8C90A0] uppercase">IFSC USD Settlement Volume</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$48,500.00 USD</div>
+          <div className="text-xs font-mono text-[#8C90A0] uppercase">IFSC INR Settlement Volume</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹48,500.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Direct Nostro foreign currency settlement
           </div>

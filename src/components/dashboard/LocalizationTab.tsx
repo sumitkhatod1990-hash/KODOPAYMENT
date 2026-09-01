@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -18,7 +19,7 @@ export const LocalizationTab: React.FC = () => {
   const translations = {
     en: {
       name: 'English (US)',
-      btn: 'Pay $49.00 USD (1-Click Apple Pay)',
+      btn: 'Pay ₹49.00 INR (1-Click Apple Pay)',
       vatNotice: 'Prices include all applicable sales taxes under QIVROPAY Merchant of Record.',
       cardPlaceholder: 'Card number • MM / YY • CVC',
       trust: '100% Tax Nexus Insulated'
@@ -39,7 +40,7 @@ export const LocalizationTab: React.FC = () => {
     },
     es: {
       name: 'Español (Spain & LatAm)',
-      btn: 'Pagar $49.00 USD (Apple Pay en 1 Clic)',
+      btn: 'Pagar ₹49.00 INR (Apple Pay en 1 Clic)',
       vatNotice: 'Precios con impuestos incluidos bajo QIVROPAY Merchant of Record.',
       cardPlaceholder: 'Número de tarjeta • MM / AA • CVC',
       trust: '100% Libre de Responsabilidad Fiscal'

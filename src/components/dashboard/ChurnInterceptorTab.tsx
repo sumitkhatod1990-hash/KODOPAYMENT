@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -46,7 +47,7 @@ export const ChurnInterceptorTab: React.FC = () => {
         id: `res_qivropay_${Date.now().toString().slice(-4)}`,
         customerEmail: testEmail,
         reason: 'Feature complexity / underutilized',
-        deflectionOffer: 'Switch to Developer Lite Plan ($19/mo) + 1-on-1 Onboarding Call',
+        deflectionOffer: 'Switch to Developer Lite Plan (₹19/mo) + 1-on-1 Onboarding Call',
         mrrSaved: 29.00,
         timestamp: 'Just now',
         status: 'accepted_retained'
@@ -84,7 +85,7 @@ export const ChurnInterceptorTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Saved MRR Velocity</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">+${totalSavedMRR.toFixed(2)} USD / mo</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">+₹{totalSavedMRR.toFixed(2)} INR / mo</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Across {rescuedSubscribers.length} rescued accounts
           </div>
@@ -156,7 +157,7 @@ export const ChurnInterceptorTab: React.FC = () => {
                     {res.deflectionOffer}
                   </td>
                   <td className="p-4 font-mono font-bold text-emerald-700">
-                    +${res.mrrSaved.toFixed(2)} USD/mo
+                    +₹{res.mrrSaved.toFixed(2)} INR/mo
                   </td>
                   <td className="p-4 text-[#8C90A0] font-mono text-[11px]">
                     {res.timestamp}

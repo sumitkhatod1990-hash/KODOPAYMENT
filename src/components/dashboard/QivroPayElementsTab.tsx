@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -69,7 +70,7 @@ export function InlineCheckout() {
   return (
     <form onSubmit={handlePay} className="space-y-4">
       <QivroPayCardElement hidePostalCode={false} />
-      <button type="submit" className="opp-btn-primary">Pay $49 USD</button>
+      <button type="submit" className="opp-btn-primary">Pay ₹49 INR</button>
     </form>
   );
 }`,
@@ -187,7 +188,7 @@ import { QivroPayCustomerPortalWidget } from '@qivropay/elements-vue';
               <span className="px-3 py-1 rounded-full bg-blue-50 text-[#0055FF] text-[10px] font-bold font-mono">
                 POPULAR PRO TIER
               </span>
-              <div className="text-3xl font-bold font-mono text-[#0A0D14]">$49<span className="text-xs text-[#8C90A0]">/month</span></div>
+              <div className="text-3xl font-bold font-mono text-[#0A0D14]">₹49<span className="text-xs text-[#8C90A0]">/month</span></div>
               <p className="text-xs text-[#6E717D]">50M AI inference tokens & automated tax compliance</p>
               <button className="w-full opp-btn-primary py-2.5 text-xs font-bold shadow-md">
                 Subscribe with 1-Click
@@ -215,7 +216,7 @@ import { QivroPayCustomerPortalWidget } from '@qivropay/elements-vue';
                 <span className="text-emerald-700">● Active</span>
               </div>
               <div className="p-3 rounded-xl bg-[#F4F5F8] text-[#6E717D]">
-                Renews on Sept 30, 2026 for $49.00 USD
+                Renews on Sept 30, 2026 for ₹49.00 INR
               </div>
               <div className="flex gap-2">
                 <button className="opp-btn-secondary flex-1 py-1.5 text-[11px] font-semibold">Change Card</button>

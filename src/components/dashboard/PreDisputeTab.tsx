@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -18,7 +19,7 @@ export const PreDisputeTab: React.FC = () => {
       id: 'alt_ethoca_882',
       network: 'Mastercard Ethoca Alert',
       cardLast4: '8841',
-      amount: '$149.00 USD',
+      amount: '₹149.00 INR',
       issuerBank: 'Barclays UK',
       actionTaken: 'Auto-Refunded in 3 mins',
       chargebackAvoided: true,
@@ -28,7 +29,7 @@ export const PreDisputeTab: React.FC = () => {
       id: 'alt_verifi_991',
       network: 'Visa Verifi CDRN',
       cardLast4: '1120',
-      amount: '$299.00 USD',
+      amount: '₹299.00 INR',
       issuerBank: 'JPMorgan Chase',
       actionTaken: 'Auto-Refunded in 2 mins',
       chargebackAvoided: true,
@@ -79,8 +80,8 @@ export const PreDisputeTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Chargeback Fees Saved</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">+$14,250.00 USD</div>
-          <div className="text-[11px] text-[#8C90A0] font-mono">Avoided $15-$25 dispute penalties</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">+₹14,250.00 INR</div>
+          <div className="text-[11px] text-[#8C90A0] font-mono">Avoided ₹15-₹25 dispute penalties</div>
         </div>
 
         <div className="opp-card p-6 space-y-2">

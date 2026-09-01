@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -19,7 +20,7 @@ export const PurchaseOrdersTab: React.FC = () => {
       id: 'po_inv_9901',
       poNumber: 'PO-ENTERPRISE-2026-8812',
       enterpriseClient: 'Deloitte Global Tax & Advisory Ltd',
-      amount: '$45,000.00 USD',
+      amount: '₹45,000.00 INR',
       terms: 'Net-30 Days',
       dueDate: 'Sep 28, 2026',
       status: 'pending_wire_settlement'
@@ -51,7 +52,7 @@ export const PurchaseOrdersTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Enterprise PO Pipeline</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$45,000.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹45,000.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Two-Way Matched to AP Portal
           </div>

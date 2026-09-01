@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Logo } from '../common/Logo';
@@ -176,7 +177,7 @@ export const CustomerBillingPortal: React.FC = () => {
                       </span>
                     </div>
                     <div className="text-xs text-[#6E717D] font-mono">
-                      Billed: <strong>${sub.amount.toFixed(2)} USD / {sub.interval}</strong> • Next billing cycle: {sub.currentPeriodEnd}
+                      Billed: <strong>₹{sub.amount.toFixed(2)} INR / {sub.interval}</strong> • Next billing cycle: {sub.currentPeriodEnd}
                     </div>
                     <div className="text-[11px] text-[#8C90A0] font-mono flex items-center gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
@@ -238,7 +239,7 @@ export const CustomerBillingPortal: React.FC = () => {
                         {tx.productName}
                       </td>
                       <td className="p-4 font-mono font-bold text-[#0055FF]">
-                        ${tx.amount.toFixed(2)} USD
+                        ${tx.amount.toFixed(2)} INR
                       </td>
                       <td className="p-4 font-mono uppercase text-[10px]">
                         {tx.paymentMethod.replace('_', ' ')}

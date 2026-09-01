@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -20,9 +21,9 @@ export const MeteredOveragesTab: React.FC = () => {
       id: 'ov_01',
       meterName: 'AI Inference Tokens (Millions)',
       includedUnits: '50M Tokens',
-      tier1: '0 - 50M: Included in $49/mo Base',
-      tier2: '50M - 200M: $0.0008 / 1k Tokens',
-      tier3: '200M+: $0.0005 / 1k Tokens (Volume Discount)',
+      tier1: '0 - 50M: Included in ₹49/mo Base',
+      tier2: '50M - 200M: ₹0.0008 / 1k Tokens',
+      tier3: '200M+: ₹0.0005 / 1k Tokens (Volume Discount)',
       autoBumpThreshold: '250M Tokens (Auto-upgrades to Enterprise Cluster)',
       status: 'active'
     },
@@ -31,8 +32,8 @@ export const MeteredOveragesTab: React.FC = () => {
       meterName: 'Dedicated GPU Node Hours',
       includedUnits: '100 Hours',
       tier1: '0 - 100 Hrs: Included in Base',
-      tier2: '100 - 500 Hrs: $0.45 / GPU Hour',
-      tier3: '500+ Hrs: $0.35 / GPU Hour',
+      tier2: '100 - 500 Hrs: ₹0.45 / GPU Hour',
+      tier3: '500+ Hrs: ₹0.35 / GPU Hour',
       autoBumpThreshold: '600 Hrs (Auto-upgrades to Dedicated Rack)',
       status: 'active'
     }
@@ -43,7 +44,7 @@ export const MeteredOveragesTab: React.FC = () => {
   const calculateOverage = (usageM: number) => {
     if (usageM <= 50) return 0;
     const overageM = usageM - 50;
-    return overageM * 1000 * 0.0008; // $0.0008 per 1k = $0.80 per 1M
+    return overageM * 1000 * 0.0008; // ₹0.0008 per 1k = ₹0.80 per 1M
   };
 
   const calculatedOverageFee = calculateOverage(simulatedUsage);
@@ -100,15 +101,15 @@ export const MeteredOveragesTab: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
           <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
             <span className="text-[#8C90A0]">Base Included Plan:</span>
-            <div className="font-bold text-[#0A0D14] text-sm">$49.00 USD (50M Tokens)</div>
+            <div className="font-bold text-[#0A0D14] text-sm">₹49.00 INR (50M Tokens)</div>
           </div>
           <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
             <span className="text-[#8C90A0]">Metered Burst Overage:</span>
-            <div className="font-bold text-[#0055FF] text-sm">+${calculatedOverageFee.toFixed(2)} USD ({Math.max(0, simulatedUsage - 50)}M Over)</div>
+            <div className="font-bold text-[#0055FF] text-sm">+₹{calculatedOverageFee.toFixed(2)} INR ({Math.max(0, simulatedUsage - 50)}M Over)</div>
           </div>
           <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-1">
             <span className="text-[#0055FF]">Total Invoice At Renewal:</span>
-            <div className="font-bold text-emerald-700 text-lg">${(49 + calculatedOverageFee).toFixed(2)} USD</div>
+            <div className="font-bold text-emerald-700 text-lg">₹{(49 + calculatedOverageFee).toFixed(2)} INR</div>
           </div>
         </div>
 

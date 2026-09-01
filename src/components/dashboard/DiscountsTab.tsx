@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Discount } from '../../types';
@@ -82,7 +83,7 @@ export const DiscountsTab: React.FC = () => {
               <div className="p-3 rounded-2xl bg-[#f5f5f7] border border-black/5 flex items-center justify-between text-xs font-mono">
                 <span className="text-[#86868b]">Discount Value:</span>
                 <span className="font-bold text-[#0071e3]">
-                  {d.type === 'percentage' ? `${d.amount}% OFF` : `$${d.amount} OFF`}
+                  {d.type === 'percentage' ? `${d.amount}% OFF` : `₹${d.amount} OFF`}
                 </span>
               </div>
             </div>
@@ -136,7 +137,7 @@ export const DiscountsTab: React.FC = () => {
                     className="w-full p-2.5 rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f]"
                   >
                     <option value="percentage">Percentage (%)</option>
-                    <option value="fixed">Fixed Dollar ($)</option>
+                    <option value="fixed">Fixed Dollar (₹)</option>
                   </select>
                 </div>
 

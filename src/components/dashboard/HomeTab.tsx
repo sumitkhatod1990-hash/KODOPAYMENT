@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -39,7 +40,7 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
               Merchant of Record Active (220+ Countries)
             </h4>
             <p className="text-xs text-[#86868b]">
-              Global sales tax, EU VAT, dunning, and currency FX automated under QIVROPAY's tax nexus. Zero liability.
+              India GST, collections, settlements, and INR payment activity in one QivroPay dashboard.
             </p>
           </div>
         </div>
@@ -88,7 +89,7 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
             ${analytics?.totalNet.toLocaleString() || '0.00'}
           </div>
           <div className="text-xs text-[#86868b]">
-            Total MoR Fees: <strong>${analytics?.totalFees || '0.00'}</strong> (4% + 40¢)
+            Total MoR Fees: <strong>₹{analytics?.totalFees || '0.00'}</strong> (4% + 40¢)
           </div>
         </div>
 

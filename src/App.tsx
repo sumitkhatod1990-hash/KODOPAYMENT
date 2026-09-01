@@ -1,4 +1,5 @@
-import React from 'react';
+sed: --: No such file or directory
+import React, { useEffect } from 'react';
 import { useApp } from './context/AppContext';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
@@ -20,6 +21,35 @@ import { useAuth } from './context/AuthContext';
 export const App: React.FC = () => {
   const { currentView, activeSessionId } = useApp();
   const { user, loading: authLoading } = useAuth();
+
+  // India-only safeguard for dynamic values returned by older records or APIs.
+  // Source defaults are INR; this keeps a stale dollar-prefixed value from
+  // briefly appearing in the UI while data is being migrated.
+  useEffect(() => {
+    const normalizeText = (root: Node) => {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const textNodes: Text[] = [];
+      let node: Node | null;
+      while ((node = walker.nextNode())) textNodes.push(node as Text);
+
+      textNodes.forEach((textNode) => {
+        const parent = textNode.parentElement;
+        if (parent?.closest('script, style, pre, code')) return;
+        const next = textNode.nodeValue
+          ?.replace(/\$([0-9])/g, '₹$1')
+          .replace(/\(\$\)/g, '(₹)')
+          .replace(/\bUSD\b/g, 'INR');
+        if (next && next !== textNode.nodeValue) textNode.nodeValue = next;
+      });
+    };
+
+    normalizeText(document.body);
+    const observer = new MutationObserver((records) => {
+      records.forEach((record) => record.addedNodes.forEach(normalizeText));
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
 
   if (currentView === 'dashboard' && authLoading) {
     return <div className="min-h-screen bg-[#f7f8fb] flex items-center justify-center text-sm text-gray-500">Loading your secure workspace…</div>;

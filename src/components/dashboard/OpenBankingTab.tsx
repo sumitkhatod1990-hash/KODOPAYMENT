@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -19,7 +20,7 @@ export const OpenBankingTab: React.FC = () => {
       customerName: 'Marcus Vance',
       bank: 'Barclays Bank UK',
       rail: 'Faster Payments Open Banking Mandate',
-      amount: '£79.00 GBP / mo',
+      amount: '£79.00 INR / mo',
       interchangeSaved: '£2.75 / tx (3.5% saved)',
       status: 'active_mandate'
     },
@@ -28,7 +29,7 @@ export const OpenBankingTab: React.FC = () => {
       customerName: 'Synthetix Tech GmbH',
       bank: 'BNP Paribas (France)',
       rail: 'SEPA Direct Request-to-Pay',
-      amount: '€249.00 EUR / mo',
+      amount: '€249.00 INR / mo',
       interchangeSaved: '€7.47 / tx (3.0% saved)',
       status: 'active_mandate'
     },
@@ -76,7 +77,7 @@ export const OpenBankingTab: React.FC = () => {
             Live Interchange Fee Savings Calculator
           </h3>
           <span className="text-xs font-mono font-bold text-[#0055FF]">
-            Monthly SaaS Volume: ${simulatedMonthlyVolume.toLocaleString()} USD
+            Monthly SaaS Volume: ₹{simulatedMonthlyVolume.toLocaleString()} INR
           </span>
         </div>
 
@@ -91,24 +92,24 @@ export const OpenBankingTab: React.FC = () => {
             className="w-full accent-[#0055FF]"
           />
           <div className="flex justify-between text-[11px] font-mono text-[#8C90A0]">
-            <span>$10,000 / mo</span>
-            <span>$500,000 / mo</span>
-            <span>$1,000,000 / mo</span>
+            <span>₹10,000 / mo</span>
+            <span>₹500,000 / mo</span>
+            <span>₹1,000,000 / mo</span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
           <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
             <span className="text-[#8C90A0]">Traditional Card Interchange (3.2%):</span>
-            <div className="font-bold text-rose-600 text-sm">-${cardFees.toLocaleString(undefined, { minimumFractionDigits: 2 })} / mo</div>
+            <div className="font-bold text-rose-600 text-sm">-₹{cardFees.toLocaleString(undefined, { minimumFractionDigits: 2 })} / mo</div>
           </div>
           <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
             <span className="text-[#8C90A0]">Open Banking Direct Rail (0.5%):</span>
-            <div className="font-bold text-[#0A0D14] text-sm">-${openBankingFees.toLocaleString(undefined, { minimumFractionDigits: 2 })} / mo</div>
+            <div className="font-bold text-[#0A0D14] text-sm">-₹{openBankingFees.toLocaleString(undefined, { minimumFractionDigits: 2 })} / mo</div>
           </div>
           <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 space-y-1">
             <span className="text-emerald-800 font-bold">Annual Net Savings to Merchant:</span>
-            <div className="font-bold text-emerald-700 text-lg">+${annualSavings.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD / yr</div>
+            <div className="font-bold text-emerald-700 text-lg">+₹{annualSavings.toLocaleString(undefined, { minimumFractionDigits: 2 })} INR / yr</div>
           </div>
         </div>
       </div>

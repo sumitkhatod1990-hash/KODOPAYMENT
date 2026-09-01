@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -14,10 +15,10 @@ import confetti from 'canvas-confetti';
 
 export const VolumePricingTab: React.FC = () => {
   const [tiers] = useState([
-    { seats: '1 - 9 Seats', discount: '0% (Standard)', unitPrice: '$49.00 / seat' },
-    { seats: '10 - 49 Seats', discount: '15% Off', unitPrice: '$41.65 / seat' },
-    { seats: '50 - 99 Seats', discount: '25% Off', unitPrice: '$36.75 / seat' },
-    { seats: '100+ Seats', discount: '35% Off (Enterprise)', unitPrice: '$31.85 / seat' }
+    { seats: '1 - 9 Seats', discount: '0% (Standard)', unitPrice: '₹49.00 / seat' },
+    { seats: '10 - 49 Seats', discount: '15% Off', unitPrice: '₹41.65 / seat' },
+    { seats: '50 - 99 Seats', discount: '25% Off', unitPrice: '₹36.75 / seat' },
+    { seats: '100+ Seats', discount: '35% Off (Enterprise)', unitPrice: '₹31.85 / seat' }
   ]);
 
   const [simulatedSeats, setSimulatedSeats] = useState(25);
@@ -64,13 +65,13 @@ export const VolumePricingTab: React.FC = () => {
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Selected Volume Tier</div>
           <div className="text-2xl font-bold font-mono text-emerald-700">{(discountPct * 100).toFixed(0)}% Volume Discount</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" /> ${unitCost.toFixed(2)} USD per seat
+            <CheckCircle2 className="w-3 h-3" /> ${unitCost.toFixed(2)} INR per seat
           </div>
         </div>
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Monthly Contract</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">${totalMonthly.toLocaleString(undefined, { minimumFractionDigits: 2 })} / mo</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹{totalMonthly.toLocaleString(undefined, { minimumFractionDigits: 2 })} / mo</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">For {simulatedSeats} enterprise seats</div>
         </div>
 

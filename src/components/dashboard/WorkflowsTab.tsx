@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -21,7 +22,7 @@ export const WorkflowsTab: React.FC = () => {
       id: 'wf_01',
       name: 'High-Value Payment Slack Alert',
       trigger: 'payment.succeeded',
-      condition: 'amount >= 100 USD',
+      condition: 'amount >= 100 INR',
       action: 'Post Slack Notification',
       target: '#revenue-celebrations',
       executions: 42,

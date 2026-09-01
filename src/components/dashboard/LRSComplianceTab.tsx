@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -17,7 +18,7 @@ export const LRSComplianceTab: React.FC = () => {
     {
       id: 'lrs_remit_441',
       purpose: 'Foreign Cloud Infra (AWS / OpenAI US)',
-      remittanceUsd: '$12,500.00 USD',
+      remittanceUsd: '₹12,500.00 INR',
       equivalentInr: '₹10,43,750.00 INR',
       tcsCollected: '₹52,187.50 INR (5.00% TCS under Sec 206C)',
       formA2Status: 'Form A2 & 15CB Generated via Authorized Dealer (AD)',
@@ -50,7 +51,7 @@ export const LRSComplianceTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Authorized Outbound Remittances</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$12,500.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹12,500.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Fully processed via Authorized Dealer Bank
           </div>
@@ -77,7 +78,7 @@ export const LRSComplianceTab: React.FC = () => {
               <tr className="border-b border-black/[0.06] bg-[#FAFBFD] text-[#8C90A0] font-mono uppercase text-[10px]">
                 <th className="p-4 font-semibold">Remittance Ref ID</th>
                 <th className="p-4 font-semibold">Overseas Purpose</th>
-                <th className="p-4 font-semibold">USD Remitted</th>
+                <th className="p-4 font-semibold">INR Remitted</th>
                 <th className="p-4 font-semibold">INR Equivalent</th>
                 <th className="p-4 font-semibold">TCS Withheld (5%)</th>
                 <th className="p-4 font-semibold">RBI Statutory Clearance</th>

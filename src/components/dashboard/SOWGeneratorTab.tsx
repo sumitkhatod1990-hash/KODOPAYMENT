@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -17,7 +18,7 @@ export const SOWGeneratorTab: React.FC = () => {
     {
       id: 'sow_prop_991',
       enterpriseClient: 'Synthetix Cloud Infra Corp',
-      expansionValue: '$68,400.00 / yr',
+      expansionValue: '₹68,400.00 / yr',
       proposedSeats: '150 Dedicated Cluster Nodes',
       generatedAt: 'Aug 31, 2026',
       status: 'ready_for_procurement_signoff'
@@ -63,7 +64,7 @@ export const SOWGeneratorTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Expansion Value Drafted</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$68,400.00 / yr</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹68,400.00 / yr</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Ready for e-signature
           </div>

@@ -1,10 +1,11 @@
+sed: --: No such file or directory
 import React from 'react';
 import { Check, X } from 'lucide-react';
 
 export const ComparisonTable: React.FC = () => {
   const comparisonRows = [
     { feature: "Built-in Merchant of Record (MoR)", qivropay: true, stripe: false, ls: true, paddle: true },
-    { feature: "Global Tax, VAT & GST Auto-Remittance", qivropay: true, stripe: "Requires Stripe Tax ($)", ls: true, paddle: true },
+    { feature: "Global Tax, VAT & GST Auto-Remittance", qivropay: true, stripe: "Requires Stripe Tax (₹)", ls: true, paddle: true },
     { feature: "Native AI Credit & Token Metering", qivropay: true, stripe: false, ls: false, paddle: false },
     { feature: "Transparent Pricing (Zero Fixed Fees)", qivropay: "4% + 40¢", stripe: "2.9% + 30¢ + Addons", ls: "5% + 50¢", paddle: "5% + 50¢" },
     { feature: "Purchasing Power Parity (PPP)", qivropay: true, stripe: false, ls: false, paddle: false },

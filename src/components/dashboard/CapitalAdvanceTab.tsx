@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -67,13 +68,13 @@ export const CapitalAdvanceTab: React.FC = () => {
             <span>Instant Revenue-Based Working Capital & Financing (RBF)</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
-            1-Click non-dilutive capital advances up to $150,000 USD based on verified platform MRR growth, automatically repaid via a 10% daily revenue split with 0% fixed interest.
+            1-Click non-dilutive capital advances up to ₹150,000 INR based on verified platform MRR growth, automatically repaid via a 10% daily revenue split with 0% fixed interest.
           </p>
         </div>
 
         <div className="opp-badge self-start sm:self-auto text-emerald-700 font-bold bg-emerald-50 border-emerald-200">
           <Sparkles className="w-4 h-4 text-emerald-600" />
-          <span>PRE-APPROVED: ${preApprovedAmount.toLocaleString()} USD</span>
+          <span>PRE-APPROVED: ₹{preApprovedAmount.toLocaleString()} INR</span>
         </div>
       </div>
 
@@ -81,7 +82,7 @@ export const CapitalAdvanceTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Growth Capital Drawn</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">${totalFunded.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹{totalFunded.toLocaleString(undefined, { minimumFractionDigits: 2 })} INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Funded instantly to merchant balance
           </div>
@@ -116,7 +117,7 @@ export const CapitalAdvanceTab: React.FC = () => {
           <div className="space-y-2">
             <div className="flex justify-between text-xs font-mono">
               <span className="text-[#8C90A0]">Select Capital Advance Amount:</span>
-              <span className="font-bold text-[#0055FF] text-sm">${requestAmount.toLocaleString()} USD</span>
+              <span className="font-bold text-[#0055FF] text-sm">₹{requestAmount.toLocaleString()} INR</span>
             </div>
             <input
               type="range"
@@ -128,24 +129,24 @@ export const CapitalAdvanceTab: React.FC = () => {
               className="w-full accent-[#0055FF]"
             />
             <div className="flex justify-between text-[11px] font-mono text-[#8C90A0]">
-              <span>$10,000</span>
-              <span>$50,000</span>
-              <span>${preApprovedAmount.toLocaleString()} (Max)</span>
+              <span>₹10,000</span>
+              <span>₹50,000</span>
+              <span>₹{preApprovedAmount.toLocaleString()} (Max)</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs pt-2">
             <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
               <span className="text-[#8C90A0]">Instant Inflow to Balance:</span>
-              <div className="font-bold text-emerald-700 text-sm">+${requestAmount.toLocaleString()} USD</div>
+              <div className="font-bold text-emerald-700 text-sm">+₹{requestAmount.toLocaleString()} INR</div>
             </div>
             <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
               <span className="text-[#8C90A0]">Flat Fixed Fee (6%):</span>
-              <div className="font-bold text-[#0A0D14] text-sm">${(requestAmount * 0.06).toLocaleString()} USD</div>
+              <div className="font-bold text-[#0A0D14] text-sm">₹{(requestAmount * 0.06).toLocaleString()} INR</div>
             </div>
             <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
               <span className="text-[#8C90A0]">Total Payback:</span>
-              <div className="font-bold text-[#0055FF] text-sm">${(requestAmount * 1.06).toLocaleString()} USD</div>
+              <div className="font-bold text-[#0055FF] text-sm">₹{(requestAmount * 1.06).toLocaleString()} INR</div>
             </div>
           </div>
 
@@ -155,7 +156,7 @@ export const CapitalAdvanceTab: React.FC = () => {
             className="w-full opp-btn-primary py-3 font-semibold text-xs flex items-center justify-center gap-2 shadow-sm"
           >
             <RefreshCw className={`w-4 h-4 ${requesting ? 'animate-spin' : ''}`} />
-            <span>{requesting ? 'Depositing Capital...' : `Accept & Draw $${requestAmount.toLocaleString()} USD Instantly`}</span>
+            <span>{requesting ? 'Depositing Capital...' : `Accept & Draw ₹${requestAmount.toLocaleString()} INR Instantly`}</span>
           </button>
         </form>
       </div>
@@ -182,16 +183,16 @@ export const CapitalAdvanceTab: React.FC = () => {
                     {adv.id}
                   </td>
                   <td className="p-4 font-mono font-bold text-[#0055FF] text-sm">
-                    ${adv.approvedAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
+                    ${adv.approvedAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })} INR
                   </td>
                   <td className="p-4 text-[#6E717D]">
                     {adv.repaymentRate}
                   </td>
                   <td className="p-4 font-mono font-bold text-[#0A0D14]">
-                    ${adv.totalToRepay.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
+                    ${adv.totalToRepay.toLocaleString(undefined, { minimumFractionDigits: 2 })} INR
                   </td>
                   <td className="p-4 font-mono font-bold text-emerald-700">
-                    ${adv.repaidSoFar.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD
+                    ${adv.repaidSoFar.toLocaleString(undefined, { minimumFractionDigits: 2 })} INR
                   </td>
                   <td className="p-4 font-mono text-[#8C90A0] text-[11px]">
                     {adv.fundedAt}

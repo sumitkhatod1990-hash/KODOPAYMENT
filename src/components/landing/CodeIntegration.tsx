@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Terminal, Copy, CheckCircle2, Play, Code2, ArrowRight } from 'lucide-react';
@@ -20,7 +21,7 @@ const qivropay = new QivroPay({
 const session = await qivropay.checkout.create({
   title: "AI Token Starter Pack",
   amount: 29.00,
-  currency: "USD",
+  currency: "INR",
   customer: {
     email: "alex.chen@synthflow.ai",
     name: "Alex Chen"
@@ -44,7 +45,7 @@ qivropay = QivroPay(api_key=os.environ.get("QIVROPAY_SECRET_KEY"))
 session = qivropay.checkout.create(
     title="QIVROPAY Pro Subscription",
     amount=79.00,
-    currency="USD",
+    currency="INR",
     customer_email="developer@startup.ai",
     billing_type="recurring_monthly",
     interval="month"
@@ -66,7 +67,7 @@ func main() {
 	session, err := client.Checkout.Create(&qivropay.CheckoutParams{
 		Title:    "Enterprise Inference Tier",
 		Amount:   199.00,
-		Currency: "USD",
+		Currency: "INR",
 		CustomerEmail: "cto@company.com",
 	})
 	if err != nil {
@@ -82,7 +83,7 @@ func main() {
   -d '{
     "title": "AI Token Starter Pack",
     "amount": 29.00,
-    "currency": "USD",
+    "currency": "INR",
     "customerEmail": "alex.chen@synthflow.ai"
   }'`
   };
@@ -102,7 +103,7 @@ func main() {
         body: JSON.stringify({
           title: "AI Token Starter Pack",
           amount: 29.00,
-          currency: "USD",
+          currency: "INR",
           customerEmail: "developer@apple-grade.io"
         })
       });

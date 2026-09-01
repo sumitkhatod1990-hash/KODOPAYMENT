@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -31,7 +32,7 @@ export const ProrationTab: React.FC = () => {
     setIsProcessing(true);
     setTimeout(() => {
       setIsProcessing(false);
-      setSuccessMessage(`Subscription upgraded! Customer charged prorated net amount of $${proratedChargeNow.toFixed(2)} USD today.`);
+      setSuccessMessage(`Subscription upgraded! Customer charged prorated net amount of ₹${proratedChargeNow.toFixed(2)} INR today.`);
       confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
     }, 900);
   };
@@ -131,22 +132,22 @@ export const ProrationTab: React.FC = () => {
             <div className="space-y-3 font-mono text-xs">
               <div className="flex justify-between text-[#8C90A0]">
                 <span>Unused Time on Current Tier ({daysRemaining} days @ ${(dailyCurrentRate).toFixed(2)}/day):</span>
-                <span className="text-rose-600 font-bold">-${unusedCredit.toFixed(2)} USD Credit</span>
+                <span className="text-rose-600 font-bold">-₹{unusedCredit.toFixed(2)} INR Credit</span>
               </div>
 
               <div className="flex justify-between text-[#8C90A0]">
                 <span>Cost for New Tier Remaining ({daysRemaining} days @ ${(dailyNewRate).toFixed(2)}/day):</span>
-                <span className="text-[#0A0D14] font-bold">+${newTierCostRemaining.toFixed(2)} USD</span>
+                <span className="text-[#0A0D14] font-bold">+₹{newTierCostRemaining.toFixed(2)} INR</span>
               </div>
 
               <div className="pt-3 border-t border-black/10 flex justify-between items-baseline">
                 <span className="font-bold text-sm text-[#0A0D14] font-sans">Immediate Prorated Charge Today:</span>
-                <span className="text-2xl font-bold font-mono text-[#0055FF]">${proratedChargeNow.toFixed(2)} USD</span>
+                <span className="text-2xl font-bold font-mono text-[#0055FF]">₹{proratedChargeNow.toFixed(2)} INR</span>
               </div>
 
               <div className="flex justify-between text-[#8C90A0] text-[11px] pt-1">
                 <span>Next Billing Cycle Full Charge:</span>
-                <span className="font-bold text-[#0A0D14]">${newPlanPrice.toFixed(2)} USD / month</span>
+                <span className="font-bold text-[#0A0D14]">₹{newPlanPrice.toFixed(2)} INR / month</span>
               </div>
             </div>
 

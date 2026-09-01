@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -58,7 +59,7 @@ export const DynamicPricingTab: React.FC = () => {
       basePrice: Number(basePrice),
       elasticPrice: Number(elasticPrice),
       trigger,
-      projectedRevenueLift: `+${Math.abs(elasticPrice - basePrice) * 3}% Yield Lift`,
+      projectedRevenueLift: `+₹{Math.abs(elasticPrice - basePrice) * 3}% Yield Lift`,
       status: 'active'
     };
     setPricingRules([newRule, ...pricingRules]);
@@ -102,7 +103,7 @@ export const DynamicPricingTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Incremental Revenue Generated</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">+$2,840.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">+₹2,840.00 INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Pure margin expansion</div>
         </div>
 
@@ -134,10 +135,10 @@ export const DynamicPricingTab: React.FC = () => {
                     {rule.productName}
                   </td>
                   <td className="p-4 font-mono text-[#8C90A0]">
-                    ${rule.basePrice.toFixed(2)} USD
+                    ${rule.basePrice.toFixed(2)} INR
                   </td>
                   <td className="p-4 font-mono font-bold text-base text-[#0055FF]">
-                    ${rule.elasticPrice.toFixed(2)} USD
+                    ${rule.elasticPrice.toFixed(2)} INR
                   </td>
                   <td className="p-4 text-[#6E717D]">
                     {rule.trigger}
@@ -180,7 +181,7 @@ export const DynamicPricingTab: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#0A0D14]">Base ($)</label>
+                  <label className="font-semibold text-[#0A0D14]">Base (₹)</label>
                   <input
                     type="number"
                     value={basePrice}
@@ -189,7 +190,7 @@ export const DynamicPricingTab: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#0A0D14]">Dynamic Elastic ($)</label>
+                  <label className="font-semibold text-[#0A0D14]">Dynamic Elastic (₹)</label>
                   <input
                     type="number"
                     value={elasticPrice}

@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -17,7 +18,7 @@ export const RevenueLeakageTab: React.FC = () => {
     {
       id: 'leak_01',
       source: 'Orphaned Webhook Failures on Plan Upgrades',
-      estimatedLostMrr: '$2,450.00 / mo',
+      estimatedLostMrr: '₹2,450.00 / mo',
       affectedAccounts: 12,
       patchStatus: 'auto_recovered',
       lastAudited: 'Today'
@@ -63,7 +64,7 @@ export const RevenueLeakageTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Recaptured Leaked MRR</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">+$2,450.00 / mo</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">+₹2,450.00 / mo</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> 100% Repaired & Synchronized
           </div>

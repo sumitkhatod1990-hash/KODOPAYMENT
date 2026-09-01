@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -60,7 +61,7 @@ export const TreasuryYieldTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Active Treasury Float</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">${investedFloat.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹{investedFloat.toLocaleString(undefined, { minimumFractionDigits: 2 })} INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> US Short-Term T-Bills (0-3M)
           </div>
@@ -74,8 +75,8 @@ export const TreasuryYieldTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Projected Annual Yield</div>
-          <div className="text-2xl font-bold font-mono text-[#0A0D14]">+${annualEarned.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD / yr</div>
-          <div className="text-[11px] text-purple-700 font-mono">+${dailyEarned.toFixed(2)} USD / day interest</div>
+          <div className="text-2xl font-bold font-mono text-[#0A0D14]">+₹{annualEarned.toLocaleString(undefined, { minimumFractionDigits: 2 })} INR / yr</div>
+          <div className="text-[11px] text-purple-700 font-mono">+₹{dailyEarned.toFixed(2)} INR / day interest</div>
         </div>
       </div>
 
@@ -87,7 +88,7 @@ export const TreasuryYieldTab: React.FC = () => {
             <span>Interactive Float Yield & Interest Calculator</span>
           </h3>
           <span className="text-xs font-mono font-bold text-[#0055FF]">
-            Selected Float: ${investedFloat.toLocaleString()} USD
+            Selected Float: ₹{investedFloat.toLocaleString()} INR
           </span>
         </div>
 
@@ -102,24 +103,24 @@ export const TreasuryYieldTab: React.FC = () => {
             className="w-full accent-[#0055FF]"
           />
           <div className="flex justify-between text-[11px] font-mono text-[#8C90A0]">
-            <span>$10,000 Float</span>
-            <span>$500,000 Float</span>
-            <span>$1,000,000 Float</span>
+            <span>₹10,000 Float</span>
+            <span>₹500,000 Float</span>
+            <span>₹1,000,000 Float</span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
           <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
             <span className="text-[#8C90A0]">Daily Passive Interest:</span>
-            <div className="font-bold text-emerald-700 text-sm">+${dailyEarned.toFixed(2)} USD / day</div>
+            <div className="font-bold text-emerald-700 text-sm">+₹{dailyEarned.toFixed(2)} INR / day</div>
           </div>
           <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
             <span className="text-[#8C90A0]">Monthly Yield Cashflow:</span>
-            <div className="font-bold text-[#0055FF] text-sm">+${(annualEarned / 12).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD / mo</div>
+            <div className="font-bold text-[#0055FF] text-sm">+₹{(annualEarned / 12).toLocaleString(undefined, { minimumFractionDigits: 2 })} INR / mo</div>
           </div>
           <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 space-y-1">
             <span className="text-emerald-800 font-bold">12-Month Net Passive Income:</span>
-            <div className="font-bold text-emerald-700 text-lg">+${annualEarned.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
+            <div className="font-bold text-emerald-700 text-lg">+₹{annualEarned.toLocaleString(undefined, { minimumFractionDigits: 2 })} INR</div>
           </div>
         </div>
       </div>

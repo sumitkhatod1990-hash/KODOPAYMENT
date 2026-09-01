@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -17,7 +18,7 @@ export const PACBRCInwardTab: React.FC = () => {
     {
       id: 'pacb_ebrc_9901',
       foreignBuyer: 'Vortex Global Labs LLC (California)',
-      inwardRemittanceUsd: '$24,500.00 USD',
+      inwardRemittanceUsd: '₹24,500.00 INR',
       inrRealized: '₹20,45,750.00 INR',
       eBrcNumber: 'DGFT-EBRC-881920198',
       fircCertNo: 'SCB-FIRC-2026-99018',
@@ -51,7 +52,7 @@ export const PACBRCInwardTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Inward Export Realization</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$24,500.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹24,500.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> INR realized into Indian Current Account
           </div>

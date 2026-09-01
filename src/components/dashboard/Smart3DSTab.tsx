@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -74,11 +75,11 @@ export const Smart3DSTab: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
           <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
             <span className="text-[#8C90A0]">Transaction Risk Analysis (TRA):</span>
-            <div className="font-bold text-emerald-700 text-sm">Exempt up to €500.00 EUR</div>
+            <div className="font-bold text-emerald-700 text-sm">Exempt up to €500.00 INR</div>
           </div>
           <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
             <span className="text-[#8C90A0]">Low-Value Transactions:</span>
-            <div className="font-bold text-[#0A0D14] text-sm">Exempt up to €30.00 EUR</div>
+            <div className="font-bold text-[#0A0D14] text-sm">Exempt up to €30.00 INR</div>
           </div>
           <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
             <span className="text-[#8C90A0]">Recurring Merchant Initiated:</span>

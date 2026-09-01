@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -66,7 +67,7 @@ export const CohortAnalyticsTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Customer Lifetime Value (LTV)</div>
-          <div className="text-2xl font-bold font-mono text-[#0A0D14]">$842.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0A0D14]">₹842.00 INR</div>
           <div className="text-[11px] text-purple-700 font-mono">+34% vs last quarter</div>
         </div>
       </div>

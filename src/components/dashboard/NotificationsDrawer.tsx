@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { 
   Bell, 
@@ -20,7 +21,7 @@ export const NotificationsDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
     {
       id: 'notif_01',
       title: 'New B2B Wire Received',
-      message: '$12,500.00 USD received via vIBAN from Synthetix Global Corp.',
+      message: '₹12,500.00 INR received via vIBAN from Synthetix Global Corp.',
       type: 'payment',
       read: false,
       createdAt: '5 mins ago'

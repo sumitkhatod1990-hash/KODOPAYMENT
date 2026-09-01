@@ -56,7 +56,7 @@ export const ReferralEngineTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Referral Revenue Generated</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">${salesGenerated.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹{salesGenerated.toLocaleString(undefined, { minimumFractionDigits: 2 })} INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <TrendingUp className="w-3 h-3" /> Across {advocates} active advocates
           </div>
@@ -64,7 +64,7 @@ export const ReferralEngineTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Customer Reward Credits Issued</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">${creditsGiven.toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹{creditsGiven.toLocaleString(undefined, { minimumFractionDigits: 2 })} INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Applied to next renewal invoices</div>
         </div>
 
@@ -94,7 +94,7 @@ export const ReferralEngineTab: React.FC = () => {
           </div>
           <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
             <span className="text-[#8C90A0]">Advocate Reward Incentive:</span>
-            <div className="font-bold text-[#0055FF] text-sm">$20.00 Subscription Bill Credit</div>
+            <div className="font-bold text-[#0055FF] text-sm">₹20.00 Subscription Bill Credit</div>
           </div>
         </div>
       </div>
@@ -102,3 +102,4 @@ export const ReferralEngineTab: React.FC = () => {
     </div>
   );
 };
+sed: --: No such file or directory

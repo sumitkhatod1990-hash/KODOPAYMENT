@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -19,8 +20,8 @@ export const VoiceAgentTab: React.FC = () => {
   const [transcript, setTranscript] = useState<Array<{ sender: 'agent' | 'user' | 'system'; text: string }>>([
     { sender: 'agent', text: "Hello! This is Sarah from SynthFlow billing support. How can I assist you today?" },
     { sender: 'user', text: "I'd like to renew my Enterprise GPU license and pay over the phone." },
-    { sender: 'agent', text: "Certainly! I've authorized your Enterprise GPU cluster invoice for $4,800.00 USD. Sending a 1-tap Apple Pay SMS trigger to your verified phone number now." },
-    { sender: 'system', text: "⚡ [QIVROPAY Intent Triggered]: payment_intent_created (Amount: $4,800.00, Status: Succeeded via Apple Pay SMS Token)" }
+    { sender: 'agent', text: "Certainly! I've authorized your Enterprise GPU cluster invoice for ₹4,800.00 INR. Sending a 1-tap Apple Pay SMS trigger to your verified phone number now." },
+    { sender: 'system', text: "⚡ [QIVROPAY Intent Triggered]: payment_intent_created (Amount: ₹4,800.00, Status: Succeeded via Apple Pay SMS Token)" }
   ]);
 
   const [simulatedVoiceInput, setSimulatedVoiceInput] = useState("Please upgrade my quota to 500M inference tokens.");
@@ -37,11 +38,11 @@ export const VoiceAgentTab: React.FC = () => {
     setTimeout(() => {
       const agentReply = { 
         sender: 'agent' as const, 
-        text: `Got it! Upgrading your account to 500M tokens ($240.00/mo). I've charged your default card on file ending in 4242.` 
+        text: `Got it! Upgrading your account to 500M tokens (₹240.00/mo). I've charged your default card on file ending in 4242.` 
       };
       const sysMsg = {
         sender: 'system' as const,
-        text: `⚡ [QIVROPAY MoR Verified]: sub_update_succeeded (Charge: $240.00, 0% Tax Liability under US Nexus)`
+        text: `⚡ [QIVROPAY MoR Verified]: sub_update_succeeded (Charge: ₹240.00, 0% Tax Liability under US Nexus)`
       };
       setTranscript(prev => [...prev, agentReply, sysMsg]);
       setProcessing(false);
@@ -74,7 +75,7 @@ export const VoiceAgentTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Voice Payment Volume</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$34,800.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹34,800.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> PCI-DSS Level 1 Voice Compliant
           </div>

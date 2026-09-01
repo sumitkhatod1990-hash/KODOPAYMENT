@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -80,7 +81,7 @@ export const SpendLimitsTab: React.FC = () => {
             <span>Interactive Spend Soft-Cap Threshold Simulator</span>
           </h3>
           <span className="text-xs font-mono font-bold text-[#0055FF]">
-            Budget: ${budget.toLocaleString()} USD
+            Budget: ₹{budget.toLocaleString()} INR
           </span>
         </div>
 
@@ -88,7 +89,7 @@ export const SpendLimitsTab: React.FC = () => {
           <div className="space-y-2">
             <div className="flex justify-between text-xs font-mono">
               <span className="text-[#8C90A0]">Monthly Spending Ceiling:</span>
-              <span className="font-bold text-[#0A0D14]">${budget.toLocaleString()} USD</span>
+              <span className="font-bold text-[#0A0D14]">₹{budget.toLocaleString()} INR</span>
             </div>
             <input
               type="range"
@@ -104,7 +105,7 @@ export const SpendLimitsTab: React.FC = () => {
           <div className="space-y-2">
             <div className="flex justify-between text-xs font-mono">
               <span className="text-[#8C90A0]">Soft-Cap Warning Trigger Percentage:</span>
-              <span className="font-bold text-amber-600">{softCap}% (${(budget * (softCap / 100)).toFixed(0)} USD)</span>
+              <span className="font-bold text-amber-600">{softCap}% (${(budget * (softCap / 100)).toFixed(0)} INR)</span>
             </div>
             <input
               type="range"

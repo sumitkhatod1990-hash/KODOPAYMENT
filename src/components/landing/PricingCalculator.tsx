@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ArrowRight, Sparkles } from 'lucide-react';
@@ -9,15 +10,15 @@ export const PricingCalculator: React.FC = () => {
 
   const totalTransactions = Math.max(1, Math.round(monthlyVolume / avgOrderValue));
   
-  // QIVROPAY: 4% + $0.40
+  // QIVROPAY: 4% + ₹0.40
   const qivropayFee = (monthlyVolume * 0.04) + (totalTransactions * 0.40);
   const qivropayNet = monthlyVolume - qivropayFee;
 
-  // LemonSqueezy: 5% + $0.50
+  // LemonSqueezy: 5% + ₹0.50
   const lsFee = (monthlyVolume * 0.05) + (totalTransactions * 0.50);
   const lsNet = monthlyVolume - lsFee;
 
-  // Stripe Stack: Stripe + Billing + Tax + Anrok/TaxJar overhead ($250/mo minimum)
+  // Stripe Stack: Stripe + Billing + Tax + Anrok/TaxJar overhead (₹250/mo minimum)
   const stripeStackFee = (monthlyVolume * (0.029 + 0.007 + 0.005 + 0.015)) + (totalTransactions * 0.30) + 250;
   const stripeNet = monthlyVolume - stripeStackFee;
 
@@ -64,9 +65,9 @@ export const PricingCalculator: React.FC = () => {
                 className="w-full h-2 bg-black/10 rounded-lg appearance-none cursor-pointer accent-[#0071e3]"
               />
               <div className="flex justify-between text-[11px] font-mono text-[#86868b]">
-                <span>$2,000/mo</span>
-                <span>$150,000/mo</span>
-                <span>$300,000+/mo</span>
+                <span>₹2,000/mo</span>
+                <span>₹150,000/mo</span>
+                <span>₹300,000+/mo</span>
               </div>
             </div>
 
@@ -88,9 +89,9 @@ export const PricingCalculator: React.FC = () => {
                 className="w-full h-2 bg-black/10 rounded-lg appearance-none cursor-pointer accent-[#0071e3]"
               />
               <div className="flex justify-between text-[11px] font-mono text-[#86868b]">
-                <span>$5 (Micro AI)</span>
-                <span>$50 (SaaS Tier)</span>
-                <span>$250 (Annual)</span>
+                <span>₹5 (Micro AI)</span>
+                <span>₹50 (SaaS Tier)</span>
+                <span>₹250 (Annual)</span>
               </div>
             </div>
 
@@ -118,15 +119,15 @@ export const PricingCalculator: React.FC = () => {
               <div className="space-y-3 text-xs border-t border-black/5 pt-4 text-[#6e6e73] font-mono">
                 <div className="flex justify-between">
                   <span>Platform Fee (4% + 40¢):</span>
-                  <span className="text-[#1d1d1f] font-bold">${Math.round(qivropayFee).toLocaleString()}</span>
+                  <span className="text-[#1d1d1f] font-bold">₹{Math.round(qivropayFee).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Merchant of Record:</span>
-                  <span className="text-emerald-600 font-bold">Included ($0)</span>
+                  <span className="text-emerald-600 font-bold">Included (₹0)</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Global Tax Remittance:</span>
-                  <span className="text-emerald-600 font-bold">Included ($0)</span>
+                  <span className="text-emerald-600 font-bold">Included (₹0)</span>
                 </div>
               </div>
             </div>
@@ -146,11 +147,11 @@ export const PricingCalculator: React.FC = () => {
               <div className="space-y-3 text-xs border-t border-black/5 pt-4 text-[#6e6e73] font-mono">
                 <div className="flex justify-between">
                   <span>Fee (5% + 50¢):</span>
-                  <span className="text-[#1d1d1f]">${Math.round(lsFee).toLocaleString()}</span>
+                  <span className="text-[#1d1d1f]">₹{Math.round(lsFee).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-amber-600">
                   <span>Extra Cost vs QIVROPAY:</span>
-                  <span className="font-bold">+${Math.round(savingsVsLS).toLocaleString()}/mo</span>
+                  <span className="font-bold">+₹{Math.round(savingsVsLS).toLocaleString()}/mo</span>
                 </div>
               </div>
             </div>
@@ -170,7 +171,7 @@ export const PricingCalculator: React.FC = () => {
               <div className="space-y-3 text-xs border-t border-black/5 pt-4 text-[#6e6e73] font-mono">
                 <div className="flex justify-between">
                   <span>Stripe + Addons:</span>
-                  <span className="text-[#1d1d1f]">${Math.round(stripeStackFee).toLocaleString()}</span>
+                  <span className="text-[#1d1d1f]">₹{Math.round(stripeStackFee).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-red-600">
                   <span>Tax Filing:</span>
@@ -185,7 +186,7 @@ export const PricingCalculator: React.FC = () => {
           <div className="pt-6 border-t border-black/10 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3 text-sm text-[#1d1d1f]">
               <Sparkles className="w-5 h-5 text-[#0071e3]" />
-              <span>You save <strong>${Math.round(savingsVsLS * 12).toLocaleString()} every year</strong> with QIVROPAY.</span>
+              <span>You save <strong>₹{Math.round(savingsVsLS * 12).toLocaleString()} every year</strong> with QIVROPAY.</span>
             </div>
 
             <button

@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -16,9 +17,9 @@ export const NRRRadarTab: React.FC = () => {
   const [metrics] = useState({
     nrr: '118.4%',
     grossRetention: '96.2%',
-    expansionMrr: '+$14,200.00 / mo',
-    contractionMrr: '-$1,850.00 / mo',
-    churnedMrr: '-$2,100.00 / mo',
+    expansionMrr: '+₹14,200.00 / mo',
+    contractionMrr: '-₹1,850.00 / mo',
+    churnedMrr: '-₹2,100.00 / mo',
     quickRatio: '4.2x'
   });
 

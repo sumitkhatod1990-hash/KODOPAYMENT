@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -65,7 +66,7 @@ export const CustomerSignalsTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Expansion Pipeline Identified</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">+$24,800.00 / mo</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">+₹24,800.00 / mo</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <TrendingUp className="w-3 h-3" /> Ready for enterprise tier upgrade
           </div>
@@ -73,7 +74,7 @@ export const CustomerSignalsTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">At-Risk Churn Volume</div>
-          <div className="text-2xl font-bold font-mono text-amber-600">$1,450.00 / mo</div>
+          <div className="text-2xl font-bold font-mono text-amber-600">₹1,450.00 / mo</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">1 account flagged for intervention</div>
         </div>
 

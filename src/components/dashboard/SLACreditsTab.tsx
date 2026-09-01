@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -20,7 +21,7 @@ export const SLACreditsTab: React.FC = () => {
       guaranteedUptime: '99.99%',
       actualMonthlyUptime: '99.94% (26 min incident)',
       creditPercentage: '10.00% Invoice Credit',
-      creditAmount: '$4,500.00 USD',
+      creditAmount: '₹4,500.00 INR',
       appliedToInvoice: 'inv_deloitte_aug_2026',
       status: 'auto_credited'
     }
@@ -51,7 +52,7 @@ export const SLACreditsTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Automated SLA Credits Applied</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$4,500.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹4,500.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Auto-deducted from renewal invoice
           </div>

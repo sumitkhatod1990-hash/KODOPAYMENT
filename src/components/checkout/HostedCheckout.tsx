@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Logo } from '../common/Logo';
@@ -98,7 +99,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
       try {
         const sid = sessionId || 'demo_session';
         try {
-          const savedReceipt = localStorage.getItem(`qivropay:receipt:${sid}`);
+          const savedReceipt = localStorage.getItem(`qivropay:receipt: ₹{sid}`);
           if (savedReceipt) {
             setCompletedTx(JSON.parse(savedReceipt));
             setCheckoutStep(2);
@@ -298,7 +299,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
               createdAt: new Date().toISOString()
             };
             setCompletedTx(transaction);
-            try { localStorage.setItem(`qivropay:receipt:${sessionId || 'checkout'}`, JSON.stringify(transaction)); } catch {}
+            try { localStorage.setItem(`qivropay:receipt: ₹{sessionId || 'checkout'}`, JSON.stringify(transaction)); } catch {}
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             break;
           }
@@ -499,7 +500,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                     />
                     <span className="font-bold text-xs text-[#0A0D14] font-sans">⚡ Add Dedicated Priority GPU Queue</span>
                   </div>
-                  <span className="text-xs font-mono font-bold text-[#0055FF]">+$19.00 USD</span>
+                  <span className="text-xs font-mono font-bold text-[#0055FF]">+₹19.00 INR</span>
                 </div>
                 <p className="text-[11px] text-[#6E717D] pl-6">
                   Guarantees sub-50ms TTFT (Time-To-First-Token) & 24/7 dedicated enterprise throughput SLA.
@@ -574,7 +575,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                 {orderBumpSelected && !isInrSession && (
                   <div className="flex justify-between text-[#0055FF] font-bold">
                     <span>Priority GPU Queue Add-On</span>
-                    <span>+$19.00 USD</span>
+                    <span>+₹19.00 INR</span>
                   </div>
                 )}
                 {discountApplied && (
@@ -752,7 +753,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                       }`}
                     >
                       <Coins className="w-4 h-4 text-emerald-600" />
-                      <span>USDC Stablecoin</span>
+                      <span>INR Stablecoin</span>
                     </button>
                   )}
                 </div>
@@ -866,7 +867,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                   </div>
                 )}
 
-                {/* 7. Crypto USDC Form */}
+                {/* 7. Crypto INR Form */}
                 {paymentRail === 'crypto' && (
                   <div className="p-4 rounded-2xl bg-[#F4F5F8] border border-black/5 space-y-3">
                     <div className="flex justify-between items-center text-xs font-mono">
@@ -899,7 +900,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                   className="opp-btn-primary w-full py-4 text-sm font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95"
                 >
                   <Lock className="w-4 h-4 fill-white" />
-                  {isProcessing ? 'Opening secure Cashfree checkout...' : `Pay ${isInrSession ? '₹' : '$'}${finalUsdAmount.toFixed(2)} ${isInrSession ? 'INR' : 'USD'} via ${paymentRail.toUpperCase().replace('_', ' ')}`}
+                  {isProcessing ? 'Opening secure Cashfree checkout...' : `Pay ${isInrSession ? '₹' : '$'}${finalUsdAmount.toFixed(2)} ${isInrSession ? 'INR' : 'INR'} via ${paymentRail.toUpperCase().replace('_', ' ')}`}
                 </button>
 
                 {isInrSession && indiaPaymentMode === 'upi' && (
@@ -951,8 +952,8 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
             <div className="p-4 rounded-2xl bg-[#F4F5F8] flex items-center justify-between text-xs font-mono">
               <span className="text-[#8C90A0]">Special Add-On Price:</span>
               <div>
-                <span className="line-through text-[#8C90A0] mr-2">$49.00</span>
-                <span className="font-bold text-emerald-700 text-sm">$15.00 USD</span>
+                <span className="line-through text-[#8C90A0] mr-2">₹49.00</span>
+                <span className="font-bold text-emerald-700 text-sm">₹15.00 INR</span>
               </div>
             </div>
 
@@ -962,7 +963,7 @@ export const HostedCheckout: React.FC<CheckoutProps> = ({ sessionId }) => {
                 className="opp-btn-primary w-full py-3 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md"
               >
                 <Zap className="w-3.5 h-3.5" />
-                <span>Claim 10M Tokens for $15 (1-Click)</span>
+                <span>Claim 10M Tokens for ₹15 (1-Click)</span>
               </button>
               
               <button

@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -17,7 +18,7 @@ import confetti from 'canvas-confetti';
 
 export const MobilePOSTab: React.FC = () => {
   const [amountStr, setAmountStr] = useState('25.00');
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState('INR');
   const [paymentMode, setPaymentMode] = useState<'qr' | 'tap'>('qr');
   const [qrType, setQrType] = useState<'upi' | 'pix' | 'usdc' | 'sepa'>('upi');
   const [posSuccess, setPosSuccess] = useState(false);
@@ -146,7 +147,7 @@ export const MobilePOSTab: React.FC = () => {
                   Payment Captured!
                 </h3>
                 <p className="text-xs text-emerald-800 font-mono font-semibold">
-                  ${parseFloat(amountStr || '0').toFixed(2)} USD settled to QIVROPAY MoR
+                  ${parseFloat(amountStr || '0').toFixed(2)} INR settled to QIVROPAY MoR
                 </p>
               </div>
               <button
@@ -166,7 +167,7 @@ export const MobilePOSTab: React.FC = () => {
                 {[
                   { id: 'upi', label: 'UPI 🇮🇳' },
                   { id: 'pix', label: 'PIX 🇧🇷' },
-                  { id: 'usdc', label: 'USDC 🪙' },
+                  { id: 'usdc', label: 'INR 🪙' },
                   { id: 'sepa', label: 'SEPA 🇪🇺' }
                 ].map(q => (
                   <button
@@ -191,7 +192,7 @@ export const MobilePOSTab: React.FC = () => {
                   />
                 </div>
                 <div className="text-[11px] font-mono text-[#8C90A0]">
-                  Scan with any {qrType.toUpperCase()} app to pay <strong>${parseFloat(amountStr || '0').toFixed(2)}</strong>
+                  Scan with any {qrType.toUpperCase()} app to pay <strong>₹{parseFloat(amountStr || '0').toFixed(2)}</strong>
                 </div>
               </div>
 

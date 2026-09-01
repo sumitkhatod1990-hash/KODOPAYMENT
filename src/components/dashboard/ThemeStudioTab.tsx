@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -188,8 +189,8 @@ export const ThemeStudioTab: React.FC = () => {
                   <p className="text-xs text-[#8C90A0]">Unlimited AI inference & API access</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-xl font-bold font-mono">$49.00</div>
-                  <div className="text-[10px] text-[#8C90A0] uppercase font-mono">USD / month</div>
+                  <div className="text-xl font-bold font-mono">₹49.00</div>
+                  <div className="text-[10px] text-[#8C90A0] uppercase font-mono">INR / month</div>
                 </div>
               </div>
 
@@ -204,7 +205,7 @@ export const ThemeStudioTab: React.FC = () => {
                   className="w-full py-3.5 rounded-xl text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 hover:opacity-95 transition-opacity"
                 >
                   <CreditCard className="w-4 h-4" />
-                  <span>Subscribe • $49.00 USD</span>
+                  <span>Subscribe • ₹49.00 INR</span>
                 </button>
               </div>
 

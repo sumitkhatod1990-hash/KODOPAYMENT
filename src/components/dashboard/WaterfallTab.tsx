@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -20,7 +21,7 @@ export const WaterfallTab: React.FC = () => {
       beneficiary: 'Founder 1 (Delaware LLC)',
       share: 45.0,
       bankAccount: 'Chase Private Client (...9921)',
-      totalDistributed: '$48,200.00 USD',
+      totalDistributed: '₹48,200.00 INR',
       status: 'active'
     },
     {
@@ -28,7 +29,7 @@ export const WaterfallTab: React.FC = () => {
       beneficiary: 'Founder 2 (Tech Lead)',
       share: 35.0,
       bankAccount: 'Silicon Valley Bank (...4012)',
-      totalDistributed: '$37,480.00 USD',
+      totalDistributed: '₹37,480.00 INR',
       status: 'active'
     },
     {
@@ -36,7 +37,7 @@ export const WaterfallTab: React.FC = () => {
       beneficiary: 'Seed Investor Pool / LP Syndicate',
       share: 20.0,
       bankAccount: 'First Republic Trust (...1190)',
-      totalDistributed: '$21,420.00 USD',
+      totalDistributed: '₹21,420.00 INR',
       status: 'active'
     }
   ]);
@@ -68,7 +69,7 @@ export const WaterfallTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Distributed to Beneficiaries</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$107,100.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹107,100.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> T+0 Instant Split Settlement
           </div>
@@ -95,7 +96,7 @@ export const WaterfallTab: React.FC = () => {
             <span>Real-Time Payout Waterfall Calculator</span>
           </h3>
           <span className="text-xs font-mono font-bold text-[#0055FF]">
-            Simulated Net Inflow: ${simulatedRevenue.toLocaleString()} USD
+            Simulated Net Inflow: ₹{simulatedRevenue.toLocaleString()} INR
           </span>
         </div>
 
@@ -104,7 +105,7 @@ export const WaterfallTab: React.FC = () => {
             <div key={s.id} className="p-4 rounded-2xl bg-[#F4F5F8] border border-black/5 space-y-1">
               <span className="text-[#8C90A0] font-semibold">{s.beneficiary} ({s.share}%):</span>
               <div className="font-bold text-emerald-700 text-base">
-                ${((simulatedRevenue * s.share) / 100).toFixed(2)} USD
+                ${((simulatedRevenue * s.share) / 100).toFixed(2)} INR
               </div>
               <div className="text-[10px] text-[#8C90A0]">{s.bankAccount}</div>
             </div>

@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -17,10 +18,10 @@ export const MilestoneEscrowTab: React.FC = () => {
     {
       id: 'esc_deal_401',
       clientName: 'Palantir Solutions Group',
-      totalContract: '$120,000.00 USD',
-      heldInEscrow: '$60,000.00 USD',
+      totalContract: '₹120,000.00 INR',
+      heldInEscrow: '₹60,000.00 INR',
       nextMilestone: 'Phase 2 API Integration Signoff',
-      milestoneAmount: '$30,000.00 USD',
+      milestoneAmount: '₹30,000.00 INR',
       status: 'milestone_ready_to_release'
     }
   ]);
@@ -60,7 +61,7 @@ export const MilestoneEscrowTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Active Escrow Balances</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">$60,000.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">₹60,000.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Fully segregated client funds
           </div>
@@ -68,7 +69,7 @@ export const MilestoneEscrowTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Milestones Ready to Release</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">$30,000.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹30,000.00 INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">1 deliverable signed by client</div>
         </div>
 
@@ -118,7 +119,7 @@ export const MilestoneEscrowTab: React.FC = () => {
                       className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-emerald-800 font-mono text-[11px] font-bold flex items-center gap-1.5 transition-colors"
                     >
                       <Unlock className="w-3.5 h-3.5 text-emerald-700" />
-                      <span>{releasing ? 'Releasing Funds...' : 'Release $30k Tranche'}</span>
+                      <span>{releasing ? 'Releasing Funds...' : 'Release ₹30k Tranche'}</span>
                     </button>
                   </td>
                 </tr>

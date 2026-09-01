@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -16,9 +17,9 @@ export const FxHedgingTab: React.FC = () => {
   const [hedges, setHedges] = useState([
     {
       id: 'hdg_eur_01',
-      pair: 'EUR / USD',
+      pair: 'INR / INR',
       lockedRate: '1.0920',
-      forwardVolume: '€250,000.00 EUR',
+      forwardVolume: '€250,000.00 INR',
       duration: '90 Days Forward',
       expiresAt: 'Nov 25, 2026',
       status: 'locked_active'
@@ -47,7 +48,7 @@ export const FxHedgingTab: React.FC = () => {
             <span>Automated FX Currency Hedging & 90-Day Forward Lock</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
-            Lock forward foreign exchange conversion rates for international EUR, GBP, JPY, and CAD receivables to eliminate currency depreciation losses on global SaaS contracts.
+            Lock forward foreign exchange conversion rates for international INR, INR, INR, and INR receivables to eliminate currency depreciation losses on global SaaS contracts.
           </p>
         </div>
 
@@ -61,15 +62,15 @@ export const FxHedgingTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Active Hedged Receivables</div>
-          <div className="text-2xl font-bold font-mono text-emerald-700">€250,000.00 EUR</div>
+          <div className="text-2xl font-bold font-mono text-emerald-700">€250,000.00 INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" /> Locked at 1.0920 USD Rate
+            <CheckCircle2 className="w-3 h-3" /> Locked at 1.0920 INR Rate
           </div>
         </div>
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">FX Depreciation Shielded</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">+$8,750.00 USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">+₹8,750.00 INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Protected against recent dollar swings</div>
         </div>
 
@@ -88,7 +89,7 @@ export const FxHedgingTab: React.FC = () => {
             <span>90-Day Forward Rate Lock Simulator</span>
           </h3>
           <span className="text-xs font-mono font-bold text-[#0055FF]">
-            Volume: €{simulatedVolume.toLocaleString()} EUR
+            Volume: €{simulatedVolume.toLocaleString()} INR
           </span>
         </div>
 
@@ -105,11 +106,11 @@ export const FxHedgingTab: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
             <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
               <span className="text-[#8C90A0]">Forward Rate:</span>
-              <div className="font-bold text-[#0A0D14] text-sm">1.0920 USD / EUR</div>
+              <div className="font-bold text-[#0A0D14] text-sm">1.0920 INR / INR</div>
             </div>
             <div className="p-4 rounded-2xl bg-[#F4F5F8] space-y-1">
-              <span className="text-[#8C90A0]">Guaranteed USD Payout:</span>
-              <div className="font-bold text-emerald-700 text-sm">${(simulatedVolume * 1.092).toLocaleString(undefined, { minimumFractionDigits: 2 })} USD</div>
+              <span className="text-[#8C90A0]">Guaranteed INR Payout:</span>
+              <div className="font-bold text-emerald-700 text-sm">₹{(simulatedVolume * 1.092).toLocaleString(undefined, { minimumFractionDigits: 2 })} INR</div>
             </div>
             <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex items-center justify-center">
               <button

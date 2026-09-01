@@ -1,3 +1,4 @@
+sed: --: No such file or directory
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -71,7 +72,7 @@ export const AgentWalletsTab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Agent Float Balance</div>
-          <div className="text-2xl font-bold font-mono text-[#0055FF]">${totalBalance.toFixed(2)} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0055FF]">₹{totalBalance.toFixed(2)} INR</div>
           <div className="text-[11px] text-emerald-600 font-mono flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" /> Auto-refill rails active
           </div>
@@ -79,7 +80,7 @@ export const AgentWalletsTab: React.FC = () => {
 
         <div className="opp-card p-6 space-y-2">
           <div className="text-xs font-mono text-[#8C90A0] uppercase">Total Agent Compute Incurred</div>
-          <div className="text-2xl font-bold font-mono text-[#0A0D14]">${totalConsumed.toFixed(2)} USD</div>
+          <div className="text-2xl font-bold font-mono text-[#0A0D14]">₹{totalConsumed.toFixed(2)} INR</div>
           <div className="text-[11px] text-[#8C90A0] font-mono">Micro-metered per 1k tokens</div>
         </div>
 
@@ -123,7 +124,7 @@ export const AgentWalletsTab: React.FC = () => {
                     When &lt; ${wallet.autoRefillThreshold.toFixed(2)}
                   </td>
                   <td className="p-4 font-mono font-bold text-emerald-700">
-                    +${wallet.autoRefillAmount.toFixed(2)}
+                    +₹{wallet.autoRefillAmount.toFixed(2)}
                   </td>
                   <td className="p-4 font-mono font-bold text-[#0A0D14]">
                     ${(wallet.totalConsumed || 0).toFixed(2)}
@@ -143,7 +144,7 @@ export const AgentWalletsTab: React.FC = () => {
                       className="opp-btn-secondary px-3 py-1 text-[11px] font-bold flex items-center gap-1"
                     >
                       <Coins className="w-3 h-3 text-[#0055FF]" />
-                      <span>{toppingUpId === wallet.id ? 'Topping Up...' : '+$50 Top-up'}</span>
+                      <span>{toppingUpId === wallet.id ? 'Topping Up...' : '+₹50 Top-up'}</span>
                     </button>
                   </td>
                 </tr>
@@ -199,7 +200,7 @@ print("Updated wallet balance:", wallet.get_balance())`}
 
               <div className="grid grid-cols-3 gap-2">
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#0A0D14]">Initial ($)</label>
+                  <label className="font-semibold text-[#0A0D14]">Initial (₹)</label>
                   <input
                     type="number"
                     value={initialBalance}
@@ -208,7 +209,7 @@ print("Updated wallet balance:", wallet.get_balance())`}
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#0A0D14]">Refill When &lt; ($)</label>
+                  <label className="font-semibold text-[#0A0D14]">Refill When &lt; (₹)</label>
                   <input
                     type="number"
                     value={autoRefillThreshold}
@@ -217,7 +218,7 @@ print("Updated wallet balance:", wallet.get_balance())`}
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#0A0D14]">Refill + ($)</label>
+                  <label className="font-semibold text-[#0A0D14]">Refill + (₹)</label>
                   <input
                     type="number"
                     value={autoRefillAmount}
