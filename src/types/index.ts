@@ -181,6 +181,7 @@ export interface AuditLog {
 
 export type DashboardTabType = 
   | 'home'
+  | 'verification'
   | 'copilot'
   | 'payments'
   | 'smart-routing'

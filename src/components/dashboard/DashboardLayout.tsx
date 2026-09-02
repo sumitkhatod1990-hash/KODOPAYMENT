@@ -151,6 +151,7 @@ import { NotificationsDrawer } from './NotificationsDrawer';
 import { OnboardingWizard } from './OnboardingWizard';
 import { SetupGuideWidget } from './SetupGuideWidget';
 import { AccountVerificationModal } from './AccountVerificationModal';
+import { VerificationTab } from './VerificationTab';
 import { OverlayCheckoutModal } from '../checkout/OverlayCheckoutModal';
 import { 
   LayoutDashboard, 
@@ -507,6 +508,7 @@ export const DashboardLayout: React.FC = () => {
       group: 'OVERVIEW',
       items: [
         { id: 'home', label: 'Overview', icon: LayoutDashboard },
+        { id: 'verification', label: 'Account Verification', icon: ShieldCheck },
         { id: 'payments', label: 'Payments', icon: CreditCard },
         { id: 'payouts', label: 'Payouts', icon: Building },
       ]
@@ -676,10 +678,25 @@ export const DashboardLayout: React.FC = () => {
             <h1 className="font-bold text-[#1d1d1f] dark:text-white text-lg capitalize font-heading">
               {dashboardTab.replace('-', ' ')}
             </h1>
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-mono text-emerald-800 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-2.5 py-0.5 rounded-full font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              QIVROPAY MoR Active
-            </span>
+            {verificationData && verificationData.status === 'approved' ? (
+              <button
+                onClick={() => setDashboardTab('verification')}
+                className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-mono text-emerald-800 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-2.5 py-0.5 rounded-full font-bold hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-sm"
+                title="View Verification Details"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>QIVROPAY MoR Verified (Live Rails)</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => setDashboardTab('verification')}
+                className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-mono text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-2.5 py-0.5 rounded-full font-bold hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-sm animate-pulse"
+                title="Click to Complete Verification"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                <span>Complete Verification (72h Review)</span>
+              </button>
+            )}
           </div>
 
           {/* Topbar Right Action Bar */}
@@ -813,6 +830,7 @@ export const DashboardLayout: React.FC = () => {
         {/* Dynamic Route Container */}
         <main className="flex-1 p-6 sm:p-8 lg:p-10 overflow-y-auto max-w-7xl bg-[#f5f5f7] dark:bg-[#07090E] text-[#1d1d1f] dark:text-slate-100 transition-colors duration-300">
           {dashboardTab === 'home' && <OverviewTab onNavigateTab={setDashboardTab} />}
+          {dashboardTab === 'verification' && <VerificationTab onNavigateTab={setDashboardTab} />}
           {dashboardTab === 'copilot' && <AICopilotTab />}
           {dashboardTab === 'payments' && <PaymentsTab />}
           {dashboardTab === 'smart-routing' && <SmartRoutingTab />}
@@ -971,7 +989,10 @@ export const DashboardLayout: React.FC = () => {
         <SetupGuideWidget 
           isOpen={setupGuideOpen}
           onClose={() => setSetupGuideOpen(false)}
-          onOpenVerification={() => setVerificationModalOpen(true)}
+          onOpenVerification={() => {
+            setDashboardTab('verification');
+            setSetupGuideOpen(false);
+          }}
           verificationData={verificationData}
           onNavigateTab={setDashboardTab}
           isTestMode={isTestMode}
