@@ -21,28 +21,6 @@ export const App: React.FC = () => {
   const { currentView, activeSessionId } = useApp();
   const { user } = useAuth();
 
-  const isAppSubdomain = typeof window !== 'undefined' && (
-    window.location.hostname === 'app.qivropay.com' ||
-    window.location.hostname.startsWith('app.')
-  );
-
-  // If on app.qivropay.com, prioritize Dashboard / Auth workspace
-  if (isAppSubdomain) {
-    if (currentView === 'checkout') {
-      return <HostedCheckout sessionId={activeSessionId} />;
-    }
-    if (currentView === 'portal') {
-      return <CustomerBillingPortal />;
-    }
-    if (currentView === 'docs') {
-      return <DocsPage />;
-    }
-    if (!user) {
-      return <AuthPage />;
-    }
-    return <DashboardLayout />;
-  }
-
   if (currentView === 'auth') {
     return <AuthPage />;
   }

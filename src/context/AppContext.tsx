@@ -80,17 +80,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const initialCheckoutId = typeof window !== 'undefined' ? window.location.pathname.match(/^\/checkout\/([^/]+)/)?.[1] : null;
-  const isAppSubdomain = typeof window !== 'undefined' && (
-    window.location.hostname === 'app.qivropay.com' ||
-    window.location.hostname.startsWith('app.')
-  );
   const savedView = typeof window !== 'undefined' ? window.localStorage.getItem('qivropay_last_view') : null;
-  const initialView: CurrentViewType = initialCheckoutId 
-    ? 'checkout' 
-    : isAppSubdomain 
-      ? 'dashboard' 
-      : (savedView === 'dashboard' ? 'dashboard' : 'landing');
-  const [currentView, setCurrentViewInternal] = useState<CurrentViewType>(initialView);
+  const [currentView, setCurrentViewInternal] = useState<CurrentViewType>(initialCheckoutId ? 'checkout' : savedView === 'dashboard' ? 'dashboard' : 'landing');
   const [dashboardTab, setDashboardTab] = useState<DashboardTabType>('home');
   const [activeSessionId, setActiveSessionId] = useState<string | null>(initialCheckoutId ? decodeURIComponent(initialCheckoutId) : null);
   const [isTestMode, setIsTestMode] = useState<boolean>(false);

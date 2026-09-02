@@ -64,12 +64,8 @@ function readCookie(req, name) {
   return entry ? decodeURIComponent(entry.trim().slice(name.length + 1)) : '';
 }
 
-function authCookieOptions(maxAge, req) {
-  const host = String(req?.headers?.['x-forwarded-host'] || req?.headers?.host || '');
-  const isQivropay = host.includes('qivropay.com');
-  const domainPart = isQivropay ? '; Domain=.qivropay.com' : '';
-  const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
-  return `qivropay_session=; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Lax${isProd ? '; Secure' : ''}${domainPart}`;
+function authCookieOptions(maxAge) {
+  return `qivropay_session=; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
 }
 
 function publicUser(user) {
@@ -82,22 +78,22 @@ app.get('/api/v1/auth/me', async (req, res) => {
     res.json({ success: true, user: publicUser(user) });
   } catch (error) {
     console.error('Auth lookup failed', error);
-    res.json({ success: true, user: null });
+    res.status(503).json({ success: false, error: 'Authentication service is temporarily unavailable' });
   }
 });
 
 app.post('/api/v1/auth/signup', async (req, res) => {
   const { email, password, name, company } = req.body || {};
   const normalizedEmail = String(email || '').trim().toLowerCase();
-  if (!normalizedEmail || !password || !name) {
-    return res.status(400).json({ success: false, error: 'Name, email, and password are required' });
+  if (!/^\S+@\S+\.\S+$/.test(normalizedEmail) || String(password || '').length < 8 || !String(name || '').trim() || !String(company || '').trim()) {
+    return res.status(400).json({ success: false, error: 'Name, company, valid email and an 8+ character password are required' });
   }
   try {
     const existing = await findUserByEmail(normalizedEmail);
     if (existing) return res.status(409).json({ success: false, error: 'An account with this email already exists' });
     const user = await createUser({ email: normalizedEmail, password: String(password), name: String(name).trim(), company: String(company).trim() });
     const session = await createAuthSession(user.id);
-    res.setHeader('Set-Cookie', authCookieOptions(60 * 60 * 24 * 30, req).replace('qivropay_session=;', `qivropay_session=${encodeURIComponent(session.token)};`));
+    res.setHeader('Set-Cookie', authCookieOptions(60 * 60 * 24 * 30).replace('qivropay_session=;', `qivropay_session=${encodeURIComponent(session.token)};`));
     res.status(201).json({ success: true, user: publicUser(user) });
   } catch (error) {
     console.error('Signup failed', error);
@@ -119,7 +115,7 @@ app.post('/api/v1/auth/login', async (req, res) => {
     }
     if (!user || !checkUserPassword(password, user.password_hash)) return res.status(401).json({ success: false, error: 'Invalid email or password' });
     const session = await createAuthSession(user.id);
-    res.setHeader('Set-Cookie', authCookieOptions(60 * 60 * 24 * 30, req).replace('qivropay_session=;', `qivropay_session=${encodeURIComponent(session.token)};`));
+    res.setHeader('Set-Cookie', authCookieOptions(60 * 60 * 24 * 30).replace('qivropay_session=;', `qivropay_session=${encodeURIComponent(session.token)};`));
     res.json({ success: true, user: publicUser(user) });
   } catch (error) {
     console.error('Login failed', error);
@@ -129,7 +125,7 @@ app.post('/api/v1/auth/login', async (req, res) => {
 
 app.post('/api/v1/auth/logout', async (req, res) => {
   try { await deleteAuthSession(readCookie(req, 'qivropay_session')); } catch (error) { console.error('Logout failed', error); }
-  res.setHeader('Set-Cookie', authCookieOptions(0, req));
+  res.setHeader('Set-Cookie', authCookieOptions(0));
   res.json({ success: true });
 });
 
