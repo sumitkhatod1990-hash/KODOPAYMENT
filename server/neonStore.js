@@ -474,6 +474,8 @@ export async function ensureAuthStore() {
       await sql`ALTER TABLE qivropay_users ALTER COLUMN password_hash DROP NOT NULL`;
       await sql`ALTER TABLE qivropay_users ADD COLUMN IF NOT EXISTS google_id TEXT`;
       await sql`CREATE UNIQUE INDEX IF NOT EXISTS qivropay_users_google_id_key ON qivropay_users (google_id)`;
+      await sql`ALTER TABLE qivropay_users ADD COLUMN IF NOT EXISTS google_sub TEXT`;
+      await sql`CREATE UNIQUE INDEX IF NOT EXISTS qivropay_users_google_sub_key ON qivropay_users (google_sub)`;
     })().catch((error) => {
       authSchemaReady = undefined;
       console.error('Neon auth schema init failed:', error.message);
@@ -539,7 +541,12 @@ export async function findUserByGoogleId(googleId) {
   if (sql) {
     try {
       await ensureAuthStore();
-      const rows = await sql`SELECT id, email, name, company, password_hash, google_id, created_at FROM qivropay_users WHERE google_id = ${googleId} LIMIT 1`;
+      const rows = await sql`
+        SELECT id, email, name, company, password_hash, google_id, google_sub, created_at
+        FROM qivropay_users
+        WHERE google_id = ${googleId} OR google_sub = ${googleId}
+        LIMIT 1
+      `;
       if (rows && rows[0]) return rows[0];
     } catch (e) {
       throw e;
@@ -547,7 +554,7 @@ export async function findUserByGoogleId(googleId) {
     return null;
   }
   for (const u of memoryUsers.values()) {
-    if (u.google_id === googleId) return u;
+    if (u.google_id === googleId || u.google_sub === googleId) return u;
   }
   return null;
 }
@@ -558,8 +565,10 @@ async function linkGoogleId(userId, googleId) {
     try {
       await ensureAuthStore();
       const rows = await sql`
-        UPDATE qivropay_users SET google_id = ${googleId} WHERE id = ${userId}
-        RETURNING id, email, name, company, password_hash, google_id, created_at
+        UPDATE qivropay_users
+        SET google_id = ${googleId}, google_sub = ${googleId}
+        WHERE id = ${userId}
+        RETURNING id, email, name, company, password_hash, google_id, google_sub, created_at
       `;
       if (rows && rows[0]) return rows[0];
     } catch (e) {
@@ -568,7 +577,7 @@ async function linkGoogleId(userId, googleId) {
     return null;
   }
   for (const u of memoryUsers.values()) {
-    if (u.id === userId) { u.google_id = googleId; persistLocalStore(); return u; }
+    if (u.id === userId) { u.google_id = googleId; u.google_sub = googleId; persistLocalStore(); return u; }
   }
   return null;
 }
@@ -585,16 +594,16 @@ async function createGoogleUser({ email, name, googleId }) {
     try {
       await ensureAuthStore();
       const rows = await sql`
-        INSERT INTO qivropay_users (id, email, name, company, password_hash, google_id)
-        VALUES (${id}, ${email}, ${safeName}, ${''}, ${null}, ${googleId})
-        RETURNING id, email, name, company, password_hash, google_id, created_at
+        INSERT INTO qivropay_users (id, email, name, company, password_hash, google_id, google_sub)
+        VALUES (${id}, ${email}, ${safeName}, ${''}, ${null}, ${googleId}, ${googleId})
+        RETURNING id, email, name, company, password_hash, google_id, google_sub, created_at
       `;
       if (rows && rows[0]) return rows[0];
     } catch (e) {
       throw e;
     }
   }
-  const user = { id, email, name: safeName, company: '', password_hash: null, google_id: googleId, created_at: new Date().toISOString() };
+  const user = { id, email, name: safeName, company: '', password_hash: null, google_id: googleId, google_sub: googleId, created_at: new Date().toISOString() };
   memoryUsers.set(email.toLowerCase(), user);
   persistLocalStore();
   return user;
