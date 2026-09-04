@@ -34,6 +34,8 @@ const parseRouteFromPath = (pathname: string): ParsedRoute | null => {
   const checkoutMatch = pathname.match(/^\/checkout\/([^/]+)/);
   if (checkoutMatch) return { view: 'checkout', sessionId: decodeURIComponent(checkoutMatch[1]) };
   if (pathname === '/docs' || pathname.startsWith('/docs/')) return { view: 'docs' };
+  if (pathname === '/privacy') return { view: 'privacy' };
+  if (pathname === '/terms') return { view: 'terms' };
   if (pathname === '/login') return { view: 'auth', authMode: 'login' };
   if (pathname === '/signup') return { view: 'auth', authMode: 'signup' };
   if (pathname === '/dashboard') return { view: 'dashboard' };
@@ -46,6 +48,8 @@ const pathForView = (view: CurrentViewType, opts?: { sessionId?: string | null; 
   switch (view) {
     case 'landing': return '/';
     case 'docs': return '/docs';
+    case 'privacy': return '/privacy';
+    case 'terms': return '/terms';
     case 'auth': return opts?.authMode === 'login' ? '/login' : '/signup';
     case 'dashboard': return '/dashboard';
     case 'portal': return '/portal';

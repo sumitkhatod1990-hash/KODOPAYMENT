@@ -12,6 +12,8 @@ import { DashboardLayout } from './components/dashboard/DashboardLayout';
 import { FirstMerchantOnboarding } from './components/dashboard/FirstMerchantOnboarding';
 import { HostedCheckout } from './components/checkout/HostedCheckout';
 import { DocsPage } from './components/docs/DocsPage';
+import { PrivacyPolicyPage } from './components/legal/PrivacyPolicyPage';
+import { TermsOfServicePage } from './components/legal/TermsOfServicePage';
 import { CustomerBillingPortal } from './components/portal/CustomerBillingPortal';
 import { AuthPage } from './components/auth/AuthPage';
 import { useAuth } from './context/AuthContext';
@@ -45,6 +47,14 @@ export const App: React.FC = () => {
         <SupportChat />
       </>
     );
+  }
+
+  if (currentView === 'privacy') {
+    return <PrivacyPolicyPage />;
+  }
+
+  if (currentView === 'terms') {
+    return <TermsOfServicePage />;
   }
 
   if (currentView === 'portal') {

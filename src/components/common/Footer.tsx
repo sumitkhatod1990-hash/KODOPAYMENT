@@ -80,11 +80,13 @@ export const Footer: React.FC = () => {
             <span>India Payments</span>
           </div>
 
-          {/* Not yet published — left as plain text rather than dead links
-              until real policy pages exist. */}
           <div className="flex items-center gap-6">
-            <span>Privacy Policy</span>
-            <span>Terms of Service</span>
+            <button onClick={() => setCurrentView('privacy')} className="hover:text-[#1d1d1f] hover:underline text-left transition-colors">
+              Privacy Policy
+            </button>
+            <button onClick={() => setCurrentView('terms')} className="hover:text-[#1d1d1f] hover:underline text-left transition-colors">
+              Terms of Service
+            </button>
           </div>
         </div>
 

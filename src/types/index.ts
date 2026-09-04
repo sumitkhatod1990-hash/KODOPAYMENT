@@ -340,4 +340,4 @@ export type DashboardTabType =
   | 'settlements'
   | 'settings';
 
-export type CurrentViewType = 'landing' | 'auth' | 'dashboard' | 'checkout' | 'docs' | 'portal';
+export type CurrentViewType = 'landing' | 'auth' | 'dashboard' | 'checkout' | 'docs' | 'portal' | 'privacy' | 'terms';
