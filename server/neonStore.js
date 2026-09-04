@@ -80,41 +80,54 @@ export async function ensurePaymentStore() {
   const sql = sqlClient();
   if (!sql) return;
   if (!schemaReady) {
-    schemaReady = sql`
-      CREATE TABLE IF NOT EXISTS qivropay_payment_events (
-        event_id TEXT PRIMARY KEY,
-        kind TEXT NOT NULL,
-        order_id TEXT,
-        status TEXT,
-        payload JSONB NOT NULL,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      );
-      CREATE INDEX IF NOT EXISTS qivropay_payment_events_session_idx
-        ON qivropay_payment_events ((payload->>'sessionToken'));
-      CREATE TABLE IF NOT EXISTS qivropay_resources (
-        merchant_id TEXT NOT NULL,
-        resource_type TEXT NOT NULL,
-        resource_id TEXT NOT NULL,
-        payload JSONB NOT NULL,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        PRIMARY KEY (merchant_id, resource_type, resource_id)
-      );
-      CREATE INDEX IF NOT EXISTS qivropay_resources_type_idx
-        ON qivropay_resources (merchant_id, resource_type, created_at DESC);
-      CREATE TABLE IF NOT EXISTS qivropay_checkout_sessions (
-        session_id TEXT PRIMARY KEY,
-        merchant_id TEXT,
-        payload JSONB NOT NULL,
-        status TEXT NOT NULL DEFAULT 'open',
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        expires_at TIMESTAMPTZ
-      );
-      CREATE INDEX IF NOT EXISTS qivropay_checkout_sessions_merchant_idx
-        ON qivropay_checkout_sessions (merchant_id, created_at DESC);
-    `.catch((error) => {
+    schemaReady = (async () => {
+      await sql`
+        CREATE TABLE IF NOT EXISTS qivropay_payment_events (
+          event_id TEXT PRIMARY KEY,
+          kind TEXT NOT NULL,
+          order_id TEXT,
+          status TEXT,
+          payload JSONB NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `;
+      await sql`
+        CREATE INDEX IF NOT EXISTS qivropay_payment_events_session_idx
+          ON qivropay_payment_events ((payload->>'sessionToken'))
+      `;
+      await sql`
+        CREATE TABLE IF NOT EXISTS qivropay_resources (
+          merchant_id TEXT NOT NULL,
+          resource_type TEXT NOT NULL,
+          resource_id TEXT NOT NULL,
+          payload JSONB NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          PRIMARY KEY (merchant_id, resource_type, resource_id)
+        )
+      `;
+      await sql`
+        CREATE INDEX IF NOT EXISTS qivropay_resources_type_idx
+          ON qivropay_resources (merchant_id, resource_type, created_at DESC)
+      `;
+      await sql`
+        CREATE TABLE IF NOT EXISTS qivropay_checkout_sessions (
+          session_id TEXT PRIMARY KEY,
+          merchant_id TEXT,
+          payload JSONB NOT NULL,
+          status TEXT NOT NULL DEFAULT 'open',
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          expires_at TIMESTAMPTZ
+        )
+      `;
+      await sql`
+        CREATE INDEX IF NOT EXISTS qivropay_checkout_sessions_merchant_idx
+          ON qivropay_checkout_sessions (merchant_id, created_at DESC)
+      `;
+    })().catch((error) => {
       schemaReady = undefined;
-      console.warn('Neon payment schema init skipped/failed, using fallback store', error.message);
+      console.error('Neon payment schema init failed:', error.message);
+      throw error;
     });
   }
   await schemaReady;
@@ -420,42 +433,49 @@ function verifyPassword(password, stored) {
   return actual.length === expected.length && crypto.timingSafeEqual(Buffer.from(actual), Buffer.from(expected));
 }
 
+let authSchemaReady;
+
 export async function ensureAuthStore() {
   const sql = sqlClient();
   if (!sql) return;
-  try {
-    await sql`
-      CREATE TABLE IF NOT EXISTS qivropay_users (
-        id TEXT PRIMARY KEY,
-        email TEXT UNIQUE NOT NULL,
-        name TEXT NOT NULL,
-        company TEXT NOT NULL,
-        password_hash TEXT,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `;
-    await sql`
-      CREATE TABLE IF NOT EXISTS qivropay_auth_sessions (
-        token_hash TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL REFERENCES qivropay_users(id) ON DELETE CASCADE,
-        expires_at TIMESTAMPTZ NOT NULL,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `;
-    // Additive migration for Google Sign-In (Phase 11): existing deployments
-    // already have qivropay_users without this column / with password_hash
-    // NOT NULL, and CREATE TABLE IF NOT EXISTS above is a no-op for them, so
-    // both statements must run unconditionally every time. Both are
-    // idempotent — Postgres accepts DROP NOT NULL and ADD COLUMN IF NOT
-    // EXISTS even when already applied. A plain (non-partial) UNIQUE index
-    // is safe here: Postgres never treats two NULLs as equal, so any number
-    // of password-only accounts (google_id IS NULL) can coexist.
-    await sql`ALTER TABLE qivropay_users ALTER COLUMN password_hash DROP NOT NULL`;
-    await sql`ALTER TABLE qivropay_users ADD COLUMN IF NOT EXISTS google_id TEXT`;
-    await sql`CREATE UNIQUE INDEX IF NOT EXISTS qivropay_users_google_id_key ON qivropay_users (google_id)`;
-  } catch (e) {
-    throw e;
+  if (!authSchemaReady) {
+    authSchemaReady = (async () => {
+      await sql`
+        CREATE TABLE IF NOT EXISTS qivropay_users (
+          id TEXT PRIMARY KEY,
+          email TEXT UNIQUE NOT NULL,
+          name TEXT NOT NULL,
+          company TEXT NOT NULL,
+          password_hash TEXT,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `;
+      await sql`
+        CREATE TABLE IF NOT EXISTS qivropay_auth_sessions (
+          token_hash TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL REFERENCES qivropay_users(id) ON DELETE CASCADE,
+          expires_at TIMESTAMPTZ NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `;
+      // Additive migration for Google Sign-In (Phase 11): existing deployments
+      // already have qivropay_users without this column / with password_hash
+      // NOT NULL, and CREATE TABLE IF NOT EXISTS above is a no-op for them, so
+      // both statements must run unconditionally every time. Both are
+      // idempotent — Postgres accepts DROP NOT NULL and ADD COLUMN IF NOT
+      // EXISTS even when already applied. A plain (non-partial) UNIQUE index
+      // is safe here: Postgres never treats two NULLs as equal, so any number
+      // of password-only accounts (google_id IS NULL) can coexist.
+      await sql`ALTER TABLE qivropay_users ALTER COLUMN password_hash DROP NOT NULL`;
+      await sql`ALTER TABLE qivropay_users ADD COLUMN IF NOT EXISTS google_id TEXT`;
+      await sql`CREATE UNIQUE INDEX IF NOT EXISTS qivropay_users_google_id_key ON qivropay_users (google_id)`;
+    })().catch((error) => {
+      authSchemaReady = undefined;
+      console.error('Neon auth schema init failed:', error.message);
+      throw error;
+    });
   }
+  await authSchemaReady;
 }
 
 export async function createUser({ email, name, company, password }) {
@@ -848,26 +868,33 @@ export async function getPaymentOrder(orderId) {
 // ensureAuthStore() having run first.
 // -------------------------------------------------------------
 
+let partnerSchemaReady;
+
 export async function ensurePartnerMerchantStore() {
   const sql = sqlClient();
   if (!sql) return;
-  try {
-    await sql`
-      CREATE TABLE IF NOT EXISTS qivropay_cashfree_partner_merchants (
-        merchant_id TEXT PRIMARY KEY,
-        cf_merchant_id TEXT NOT NULL UNIQUE,
-        onboarding_status TEXT,
-        kyc_status TEXT,
-        full_kyc_status TEXT,
-        activation_status TEXT,
-        transaction_access TEXT,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `;
-  } catch (e) {
-    throw e;
+  if (!partnerSchemaReady) {
+    partnerSchemaReady = (async () => {
+      await sql`
+        CREATE TABLE IF NOT EXISTS qivropay_cashfree_partner_merchants (
+          merchant_id TEXT PRIMARY KEY,
+          cf_merchant_id TEXT NOT NULL UNIQUE,
+          onboarding_status TEXT,
+          kyc_status TEXT,
+          full_kyc_status TEXT,
+          activation_status TEXT,
+          transaction_access TEXT,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `;
+    })().catch((error) => {
+      partnerSchemaReady = undefined;
+      console.error('Neon partner merchant schema init failed:', error.message);
+      throw error;
+    });
   }
+  await partnerSchemaReady;
 }
 
 export class PartnerMappingError extends Error {
