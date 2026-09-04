@@ -117,8 +117,13 @@ export async function ensurePaymentStore() {
           payload JSONB NOT NULL,
           status TEXT NOT NULL DEFAULT 'open',
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           expires_at TIMESTAMPTZ
         )
+      `;
+      await sql`
+        ALTER TABLE qivropay_checkout_sessions
+        ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       `;
       await sql`
         CREATE INDEX IF NOT EXISTS qivropay_checkout_sessions_merchant_idx
