@@ -1,0 +1,413 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 98%;
+    --foreground: 220 20% 6%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 6%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 6%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 240 6% 94%;
+    --secondary-foreground: 220 20% 6%;
+    --muted: 240 6% 94%;
+    --muted-foreground: 220 10% 46%;
+    --accent: 240 6% 94%;
+    --accent-foreground: 220 20% 6%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 221 83% 53%;
+    --radius: 1.5rem;
+  }
+
+  .dark {
+    --background: 222 47% 4%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 7%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 7%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 222 47% 11%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 47% 11%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 222 47% 11%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 221 83% 53%;
+  }
+
+  body {
+    background-color: #FAFAFC;
+    color: #0A0D14;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* No `.dark body` rule here on purpose: `.dark` is only ever applied to
+     the authenticated dashboard shell's own wrapper (see
+     src/hooks/useDashboardTheme.ts), never to <html> or <body>. A `.dark
+     body` rule would make dashboard dark mode repaint the whole document,
+     including the public site — exactly what theme isolation must prevent. */
+
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Plus Jakarta Sans', 'Syne', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.04em;
+    font-weight: 800;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'DM Mono', 'Fragment Mono', monospace;
+  }
+}
+
+/* OPP Signature Components */
+.opp-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(10, 13, 20, 0.07);
+  border-radius: 28px;
+  box-shadow: 0 4px 20px -4px rgba(10, 13, 20, 0.04), 0 2px 6px -2px rgba(10, 13, 20, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .opp-card {
+  background: #0E121B;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.5);
+}
+
+.opp-card:hover {
+  border-color: rgba(10, 13, 20, 0.14);
+  box-shadow: 0 12px 32px -8px rgba(10, 13, 20, 0.08);
+}
+
+.dark .opp-card:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.7);
+}
+
+.opp-card-subtle {
+  background: #F4F5F8;
+  border: 1px solid rgba(10, 13, 20, 0.05);
+  border-radius: 24px;
+}
+
+.dark .opp-card-subtle {
+  background: #141824;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.opp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  border: 1px solid rgba(10, 13, 20, 0.08);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: #0A0D14;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.dark .opp-badge {
+  background: #161B26;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #F8FAFC;
+}
+
+.opp-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  background: #0A0D14;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(10, 13, 20, 0.12);
+}
+
+.dark .opp-btn-primary {
+  background: #FFFFFF;
+  color: #0A0D14;
+  box-shadow: 0 2px 12px rgba(255, 255, 255, 0.15);
+}
+
+.opp-btn-primary:hover {
+  background: #202430;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(10, 13, 20, 0.16);
+}
+
+.dark .opp-btn-primary:hover {
+  background: #E2E8F0;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
+}
+
+.opp-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  color: #0A0D14;
+  border: 1px solid rgba(10, 13, 20, 0.12);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.dark .opp-btn-secondary {
+  background: #141824;
+  color: #F8FAFC;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.opp-btn-secondary:hover {
+  background: #F4F5F8;
+  border-color: rgba(10, 13, 20, 0.2);
+}
+
+.dark .opp-btn-secondary:hover {
+  background: #1C2333;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.apple-btn-black,
+.apple-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.apple-btn-black {
+  background: #0A0D14;
+  color: #FFFFFF;
+  border: 1px solid rgba(10, 13, 20, 0.92);
+  box-shadow: 0 2px 8px rgba(10, 13, 20, 0.12);
+}
+
+.apple-btn-black:hover {
+  background: #202430;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(10, 13, 20, 0.16);
+}
+
+.dark .apple-btn-black {
+  background: #F8FAFC;
+  color: #0A0D14;
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 12px rgba(255, 255, 255, 0.12);
+}
+
+.dark .apple-btn-black:hover {
+  background: #E2E8F0;
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+}
+
+.apple-btn-secondary {
+  background: #FFFFFF;
+  color: #1D1D1F;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.apple-btn-secondary:hover {
+  background: #F5F5F7;
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+.dark .apple-btn-secondary {
+  background: #141824;
+  color: #F8FAFC;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.dark .apple-btn-secondary:hover {
+  background: #1C2333;
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+/* Dashboard dark-mode compatibility for existing light-first utility classes. */
+.dark .qp-dashboard .bg-white,
+.dark .qp-dashboard .bg-white\/80,
+.dark .qp-dashboard .bg-white\/95 {
+  background-color: rgba(12, 15, 23, 0.96);
+}
+
+.dark .qp-dashboard .bg-\[\#FAFAFC\],
+.dark .qp-dashboard .bg-\[\#FAFBFD\],
+.dark .qp-dashboard .bg-\[\#fafafc\],
+.dark .qp-dashboard .bg-\[\#f5f5f7\] {
+  background-color: #111722;
+}
+
+.dark .qp-dashboard .bg-\[\#F4F5F8\],
+.dark .qp-dashboard .bg-\[\#e8e8ed\] {
+  background-color: #171D2A;
+}
+
+.dark .qp-dashboard .hover\:bg-\[\#f5f5f7\]:hover,
+.dark .qp-dashboard .hover\:bg-\[\#F4F5F8\]:hover,
+.dark .qp-dashboard .hover\:bg-slate-100:hover,
+.dark .qp-dashboard .hover\:bg-black\/5:hover,
+.dark .qp-dashboard .hover\:bg-black\/\[0\.04\]:hover {
+  background-color: #1B2332;
+}
+
+.dark .qp-dashboard .text-\[\#1d1d1f\],
+.dark .qp-dashboard .text-\[\#0A0D14\],
+.dark .qp-dashboard .text-\[\#3a3a3c\],
+.dark .qp-dashboard .hover\:text-\[\#1d1d1f\]:hover,
+.dark .qp-dashboard .hover\:text-\[\#0A0D14\]:hover {
+  color: #F8FAFC;
+}
+
+.dark .qp-dashboard .text-\[\#86868b\],
+.dark .qp-dashboard .text-\[\#8C90A0\],
+.dark .qp-dashboard .text-\[\#6e6e73\],
+.dark .qp-dashboard .text-\[\#6E717D\],
+.dark .qp-dashboard .text-\[\#A5A8B4\],
+.dark .qp-dashboard .text-slate-500,
+.dark .qp-dashboard .text-slate-600 {
+  color: #A6B0C3;
+}
+
+.dark .qp-dashboard .border-black\/5,
+.dark .qp-dashboard .border-black\/10,
+.dark .qp-dashboard .border-black\/20,
+.dark .qp-dashboard .border-black\/\[0\.05\],
+.dark .qp-dashboard .border-black\/\[0\.06\],
+.dark .qp-dashboard .border-black\/\[0\.08\],
+.dark .qp-dashboard .border-black\/\[0\.1\] {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .qp-dashboard .divide-black\/5 > :not([hidden]) ~ :not([hidden]),
+.dark .qp-dashboard .divide-black\/10 > :not([hidden]) ~ :not([hidden]),
+.dark .qp-dashboard .divide-black\/\[0\.05\] > :not([hidden]) ~ :not([hidden]),
+.dark .qp-dashboard .divide-black\/\[0\.06\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .qp-dashboard .shadow-sm,
+.dark .qp-dashboard .shadow-md,
+.dark .qp-dashboard .shadow-lg,
+.dark .qp-dashboard .shadow-xl,
+.dark .qp-dashboard .shadow-2xl {
+  box-shadow: 0 18px 48px -28px rgba(0, 0, 0, 0.82);
+}
+
+.dark .qp-dashboard input,
+.dark .qp-dashboard textarea,
+.dark .qp-dashboard select {
+  background-color: #111722;
+  color: #F8FAFC;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark .qp-dashboard input::placeholder,
+.dark .qp-dashboard textarea::placeholder {
+  color: #6F7A8E;
+}
+
+.dark .qp-dashboard option {
+  background-color: #111722;
+  color: #F8FAFC;
+}
+
+.dark .qp-dashboard .bg-blue-50 {
+  background-color: rgba(37, 99, 235, 0.16);
+}
+
+.dark .qp-dashboard .border-blue-100,
+.dark .qp-dashboard .border-blue-200 {
+  border-color: rgba(96, 165, 250, 0.28);
+}
+
+.dark .qp-dashboard .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.14);
+}
+
+.dark .qp-dashboard .text-emerald-700,
+.dark .qp-dashboard .text-emerald-800,
+.dark .qp-dashboard .text-emerald-900 {
+  color: #5EEAD4;
+}
+
+.dark .qp-dashboard .border-emerald-200 {
+  border-color: rgba(94, 234, 212, 0.24);
+}
+
+.dark .qp-dashboard .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.14);
+}
+
+.dark .qp-dashboard .text-amber-700,
+.dark .qp-dashboard .text-amber-800 {
+  color: #FBBF24;
+}
+
+.dark .qp-dashboard .border-amber-200 {
+  border-color: rgba(251, 191, 36, 0.24);
+}
+
+.dark .qp-dashboard .bg-orange-100 {
+  background-color: rgba(249, 115, 22, 0.16);
+}
+
+.dark .qp-dashboard .text-orange-800 {
+  color: #FDBA74;
+}
+
+.dark .qp-dashboard .bg-slate-100 {
+  background-color: rgba(148, 163, 184, 0.12);
+}
+
+.dark .qp-dashboard .text-slate-800 {
+  color: #E2E8F0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}

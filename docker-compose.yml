@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  qivropay-payments:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: qivropay-payments-app
+    restart: always
+    ports:
+      - "4000:4000"
+    # All values below must come from the shell/CI environment or a
+    # docker-compose `.env` file that is NOT committed to source control.
+    # Phase 10 audit: this file previously shipped committed fallback
+    # defaults for CASHFREE_APP_ID, CASHFREE_ENV and (worst) a
+    # QIVROPAY_WEBHOOK_SECRET literal value ("whsec_qivropay_prod_991820")
+    # that would have silently made webhook signature verification trust a
+    # secret published in this public repository. There are no defaults now
+    # — an unset required variable is left empty so the app fails closed
+    # (server/index.js already refuses signup/login without DATABASE_URL,
+    # and returns 503 from the webhook route without a real webhook secret)
+    # instead of silently starting with a known, public value.
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - PUBLIC_URL=${PUBLIC_URL}
+      - CORS_ORIGIN=${CORS_ORIGIN}
+      - DATABASE_URL=${DATABASE_URL}
+      - QIVROPAY_SESSION_SECRET=${QIVROPAY_SESSION_SECRET}
+      - CASHFREE_APP_ID=${CASHFREE_APP_ID}
+      - CASHFREE_SECRET_KEY=${CASHFREE_SECRET_KEY}
+      # sandbox | production (see server/index.js normalizeCashfreeEnv — no
+      # other value is accepted, and an invalid one refuses to start).
+      - CASHFREE_ENV=${CASHFREE_ENV:-sandbox}
+      - CASHFREE_WEBHOOK_SECRET=${CASHFREE_WEBHOOK_SECRET}
+      - HOSTNAME=0.0.0.0
+    volumes:
+      - ./server/db.json:/app/server/db.json
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  default:
+    name: qivropay-network
