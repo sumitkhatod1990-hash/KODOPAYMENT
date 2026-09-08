@@ -34,9 +34,9 @@ export const Logo: React.FC<LogoProps> = ({
           }`}
         />
 
-        {/* Payment Infrastructure India Badge */}
+        {/* Payment Infrastructure Global Badge */}
         <span className="ml-2 text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 font-bold tracking-wider hidden sm:inline-block">
-          🇮🇳 India Payments
+          🌐 Global Payments
         </span>
       </div>
 
