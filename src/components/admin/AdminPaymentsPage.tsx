@@ -57,6 +57,7 @@ export const AdminPaymentsPage: React.FC = () => {
   const [debouncedSearch, setDebouncedSearch] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [envFilter, setEnvFilter] = useState<string>('all');
+  const [datePreset, setDatePreset] = useState<string>('all');
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
 
@@ -78,10 +79,32 @@ export const AdminPaymentsPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // Handle date preset change
+  const handleDatePresetChange = (preset: string) => {
+    setDatePreset(preset);
+    const now = new Date();
+    if (preset === 'all') {
+      setFromDate('');
+      setToDate('');
+    } else if (preset === '24h') {
+      const past = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      setFromDate(past.toISOString());
+      setToDate('');
+    } else if (preset === '7d') {
+      const past = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      setFromDate(past.toISOString());
+      setToDate('');
+    } else if (preset === '30d') {
+      const past = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      setFromDate(past.toISOString());
+      setToDate('');
+    }
+  };
+
   // Reset page on filter changes
   useEffect(() => {
     setPage(1);
-  }, [statusFilter, envFilter, fromDate, toDate]);
+  }, [statusFilter, envFilter, datePreset, fromDate, toDate]);
 
   const fetchPayments = async () => {
     setLoading(true);
@@ -94,7 +117,10 @@ export const AdminPaymentsPage: React.FC = () => {
       if (envFilter !== 'all') params.set('environment', envFilter);
       if (debouncedSearch) params.set('search', debouncedSearch);
       if (fromDate) params.set('from', fromDate);
-      if (toDate) params.set('to', toDate);
+      if (toDate) {
+        const toVal = toDate.length === 10 ? `${toDate}T23:59:59.999Z` : toDate;
+        params.set('to', toVal);
+      }
 
       const res = await fetch(`/api/v1/admin/payments?${params.toString()}`, {
         credentials: 'include',
@@ -140,6 +166,7 @@ export const AdminPaymentsPage: React.FC = () => {
     setDebouncedSearch('');
     setStatusFilter('all');
     setEnvFilter('all');
+    setDatePreset('all');
     setFromDate('');
     setToDate('');
     setPage(1);
@@ -149,6 +176,7 @@ export const AdminPaymentsPage: React.FC = () => {
     debouncedSearch ||
     statusFilter !== 'all' ||
     envFilter !== 'all' ||
+    datePreset !== 'all' ||
     fromDate ||
     toDate
   );
@@ -224,7 +252,7 @@ export const AdminPaymentsPage: React.FC = () => {
 
         <div className="p-3.5 rounded-2xl bg-[#0F172A] border border-slate-800/80">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-slate-400 font-medium">Settled Volume (In View)</span>
+            <span className="text-[11px] text-slate-400 font-medium">Payment Volume (In View)</span>
             <TrendingUp className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-lg font-bold text-white font-mono mt-1">
@@ -307,15 +335,20 @@ export const AdminPaymentsPage: React.FC = () => {
             </select>
           </div>
 
-          {/* Date Range / Reset */}
+          {/* Date Range Preset */}
           <div className="flex items-center gap-2">
-            <input
-              type="date"
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-              aria-label="From date"
-              className="w-full py-2 px-2 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-emerald-500"
-            />
+            <select
+              value={datePreset}
+              onChange={(e) => handleDatePresetChange(e.target.value)}
+              aria-label="Filter by date range"
+              className="w-full py-2 px-3 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
+            >
+              <option value="all">All Time</option>
+              <option value="24h">Last 24 Hours</option>
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+              <option value="custom">Custom Range...</option>
+            </select>
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
@@ -327,6 +360,41 @@ export const AdminPaymentsPage: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* Custom Date Range Inputs */}
+        {datePreset === 'custom' && (
+          <div className="flex flex-wrap items-center gap-3 pt-2.5 border-t border-slate-800/80">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-xs text-slate-400 font-medium">From:</span>
+              <input
+                type="date"
+                value={fromDate.slice(0, 10)}
+                onChange={(e) => setFromDate(e.target.value)}
+                aria-label="From date"
+                className="py-1.5 px-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400 font-medium">To:</span>
+              <input
+                type="date"
+                value={toDate.slice(0, 10)}
+                onChange={(e) => setToDate(e.target.value)}
+                aria-label="To date"
+                className="py-1.5 px-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+            {(fromDate || toDate) && (
+              <button
+                onClick={() => { setFromDate(''); setToDate(''); }}
+                className="text-xs text-slate-400 hover:text-white underline ml-1"
+              >
+                Clear Dates
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Error Banner */}

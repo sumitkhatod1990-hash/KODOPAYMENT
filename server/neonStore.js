@@ -2203,10 +2203,10 @@ export async function listAdminClients({ page = 1, pageSize = 25, search = '', s
 
   if (q) {
     users = users.filter(u =>
-      u.id.toLowerCase().includes(q) ||
-      u.name.toLowerCase().includes(q) ||
-      u.email.toLowerCase().includes(q) ||
-      u.company.toLowerCase().includes(q)
+      String(u.id || '').toLowerCase().includes(q) ||
+      String(u.name || '').toLowerCase().includes(q) ||
+      String(u.email || '').toLowerCase().includes(q) ||
+      String(u.company || '').toLowerCase().includes(q)
     );
   }
   if (from) {

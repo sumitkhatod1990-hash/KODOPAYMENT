@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import crypto from 'crypto';
 
 const RUN_ID = crypto.randomBytes(4).toString('hex');
-const PORT = 5050 + crypto.randomInt(0, 30);
+const PORT = 5200 + crypto.randomInt(0, 150);
 
 process.env.PORT = String(PORT);
 process.env.NODE_ENV = 'test';
@@ -50,7 +50,7 @@ function adminCookieFrom(res) {
 }
 
 async function waitForServer() {
-  const deadline = Date.now() + 15000;
+  const deadline = Date.now() + 20000;
   while (Date.now() < deadline) {
     try {
       const res = await fetch(`${BASE}/api/v1/health`);
