@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { formatINR, navigateAdmin } from '../../utils/adminDomain';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 import {
   CreditCard,
   ArrowLeft,
@@ -10,6 +11,7 @@ import {
   ExternalLink,
   LifeBuoy,
   AlertCircle,
+  AlertTriangle,
   Copy,
   Check,
   RefreshCw,
@@ -21,7 +23,9 @@ import {
   RotateCcw,
   CheckCircle2,
   FileCheck,
-  Scale
+  Scale,
+  Activity,
+  Loader2
 } from 'lucide-react';
 
 interface Props {
@@ -90,6 +94,9 @@ interface PaymentDetail {
   currency: string;
   status: string;
   createdAt: string;
+  updatedAt?: string | null;
+  isStale?: boolean;
+  staleReason?: string | null;
   environment: 'sandbox' | 'production' | string;
   merchant: MerchantInfo;
   customer: CustomerInfo;
@@ -101,10 +108,18 @@ interface PaymentDetail {
 }
 
 export const AdminPaymentDetailPage: React.FC<Props> = ({ paymentId }) => {
+  const { adminUser } = useAdminAuth();
+  const canOperate = adminUser?.role === 'super_admin' || adminUser?.role === 'compliance_officer';
+
   const [payment, setPayment] = useState<PaymentDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const [refreshingStatus, setRefreshingStatus] = useState<boolean>(false);
+  const [refreshingRecon, setRefreshingRecon] = useState<boolean>(false);
+  const [operationSuccess, setOperationSuccess] = useState<string | null>(null);
+  const [operationError, setOperationError] = useState<string | null>(null);
 
   const fetchPaymentDetail = async () => {
     setLoading(true);
@@ -148,6 +163,62 @@ export const AdminPaymentDetailPage: React.FC<Props> = ({ paymentId }) => {
     navigator.clipboard.writeText(text);
     setCopiedField(fieldId);
     setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const handleRefreshStatus = async () => {
+    if (!payment || refreshingStatus || refreshingRecon) return;
+    setRefreshingStatus(true);
+    setOperationSuccess(null);
+    setOperationError(null);
+    try {
+      const res = await fetch(`/api/v1/admin/payments/${encodeURIComponent(payment.id)}/refresh-status`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' }
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || `Failed to refresh status (HTTP ${res.status})`);
+      }
+      if (json.data) {
+        setPayment(json.data);
+      }
+      setOperationSuccess(json.message || 'Payment status refreshed successfully from Cashfree gateway.');
+    } catch (err: any) {
+      setOperationError(err.message || 'Failed to refresh payment status.');
+    } finally {
+      setRefreshingStatus(false);
+    }
+  };
+
+  const handleRefreshReconciliation = async () => {
+    if (!payment || refreshingStatus || refreshingRecon) return;
+    if (payment.status !== 'succeeded') {
+      setOperationError('Only succeeded payments can be reconciled against Cashfree settlements.');
+      return;
+    }
+    setRefreshingRecon(true);
+    setOperationSuccess(null);
+    setOperationError(null);
+    try {
+      const res = await fetch(`/api/v1/admin/payments/${encodeURIComponent(payment.id)}/refresh-reconciliation`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' }
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || `Failed to refresh reconciliation (HTTP ${res.status})`);
+      }
+      if (json.data) {
+        setPayment(json.data);
+      }
+      setOperationSuccess(json.message || 'Reconciliation refreshed successfully from Cashfree.');
+    } catch (err: any) {
+      setOperationError(err.message || 'Failed to refresh settlement reconciliation.');
+    } finally {
+      setRefreshingRecon(false);
+    }
   };
 
   const getStatusPill = (status: string) => {
@@ -290,9 +361,9 @@ export const AdminPaymentDetailPage: React.FC<Props> = ({ paymentId }) => {
               <span className="capitalize">{payment.environment}</span>
             </span>
 
-            {/* Read-Only Badge */}
+            {/* Operations / Read-Only Badge */}
             <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/60">
-              Read-Only
+              {canOperate ? 'Operations Console' : 'Read-Only'}
             </span>
           </div>
 
@@ -517,7 +588,160 @@ export const AdminPaymentDetailPage: React.FC<Props> = ({ paymentId }) => {
             </div>
           </div>
 
-          {/* 5. Refund Information (Read-Only) */}
+          {/* 5. Payment Operations */}
+          <div className="p-5 rounded-2xl bg-[#0F172A] border border-slate-800/80 shadow-xl space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <Activity className="w-4 h-4 text-emerald-400" />
+                Payment Operations
+              </h3>
+              <span className="text-[11px] font-mono text-slate-400">
+                {payment.orderId}
+              </span>
+            </div>
+
+            {/* Status & Health Indicators */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800 space-y-1">
+                <div className="text-[11px] text-slate-400 font-medium">Authoritative Status</div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full border font-semibold ${getStatusPill(payment.status)}`}>
+                    {payment.status}
+                  </span>
+                  {payment.isStale && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full border bg-amber-500/15 text-amber-300 border-amber-500/30 font-semibold flex items-center gap-1">
+                      <AlertTriangle className="w-2.5 h-2.5" />
+                      Potentially Stale
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800 space-y-1">
+                <div className="text-[11px] text-slate-400 font-medium">Reconciliation Verdict</div>
+                <div className="flex items-center gap-2">
+                  {payment.reconciliation ? (
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full border font-semibold ${getReconBadge(payment.reconciliation.state)}`}>
+                      {payment.reconciliation.state}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full border bg-slate-800 text-slate-400 border-slate-700 font-mono">
+                      NOT_RECONCILED
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800 space-y-1">
+                <div className="text-[11px] text-slate-400 font-medium">Last Status Update</div>
+                <div className="font-mono text-slate-300 text-[11px]">
+                  {payment.updatedAt ? new Date(payment.updatedAt).toLocaleString() : (payment.createdAt ? new Date(payment.createdAt).toLocaleString() : '—')}
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-900/70 border border-slate-800 space-y-1">
+                <div className="text-[11px] text-slate-400 font-medium">Settlement Status</div>
+                <div className="font-mono text-slate-300 text-[11px]">
+                  {payment.settlement ? (
+                    <span className="text-emerald-400 font-semibold">{payment.settlement.status || 'SETTLED'}</span>
+                  ) : (
+                    <span className="text-slate-500">Pending settlement</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Stale warning banner if applicable */}
+            {payment.isStale && payment.staleReason && (
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
+                <div>
+                  <span className="font-semibold">Staleness Note: </span>
+                  {payment.staleReason}
+                </div>
+              </div>
+            )}
+
+            {/* Success / Error Feedback */}
+            {operationSuccess && (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <span>{operationSuccess}</span>
+                </div>
+                <button onClick={() => setOperationSuccess(null)} className="text-emerald-400 hover:text-emerald-200 text-xs font-bold px-1">✕</button>
+              </div>
+            )}
+
+            {operationError && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+                  <span>{operationError}</span>
+                </div>
+                <button onClick={() => setOperationError(null)} className="text-rose-400 hover:text-rose-200 text-xs font-bold px-1">✕</button>
+              </div>
+            )}
+
+            {/* Operational Controls / Buttons */}
+            <div className="pt-2 border-t border-slate-800/80 space-y-2">
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <button
+                  onClick={handleRefreshStatus}
+                  disabled={!canOperate || refreshingStatus || refreshingRecon}
+                  className={`flex-1 py-2.5 px-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 border ${
+                    canOperate
+                      ? 'bg-blue-600/90 hover:bg-blue-600 text-white border-blue-500/40 shadow-lg shadow-blue-500/10 disabled:opacity-50'
+                      : 'bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed'
+                  }`}
+                >
+                  {refreshingStatus ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Querying Cashfree Gateway...</span>
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      <span>Refresh Payment Status</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={handleRefreshReconciliation}
+                  disabled={!canOperate || payment.status !== 'succeeded' || refreshingStatus || refreshingRecon}
+                  className={`flex-1 py-2.5 px-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 border ${
+                    canOperate && payment.status === 'succeeded'
+                      ? 'bg-emerald-600/90 hover:bg-emerald-600 text-white border-emerald-500/40 shadow-lg shadow-emerald-500/10 disabled:opacity-50'
+                      : 'bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed'
+                  }`}
+                  title={payment.status !== 'succeeded' ? 'Reconciliation applies only to succeeded payments' : 'Query and reconcile Cashfree settlement status'}
+                >
+                  {refreshingRecon ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Reconciling Settlement...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Scale className="w-3.5 h-3.5" />
+                      <span>Refresh Reconciliation</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {!canOperate && (
+                <div className="text-[11px] text-slate-500 italic pt-1 flex items-center gap-1.5">
+                  <Shield className="w-3 h-3 text-slate-600" />
+                  Payment status & reconciliation operations are restricted to Super Admin and Compliance Officer roles.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 6. Refund Information (Read-Only) */}
           <div className="p-5 rounded-2xl bg-[#0F172A] border border-slate-800/80 shadow-xl space-y-3">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-slate-800/80">
               <RotateCcw className="w-4 h-4 text-indigo-400" />
@@ -570,7 +794,7 @@ export const AdminPaymentDetailPage: React.FC<Props> = ({ paymentId }) => {
             )}
           </div>
 
-          {/* 6. Settlement & Reconciliation Card */}
+          {/* 7. Settlement & Reconciliation Card */}
           <div className="p-5 rounded-2xl bg-[#0F172A] border border-slate-800/80 shadow-xl space-y-3">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-slate-800/80">
               <Scale className="w-4 h-4 text-emerald-400" />
@@ -580,25 +804,28 @@ export const AdminPaymentDetailPage: React.FC<Props> = ({ paymentId }) => {
             {/* Reconciliation section */}
             <div className="space-y-2 pb-3 border-b border-slate-800/60 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Reconciliation State</span>
+                <span className="text-slate-400">Reconciliation Verdict</span>
                 {payment.reconciliation ? (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${getReconBadge(payment.reconciliation.state)}`}>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full border font-semibold ${getReconBadge(payment.reconciliation.state)}`}>
                     {payment.reconciliation.state}
                   </span>
                 ) : (
-                  <span className="text-slate-500 font-mono text-[11px]">NOT_EVALUATED</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full border bg-slate-800 text-slate-400 border-slate-700 font-mono">
+                    PENDING
+                  </span>
                 )}
               </div>
 
               {payment.reconciliation?.discrepancy && (
-                <div className="text-[11px] text-rose-400 bg-rose-950/30 p-2.5 rounded-xl border border-rose-900/40">
+                <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-[11px]">
+                  <span className="font-semibold text-rose-400">Discrepancy: </span>
                   {payment.reconciliation.discrepancy}
                 </div>
               )}
 
               {payment.reconciliation?.lastCheckedAt && (
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500">Recon Evaluated</span>
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-slate-500">Last Reconciled</span>
                   <span className="font-mono text-slate-400 text-[10px]">
                     {new Date(payment.reconciliation.lastCheckedAt).toLocaleString()}
                   </span>
@@ -608,17 +835,17 @@ export const AdminPaymentDetailPage: React.FC<Props> = ({ paymentId }) => {
 
             {/* Settlement section */}
             {payment.settlement ? (
-              <div className="space-y-2.5 text-xs pt-1">
+              <div className="space-y-2.5 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Settlement ID</span>
-                  <span className="font-mono text-slate-200">{payment.settlement.cfSettlementId}</span>
+                  <span className="text-slate-400">Settlement Status</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full border bg-emerald-500/15 text-emerald-400 border-emerald-500/30 font-semibold uppercase">
+                    {payment.settlement.status || 'SETTLED'}
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Settlement Status</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full border bg-emerald-500/15 text-emerald-400 border-emerald-500/30 font-semibold">
-                    {payment.settlement.status}
-                  </span>
+                  <span className="text-slate-400">Cashfree Settlement ID</span>
+                  <span className="font-mono text-slate-300">{payment.settlement.cfSettlementId}</span>
                 </div>
 
                 {payment.settlement.settlementUtr && (
@@ -651,7 +878,7 @@ export const AdminPaymentDetailPage: React.FC<Props> = ({ paymentId }) => {
             )}
           </div>
 
-          {/* 7. Related Support Tickets Card */}
+          {/* 8. Related Support Tickets Card */}
           <div className="p-5 rounded-2xl bg-[#0F172A] border border-slate-800/80 shadow-xl space-y-3">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-slate-800/80">
               <LifeBuoy className="w-4 h-4 text-purple-400" />

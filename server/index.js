@@ -642,10 +642,14 @@ const ROLES_ALL = ['super_admin', 'compliance_officer', 'support_agent', 'read_o
 const ROLES_OVERVIEW = ROLES_ALL;
 const ROLES_CLIENTS = ROLES_ALL;
 const ROLES_PAYMENTS = ROLES_ALL;
+const ROLES_PAYMENT_OPERATIONS = ['super_admin', 'compliance_officer'];
 const ROLES_ONBOARDING_READ = ['super_admin', 'compliance_officer', 'read_only'];
 const ROLES_ONBOARDING_SYNC = ['super_admin', 'compliance_officer'];
 const ROLES_AUDIT_LOGS = ['super_admin', 'compliance_officer', 'read_only'];
 const ROLES_SUPPORT = ['super_admin', 'support_agent'];
+
+const inFlightStatusRefreshes = new Map();
+const inFlightReconRefreshes = new Map();
 
 // 1. Overview API
 app.get('/api/v1/admin/overview/stats', guardAdminHost, requireAdminAuth(ROLES_OVERVIEW), ah(async (req, res) => {
@@ -683,6 +687,247 @@ app.get('/api/v1/admin/payments/:paymentId', guardAdminHost, requireAdminAuth(RO
     return res.status(404).json({ success: false, error: 'Payment record not found' });
   }
   res.json({ success: true, data: payment });
+}));
+
+// 4b. Refresh Payment Status (Authoritative Gateway Verification)
+app.post('/api/v1/admin/payments/:paymentId/refresh-status', guardAdminHost, requireAdminAuth(ROLES_PAYMENT_OPERATIONS), ah(async (req, res) => {
+  const payment = await getAdminPaymentById(req.params.paymentId);
+  if (!payment) {
+    return res.status(404).json({ success: false, error: 'Payment record not found' });
+  }
+
+  const merchantId = payment.merchant?.id;
+  const orderId = payment.orderId || payment.id;
+  if (!merchantId || !orderId) {
+    return res.status(400).json({ success: false, error: 'Payment missing required order or merchant identifiers' });
+  }
+
+  const lockKey = `${merchantId}:${orderId}`;
+  if (inFlightStatusRefreshes.has(lockKey)) {
+    try {
+      await inFlightStatusRefreshes.get(lockKey);
+    } catch {}
+    const updated = await getAdminPaymentById(req.params.paymentId);
+    return res.json({ success: true, data: updated, message: 'Payment status refreshed successfully' });
+  }
+
+  const { appId, secretKey } = cashfreeCredentials();
+  if (!appId || !secretKey) {
+    return res.status(503).json({ success: false, error: 'Cashfree gateway credentials are not configured on server' });
+  }
+
+  const refreshPromise = (async () => {
+    let cfResponse;
+    let cfData;
+    try {
+      cfResponse = await fetch(`${cashfreeBaseUrl()}/orders/${encodeURIComponent(orderId)}`, {
+        headers: {
+          'x-api-version': CASHFREE_API_VERSION,
+          'x-client-id': appId,
+          'x-client-secret': secretKey,
+          'Content-Type': 'application/json'
+        }
+      });
+      cfData = await cfResponse.json();
+    } catch (err) {
+      await recordAdminAuditLog({
+        adminId: req.adminUser.id,
+        action: 'PAYMENT_STATUS_REFRESH',
+        targetMerchantId: merchantId,
+        targetResourceId: orderId,
+        details: {
+          previousStatus: payment.status,
+          outcome: 'failed',
+          error: 'Cashfree gateway request failed: ' + (err.message || 'Network error')
+        },
+        ipAddress: req.ip
+      });
+      const error = new Error('Cashfree gateway is temporarily unreachable');
+      error.status = 502;
+      throw error;
+    }
+
+    if (!cfResponse.ok) {
+      await recordAdminAuditLog({
+        adminId: req.adminUser.id,
+        action: 'PAYMENT_STATUS_REFRESH',
+        targetMerchantId: merchantId,
+        targetResourceId: orderId,
+        details: {
+          previousStatus: payment.status,
+          gatewayHttpStatus: cfResponse.status,
+          outcome: 'failed',
+          error: cfData?.message || 'Cashfree order lookup failed'
+        },
+        ipAddress: req.ip
+      });
+      const error = new Error(cfData?.message || 'Cashfree order lookup failed');
+      error.status = cfResponse.status >= 500 ? 502 : 400;
+      throw error;
+    }
+
+    const providerStatus = String(cfData.order_status || '').toUpperCase();
+    const paid = providerStatus === 'PAID';
+    const isTerminalFailure = ['FAILED', 'EXPIRED', 'CANCELLED'].includes(providerStatus);
+    const amount = Number(cfData.order_amount ?? payment.amount);
+    const currency = cfData.order_currency || payment.currency || 'INR';
+    const customerEmail = cfData.customer_details?.customer_email || payment.customer?.email || '';
+    const customerName = cfData.customer_details?.customer_name || payment.customer?.name || 'Customer';
+
+    if (paid || isTerminalFailure) {
+      await recordCashfreeOrderOutcome(merchantId, orderId, {
+        amount,
+        currency,
+        customerEmail,
+        customerName,
+        productName: 'QivroPay payment',
+        succeeded: paid
+      });
+      const tx = await getResource(merchantId, 'transaction', String(orderId));
+      if (tx) {
+        await saveResource(merchantId, 'transaction', {
+          ...tx,
+          gatewayStatus: providerStatus,
+          cfOrderId: cfData.cf_order_id || tx.cfOrderId || null,
+          cfPaymentId: cfData.cf_payment_id || tx.cfPaymentId || null,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } else {
+      const tx = await getResource(merchantId, 'transaction', String(orderId));
+      if (tx) {
+        await saveResource(merchantId, 'transaction', {
+          ...tx,
+          gatewayStatus: providerStatus,
+          cfOrderId: cfData.cf_order_id || tx.cfOrderId || null,
+          cfPaymentId: cfData.cf_payment_id || tx.cfPaymentId || null,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    }
+
+    const updatedPayment = await getAdminPaymentById(req.params.paymentId);
+
+    await recordAdminAuditLog({
+      adminId: req.adminUser.id,
+      action: 'PAYMENT_STATUS_REFRESH',
+      targetMerchantId: merchantId,
+      targetResourceId: orderId,
+      details: {
+        previousStatus: payment.status,
+        newStatus: updatedPayment?.status || payment.status,
+        gatewayStatus: providerStatus,
+        cfOrderId: cfData.cf_order_id || null,
+        outcome: 'success'
+      },
+      ipAddress: req.ip
+    });
+
+    return updatedPayment;
+  })();
+
+  inFlightStatusRefreshes.set(lockKey, refreshPromise);
+  try {
+    const updatedPayment = await refreshPromise;
+    res.json({ success: true, data: updatedPayment, message: 'Payment status refreshed successfully from Cashfree gateway' });
+  } catch (err) {
+    res.status(err.status || 502).json({ success: false, error: err.message || 'Payment status refresh failed' });
+  } finally {
+    inFlightStatusRefreshes.delete(lockKey);
+  }
+}));
+
+// 4c. Refresh Payment Reconciliation (Authoritative Settlement Verification)
+app.post('/api/v1/admin/payments/:paymentId/refresh-reconciliation', guardAdminHost, requireAdminAuth(ROLES_PAYMENT_OPERATIONS), ah(async (req, res) => {
+  const payment = await getAdminPaymentById(req.params.paymentId);
+  if (!payment) {
+    return res.status(404).json({ success: false, error: 'Payment record not found' });
+  }
+
+  const merchantId = payment.merchant?.id;
+  const orderId = payment.orderId || payment.id;
+  if (!merchantId || !orderId) {
+    return res.status(400).json({ success: false, error: 'Payment missing required order or merchant identifiers' });
+  }
+
+  if (payment.status !== 'succeeded') {
+    return res.status(400).json({
+      success: false,
+      error: 'Only a succeeded payment can be reconciled against Cashfree settlements'
+    });
+  }
+
+  const lockKey = `${merchantId}:${orderId}`;
+  if (inFlightReconRefreshes.has(lockKey)) {
+    try {
+      await inFlightReconRefreshes.get(lockKey);
+    } catch {}
+    const updated = await getAdminPaymentById(req.params.paymentId);
+    return res.json({ success: true, data: updated, message: 'Reconciliation refreshed successfully' });
+  }
+
+  const reconPromise = (async () => {
+    let reconResult;
+    try {
+      reconResult = await reconcilePayment(merchantId, orderId);
+    } catch (err) {
+      if (err instanceof ReconciliationError) {
+        const error = new Error(err.message);
+        error.status = 400;
+        error.code = err.code;
+        throw error;
+      }
+      await recordAdminAuditLog({
+        adminId: req.adminUser.id,
+        action: 'RECONCILIATION_REFRESH',
+        targetMerchantId: merchantId,
+        targetResourceId: orderId,
+        details: {
+          previousReconciliationState: payment.reconciliation?.state || null,
+          outcome: 'failed',
+          error: err.message || 'Reconciliation service error'
+        },
+        ipAddress: req.ip
+      });
+      const error = new Error('Failed to refresh settlement reconciliation from Cashfree');
+      error.status = 502;
+      throw error;
+    }
+
+    const updatedPayment = await getAdminPaymentById(req.params.paymentId);
+
+    await recordAdminAuditLog({
+      adminId: req.adminUser.id,
+      action: 'RECONCILIATION_REFRESH',
+      targetMerchantId: merchantId,
+      targetResourceId: orderId,
+      details: {
+        previousReconciliationState: payment.reconciliation?.state || null,
+        newReconciliationState: reconResult.state,
+        discrepancy: reconResult.discrepancy || null,
+        cfSettlementId: reconResult.cfSettlementId || null,
+        outcome: 'success'
+      },
+      ipAddress: req.ip
+    });
+
+    return { updatedPayment, reconResult };
+  })();
+
+  inFlightReconRefreshes.set(lockKey, reconPromise);
+  try {
+    const { updatedPayment, reconResult } = await reconPromise;
+    res.json({
+      success: true,
+      data: updatedPayment,
+      reconciliation: reconResult,
+      message: 'Reconciliation refreshed successfully'
+    });
+  } catch (err) {
+    res.status(err.status || 502).json({ success: false, error: err.message || 'Reconciliation refresh failed' });
+  } finally {
+    inFlightReconRefreshes.delete(lockKey);
+  }
 }));
 
 // 5. Onboarding / KYC Queue API

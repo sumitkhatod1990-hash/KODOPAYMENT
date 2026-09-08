@@ -2733,6 +2733,22 @@ export async function getAdminPaymentById(paymentId) {
     }
   }
 
+  const updatedAt = p.updatedAt || p.createdAt || transactionRow.created_at || null;
+
+  let isStale = false;
+  let staleReason = null;
+  const isPendingStatus = ['pending', 'created', 'active', 'open', 'initiated'].includes(String(status).toLowerCase());
+  const createdTime = new Date(createdAt).getTime();
+  const thirtyMinutesAgo = Date.now() - 30 * 60 * 1000;
+
+  if (recon?.stale) {
+    isStale = true;
+    staleReason = 'Reconciliation state is stale due to unreachable gateway settlement data.';
+  } else if (isPendingStatus && Number.isFinite(createdTime) && createdTime < thirtyMinutesAgo) {
+    isStale = true;
+    staleReason = 'Payment remains pending beyond standard 30-minute checkout session window.';
+  }
+
   return {
     id: transactionRow.id,
     orderId,
@@ -2740,6 +2756,9 @@ export async function getAdminPaymentById(paymentId) {
     currency,
     status,
     createdAt,
+    updatedAt,
+    isStale,
+    staleReason,
     environment,
     merchant,
     customer,

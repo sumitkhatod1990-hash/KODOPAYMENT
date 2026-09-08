@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { saveResource, listResources, claimOrderCredited } from './neonStore.js';
+import { getResource, saveResource, listResources, claimOrderCredited } from './neonStore.js';
 
 const newCustomerId = () => `cus_${crypto.randomBytes(10).toString('hex')}`;
 
@@ -21,20 +21,37 @@ const newCustomerId = () => `cus_${crypto.randomBytes(10).toString('hex')}`;
 // before either has written back. See neonStore.js for why the claim is
 // safe where that check was not.
 export async function recordCashfreeOrderOutcome(merchantId, orderId, { amount, currency, customerEmail, customerName, productName, succeeded }) {
+  const existing = await getResource(merchantId, 'transaction', String(orderId));
+  const hasExistingRefund = existing && (
+    existing.status === 'refunded' ||
+    existing.status === 'partially_refunded' ||
+    existing.refundStatus === 'SUCCESS' ||
+    Number(existing.refundedAmount || existing.refundAmount || 0) > 0
+  );
+
+  const status = hasExistingRefund
+    ? existing.status
+    : (succeeded ? 'succeeded' : 'failed');
+
+  const now = new Date().toISOString();
+  const txAmount = (typeof amount === 'number' && !Number.isNaN(amount)) ? amount : (existing?.amount || 0);
+
   const transaction = {
+    ...existing,
     id: String(orderId),
-    provider: 'cashfree',
-    amount,
-    currency: currency || 'INR',
-    status: succeeded ? 'succeeded' : 'failed',
-    customerEmail: customerEmail || '',
-    customerName: customerName || 'Customer',
-    productName: productName || 'QivroPay payment',
-    paymentMethod: 'cashfree',
-    fee: 0,
-    net: succeeded ? amount : 0,
-    country: 'IN',
-    createdAt: new Date().toISOString()
+    provider: existing?.provider || 'cashfree',
+    amount: txAmount,
+    currency: currency || existing?.currency || 'INR',
+    status,
+    customerEmail: customerEmail || existing?.customerEmail || '',
+    customerName: customerName || existing?.customerName || 'Customer',
+    productName: productName || existing?.productName || 'QivroPay payment',
+    paymentMethod: existing?.paymentMethod || 'cashfree',
+    fee: existing?.fee ?? 0,
+    net: succeeded ? txAmount : (existing?.net ?? 0),
+    country: existing?.country || 'IN',
+    createdAt: existing?.createdAt || now,
+    updatedAt: now
   };
   await saveResource(merchantId, 'transaction', transaction);
 
