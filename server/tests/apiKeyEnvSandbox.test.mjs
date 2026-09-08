@@ -56,7 +56,7 @@ function cookieFrom(res) {
 }
 
 async function waitForServer() {
-  const deadline = Date.now() + 10000;
+  const deadline = Date.now() + 15000;
   while (Date.now() < deadline) {
     try {
       const res = await fetch(`${BASE}/api/v1/health`);

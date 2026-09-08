@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { AppProvider } from './context/AppContext';
 import { AuthProvider } from './context/AuthContext';
+import { isAdminDomain } from './utils/adminDomain';
+import { AdminAuthProvider } from './context/AdminAuthContext';
+import { AdminApp } from './components/admin/AdminApp';
 import './index.css';
 
 interface ErrorBoundaryProps {
@@ -94,14 +97,22 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 }
 
+const isClientPortal = isAdminDomain();
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <AuthProvider>
-        <AppProvider>
-          <App />
-        </AppProvider>
-      </AuthProvider>
+      {isClientPortal ? (
+        <AdminAuthProvider>
+          <AdminApp />
+        </AdminAuthProvider>
+      ) : (
+        <AuthProvider>
+          <AppProvider>
+            <App />
+          </AppProvider>
+        </AuthProvider>
+      )}
     </ErrorBoundary>
   </React.StrictMode>
 );

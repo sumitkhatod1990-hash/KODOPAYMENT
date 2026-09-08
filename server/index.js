@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
-import { ensurePaymentStore, recordCashfreeWebhook, recordPaymentOrder, getPaymentOrderForSession, getPaymentOrder, ensureAuthStore, createUser, findUserByEmail, checkUserPassword, createAuthSession, getUserForSession, deleteAuthSession, upsertGoogleUser, createCheckoutSession, getCheckoutSession, saveResource, listResources, getResource, deleteResource, findApiKey, persistenceMode, beginRefundClaim, releaseRefundClaim, claimWelcomeEmail } from './neonStore.js';
+import { ensurePaymentStore, recordCashfreeWebhook, recordPaymentOrder, getPaymentOrderForSession, getPaymentOrder, ensureAuthStore, createUser, findUserByEmail, checkUserPassword, createAuthSession, getUserForSession, deleteAuthSession, upsertGoogleUser, createCheckoutSession, getCheckoutSession, saveResource, listResources, getResource, deleteResource, findApiKey, persistenceMode, beginRefundClaim, releaseRefundClaim, claimWelcomeEmail, ensureAdminStore, createAdminUser, findAdminUserByEmail, findAdminUserById, listAdminUsers, checkAdminPassword, createAdminSession, getAdminUserForSession, deleteAdminSession, recordAdminAuditLog, listAdminAuditLogs, bootstrapAdminUser, createSupportTicket, listSupportTickets, getSupportTicketById, addSupportTicketReply, updateSupportTicketStatus, saveSupportChatSession, listSupportChatSessions, getSupportChatSession, findUserById, getAdminOverviewStats, listAdminClients, getAdminClient360, listAdminPayments, getAdminPaymentById, listAdminOnboarding, listAdminAuditLogsFiltered, listAdminTicketsFiltered, updateSupportTicketPriority, listAdminChatLogs, getPartnerMerchantMapping } from './neonStore.js';
 import { verifyGoogleIdToken, googleClientId } from './googleAuth.js';
 import { applyRefundStatus } from './cashfreeRefundOutcome.js';
 import { recordCashfreeOrderOutcome } from './cashfreeOrderOutcome.js';
@@ -163,7 +163,101 @@ const supportChatRateLimit = createRateLimiter({ windowMs: 10 * 60 * 1000, max: 
 // to the Vite dev server origin so cookies can also be sent on direct
 // (non-proxied) cross-origin requests during testing (e.g. curl, Postman).
 const CORS_ORIGIN = process.env.CORS_ORIGIN || PUBLIC_URL || 'http://localhost:3000';
-app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
+const allowedOrigins = new Set([
+  CORS_ORIGIN,
+  PUBLIC_URL,
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'https://qivropay.com',
+  'https://client.qivropay.com'
+].filter(Boolean));
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.has(origin) || Array.from(allowedOrigins).some(allowed => origin === allowed || origin.endsWith(allowed.replace(/^https?:\/\//, '')))) {
+      return callback(null, true);
+    }
+    if (process.env.NODE_ENV !== 'production') return callback(null, true);
+    return callback(new Error('Not allowed by CORS'), false);
+  },
+  credentials: true
+}));
+
+// Normalized hostname extraction helper (handles IPv6 brackets, ports, and forwarded lists)
+function extractHostname(rawHost) {
+  if (!rawHost || typeof rawHost !== 'string') return '';
+  const first = rawHost.split(',')[0].trim().toLowerCase();
+  if (first.startsWith('[')) {
+    const endBracket = first.indexOf(']');
+    return endBracket !== -1 ? first.slice(1, endBracket) : first;
+  }
+  return first.split(':')[0].trim();
+}
+
+const PRODUCTION_ADMIN_HOST = 'client.qivropay.com';
+const PRODUCTION_MERCHANT_HOSTS = new Set(['qivropay.com', 'www.qivropay.com']);
+
+// Phase 2a: Subdomain / Host Header dispatch & isolation
+app.use((req, res, next) => {
+  const rawHost = req.headers['x-forwarded-host'] || req.headers.host || '';
+  const hostname = extractHostname(rawHost);
+  req.normalizedHost = hostname;
+  // Exact normalized match — never prefix or startsWith matching!
+  req.isAdminHost = hostname === PRODUCTION_ADMIN_HOST;
+  next();
+});
+
+// Enforce host boundary isolation across all routes:
+// 1. client.qivropay.com must NEVER serve merchant routes (only /api/v1/health and /api/v1/admin/*)
+// 2. merchant hosts (qivropay.com, www.qivropay.com) must NEVER serve admin routes (/api/v1/admin/*)
+app.use((req, res, next) => {
+  const currentPath = req.path || req.url || '';
+  const originalUrl = req.originalUrl || '';
+
+  if (req.isAdminHost) {
+    const isHealthCheck = currentPath === '/api/v1/health' || originalUrl.startsWith('/api/v1/health');
+    const isAdminRoute = currentPath.startsWith('/api/v1/admin') || originalUrl.startsWith('/api/v1/admin');
+    const isApiRoute = currentPath.startsWith('/api/') || originalUrl.startsWith('/api/');
+
+    if (isApiRoute && !isHealthCheck && !isAdminRoute) {
+      return res.status(403).json({
+        success: false,
+        error: 'Merchant routes are not accessible from client.qivropay.com'
+      });
+    }
+  }
+
+  if (PRODUCTION_MERCHANT_HOSTS.has(req.normalizedHost)) {
+    if (currentPath.startsWith('/api/v1/admin') || originalUrl.startsWith('/api/v1/admin')) {
+      return res.status(403).json({
+        success: false,
+        error: 'Admin API cannot be accessed from merchant domain'
+      });
+    }
+  }
+
+  next();
+});
+
+// Guard middleware for administrative API namespace
+function guardAdminHost(req, res, next) {
+  const host = req.normalizedHost || extractHostname(req.headers['x-forwarded-host'] || req.headers.host || '');
+  if (PRODUCTION_MERCHANT_HOSTS.has(host)) {
+    return res.status(403).json({ success: false, error: 'Admin API cannot be accessed from merchant domain' });
+  }
+  if (process.env.NODE_ENV === 'production') {
+    if (!req.isAdminHost) {
+      return res.status(403).json({ success: false, error: 'Admin API must be accessed via client.qivropay.com' });
+    }
+  } else {
+    // In dev/test: allow localhost and 127.0.0.1, but strictly reject lookalikes and merchant domains
+    if (host && host !== 'localhost' && host !== '127.0.0.1' && !req.isAdminHost) {
+      return res.status(403).json({ success: false, error: 'Admin API must be accessed via client.qivropay.com' });
+    }
+  }
+  next();
+}
 
 // Baseline security headers. Applied here (not just in nginx.conf) because
 // several documented deployment targets (Vercel/Render/Railway serverless,
@@ -222,6 +316,119 @@ function readCookie(req, name) {
 
 function authCookieOptions(maxAge) {
   return `qivropay_session=; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
+}
+
+// Phase 2a: Dedicated Admin Auth Cookie & RBAC Middleware
+export function adminAuthCookieOptions(maxAge, req) {
+  const isProduction = process.env.NODE_ENV === 'production' || req?.secure || req?.headers?.['x-forwarded-proto'] === 'https';
+  return `qivropay_admin_session=; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Strict${isProduction ? '; Secure' : ''}`;
+}
+
+// 10 failed login attempts per IP per 15 minutes
+const failedAdminLoginAttempts = new Map();
+const FAILED_ADMIN_LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const MAX_FAILED_ADMIN_LOGIN_ATTEMPTS = 10;
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of failedAdminLoginAttempts) {
+    if (now > entry.resetAt) failedAdminLoginAttempts.delete(ip);
+  }
+}, FAILED_ADMIN_LOGIN_WINDOW_MS).unref();
+
+function getClientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded && typeof forwarded === 'string') {
+    return forwarded.split(',')[0].trim();
+  }
+  return req.ip || req.socket?.remoteAddress || 'unknown';
+}
+
+function adminLoginRateLimit(req, res, next) {
+  const ip = getClientIp(req);
+  const now = Date.now();
+
+  const record = failedAdminLoginAttempts.get(ip);
+  if (record) {
+    if (now > record.resetAt) {
+      failedAdminLoginAttempts.delete(ip);
+    } else if (record.failedCount >= MAX_FAILED_ADMIN_LOGIN_ATTEMPTS) {
+      return res.status(429).json({
+        success: false,
+        error: 'Too many failed login attempts. Please wait 15 minutes before trying again.'
+      });
+    }
+  }
+  next();
+}
+
+function recordFailedAdminLogin(req) {
+  const ip = getClientIp(req);
+  const now = Date.now();
+
+  let record = failedAdminLoginAttempts.get(ip);
+  if (!record || now > record.resetAt) {
+    record = { failedCount: 0, resetAt: now + FAILED_ADMIN_LOGIN_WINDOW_MS };
+    failedAdminLoginAttempts.set(ip, record);
+  }
+  record.failedCount += 1;
+}
+
+function recordSuccessfulAdminLogin(req) {
+  const ip = getClientIp(req);
+  failedAdminLoginAttempts.delete(ip);
+}
+
+export function requireAdminAuth(allowedRoles = []) {
+  return async (req, res, next) => {
+    // Enforce admin host validation
+    const host = req.normalizedHost || extractHostname(req.headers['x-forwarded-host'] || req.headers.host || '');
+    if (PRODUCTION_MERCHANT_HOSTS.has(host)) {
+      return res.status(403).json({ success: false, error: 'Admin API cannot be accessed from merchant domain' });
+    }
+    if (process.env.NODE_ENV === 'production') {
+      if (!req.isAdminHost) {
+        return res.status(403).json({ success: false, error: 'Admin API must be accessed via client.qivropay.com' });
+      }
+    } else {
+      if (host && host !== 'localhost' && host !== '127.0.0.1' && !req.isAdminHost) {
+        return res.status(403).json({ success: false, error: 'Admin API must be accessed via client.qivropay.com' });
+      }
+    }
+
+    // Browser admin portal strictly uses HttpOnly qivropay_admin_session cookie
+    const token = readCookie(req, 'qivropay_admin_session');
+
+    if (!token) {
+      return res.status(401).json({ success: false, error: 'Admin authentication required' });
+    }
+
+    try {
+      const admin = await getAdminUserForSession(token);
+      if (!admin) {
+        return res.status(401).json({ success: false, error: 'Invalid or expired admin session' });
+      }
+
+      if (admin.status !== 'active') {
+        return res.status(403).json({ success: false, error: 'Admin account is suspended' });
+      }
+
+      if (Array.isArray(allowedRoles) && allowedRoles.length > 0) {
+        if (!allowedRoles.includes(admin.role)) {
+          return res.status(403).json({
+            success: false,
+            error: 'Insufficient administrative privileges for this resource'
+          });
+        }
+      }
+
+      req.adminUser = admin;
+      next();
+    } catch (err) {
+      console.error('Admin authentication verification failed:', err);
+      return res.status(503).json({ success: false, error: 'Admin authentication service temporarily unavailable' });
+    }
+  };
 }
 
 function publicUser(user) {
@@ -329,16 +536,474 @@ app.post('/api/v1/auth/logout', async (req, res) => {
   res.json({ success: true });
 });
 
+// -------------------------------------------------------------
+// PHASE 2A: ADMIN AUTHENTICATION & PLATFORM MANAGEMENT API
+// -------------------------------------------------------------
+
+app.post('/api/v1/admin/auth/login', guardAdminHost, adminLoginRateLimit, async (req, res) => {
+  if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_DEV_STORE && !(process.env.DATABASE_URL || process.env.POSTGRES_URL)) {
+    return res.status(503).json({ success: false, error: 'Database is not configured' });
+  }
+
+  const normalizedEmail = String(req.body?.email || '').trim().toLowerCase();
+  const password = String(req.body?.password || '');
+  if (!normalizedEmail || !password) {
+    return res.status(400).json({ success: false, error: 'Email and password are required' });
+  }
+
+  try {
+    const admin = await findAdminUserByEmail(normalizedEmail);
+    // Explicit security rule: Generic error for non-existent admin or bad password
+    if (!admin || !checkAdminPassword(password, admin.password_hash)) {
+      recordFailedAdminLogin(req);
+      return res.status(401).json({ success: false, error: 'Invalid admin credentials' });
+    }
+
+    if (admin.status !== 'active') {
+      recordFailedAdminLogin(req);
+      return res.status(403).json({ success: false, error: 'Admin account is suspended' });
+    }
+
+    recordSuccessfulAdminLogin(req);
+
+    const session = await createAdminSession(admin.id, {
+      ipAddress: getClientIp(req),
+      userAgent: req.headers['user-agent'] || null
+    });
+
+    // Immutable audit logging of admin login (credentials/secrets strictly excluded)
+    await recordAdminAuditLog({
+      adminId: admin.id,
+      action: 'admin_login',
+      details: { email: admin.email, role: admin.role },
+      ipAddress: getClientIp(req)
+    });
+
+    res.setHeader('Set-Cookie', adminAuthCookieOptions(14 * 24 * 60 * 60, req).replace('qivropay_admin_session=;', `qivropay_admin_session=${encodeURIComponent(session.token)};`));
+    res.json({
+      success: true,
+      admin: {
+        id: admin.id,
+        email: admin.email,
+        name: admin.name,
+        role: admin.role,
+        status: admin.status
+      }
+    });
+  } catch (error) {
+    console.error('Admin login failed:', error);
+    res.status(503).json({ success: false, error: 'Could not complete admin sign in. Check database connection.' });
+  }
+});
+
+app.post('/api/v1/admin/auth/logout', guardAdminHost, async (req, res) => {
+  const token = readCookie(req, 'qivropay_admin_session');
+
+  if (token) {
+    try {
+      const admin = await getAdminUserForSession(token);
+      if (admin) {
+        await recordAdminAuditLog({
+          adminId: admin.id,
+          action: 'admin_logout',
+          details: { email: admin.email },
+          ipAddress: getClientIp(req)
+        });
+      }
+      await deleteAdminSession(token);
+    } catch (error) {
+      console.error('Admin logout session removal failed:', error);
+    }
+  }
+
+  res.setHeader('Set-Cookie', adminAuthCookieOptions(0, req));
+  res.json({ success: true, message: 'Logged out successfully' });
+});
+
+app.get('/api/v1/admin/auth/me', guardAdminHost, requireAdminAuth(), (req, res) => {
+  res.json({
+    success: true,
+    admin: {
+      id: req.adminUser.id,
+      email: req.adminUser.email,
+      name: req.adminUser.name,
+      role: req.adminUser.role,
+      status: req.adminUser.status,
+      createdAt: req.adminUser.created_at
+    }
+  });
+});
+
+// -------------------------------------------------------------
+// Phase 2B: Core Admin Panel APIs & RBAC Guarded Endpoints
+// -------------------------------------------------------------
+
+const ROLES_ALL = ['super_admin', 'compliance_officer', 'support_agent', 'read_only'];
+const ROLES_OVERVIEW = ROLES_ALL;
+const ROLES_CLIENTS = ROLES_ALL;
+const ROLES_PAYMENTS = ROLES_ALL;
+const ROLES_ONBOARDING_READ = ['super_admin', 'compliance_officer', 'read_only'];
+const ROLES_ONBOARDING_SYNC = ['super_admin', 'compliance_officer'];
+const ROLES_AUDIT_LOGS = ['super_admin', 'compliance_officer', 'read_only'];
+const ROLES_SUPPORT = ['super_admin', 'support_agent'];
+
+// 1. Overview API
+app.get('/api/v1/admin/overview/stats', guardAdminHost, requireAdminAuth(ROLES_OVERVIEW), ah(async (req, res) => {
+  const stats = await getAdminOverviewStats();
+  res.json({ success: true, data: stats });
+}));
+
+// 2. Client Directory API
+app.get('/api/v1/admin/clients', guardAdminHost, requireAdminAuth(ROLES_CLIENTS), ah(async (req, res) => {
+  const { page, pageSize, search, status, from, to } = req.query;
+  const result = await listAdminClients({ page, pageSize, search, status, from, to });
+  res.json({ success: true, data: result.data, pagination: result.pagination });
+}));
+
+// 3. Client 360 API
+app.get('/api/v1/admin/clients/:merchantId/360', guardAdminHost, requireAdminAuth(ROLES_CLIENTS), ah(async (req, res) => {
+  const merchantId = String(req.params.merchantId || '').trim();
+  const data = await getAdminClient360(merchantId);
+  if (!data) {
+    return res.status(404).json({ success: false, error: 'Merchant not found' });
+  }
+  res.json({ success: true, data });
+}));
+
+// 4. Global Payments API
+app.get('/api/v1/admin/payments', guardAdminHost, requireAdminAuth(ROLES_PAYMENTS), ah(async (req, res) => {
+  const { page, pageSize, merchantId, status, search, minAmount, maxAmount, from, to, environment } = req.query;
+  const result = await listAdminPayments({ page, pageSize, merchantId, status, search, minAmount, maxAmount, from, to, environment });
+  res.json({ success: true, data: result.data, pagination: result.pagination });
+}));
+
+app.get('/api/v1/admin/payments/:paymentId', guardAdminHost, requireAdminAuth(ROLES_PAYMENTS), ah(async (req, res) => {
+  const payment = await getAdminPaymentById(req.params.paymentId);
+  if (!payment) {
+    return res.status(404).json({ success: false, error: 'Payment record not found' });
+  }
+  res.json({ success: true, data: payment });
+}));
+
+// 5. Onboarding / KYC Queue API
+app.get('/api/v1/admin/onboarding', guardAdminHost, requireAdminAuth(ROLES_ONBOARDING_READ), ah(async (req, res) => {
+  const { page, pageSize, onboardingStatus, kycStatus, activationStatus } = req.query;
+  const result = await listAdminOnboarding({ page, pageSize, onboardingStatus, kycStatus, activationStatus });
+  res.json({ success: true, data: result.data, pagination: result.pagination });
+}));
+
+// 6. Onboarding Sync API
+app.post('/api/v1/admin/onboarding/:merchantId/sync', guardAdminHost, requireAdminAuth(ROLES_ONBOARDING_SYNC), ah(async (req, res) => {
+  const merchantId = String(req.params.merchantId || '').trim();
+  const merchant = await findUserById(merchantId);
+  if (!merchant) {
+    return res.status(404).json({ success: false, error: 'Merchant not found' });
+  }
+  const mapping = await getPartnerMerchantMapping(merchantId);
+  if (!mapping) {
+    return res.status(404).json({ success: false, error: 'Merchant has no Cashfree Partner onboarding record' });
+  }
+
+  let syncResult;
+  try {
+    syncResult = await refreshMerchantStatus(merchantId);
+  } catch (err) {
+    console.error('Cashfree Partner sync error:', err);
+    return res.status(502).json({ success: false, error: 'Failed to contact Cashfree Partner service' });
+  }
+
+  if (syncResult.error) {
+    return res.status(502).json({
+      success: false,
+      error: 'Cashfree Partner service unavailable: ' + (syncResult.error.message || 'Service error'),
+      staleMapping: syncResult.mapping
+    });
+  }
+
+  await recordAdminAuditLog({
+    adminId: req.adminUser.id,
+    action: 'kyc_sync',
+    targetMerchantId: merchantId,
+    targetResourceId: mapping.cf_merchant_id,
+    details: {
+      cfMerchantId: mapping.cf_merchant_id,
+      previousStatus: {
+        onboardingStatus: mapping.onboarding_status,
+        kycStatus: mapping.kyc_status,
+        activationStatus: mapping.activation_status
+      },
+      newStatus: {
+        onboardingStatus: syncResult.mapping?.onboarding_status,
+        kycStatus: syncResult.mapping?.kyc_status,
+        activationStatus: syncResult.mapping?.activation_status
+      }
+    },
+    ipAddress: getClientIp(req)
+  });
+
+  res.json({
+    success: true,
+    data: {
+      merchantId: syncResult.mapping.merchant_id,
+      cfMerchantId: syncResult.mapping.cf_merchant_id,
+      onboardingStatus: syncResult.mapping.onboarding_status,
+      kycStatus: syncResult.mapping.kyc_status,
+      fullKycStatus: syncResult.mapping.full_kyc_status,
+      activationStatus: syncResult.mapping.activation_status,
+      transactionAccess: syncResult.mapping.transaction_access,
+      updatedAt: syncResult.mapping.updated_at
+    }
+  });
+}));
+
+// 7. Admin Audit Log API
+app.get('/api/v1/admin/audit-logs', guardAdminHost, requireAdminAuth(ROLES_AUDIT_LOGS), ah(async (req, res) => {
+  const { page, pageSize, adminId, action, merchantId, from, to } = req.query;
+  const result = await listAdminAuditLogsFiltered({ page, pageSize, adminId, action, targetMerchantId: merchantId, from, to });
+  res.json({ success: true, data: result.data, pagination: result.pagination });
+}));
+
+// 8. Tickets API (supporting both /api/v1/admin/support/tickets and /api/v1/admin/tickets)
+app.get(['/api/v1/admin/tickets', '/api/v1/admin/support/tickets'], guardAdminHost, requireAdminAuth(ROLES_SUPPORT), ah(async (req, res) => {
+  const { page, pageSize, search, status, priority, merchantId, from, to } = req.query;
+  const result = await listAdminTicketsFiltered({ page, pageSize, search, status, priority, merchantId, from, to });
+  res.json({ success: true, data: result.data, pagination: result.pagination });
+}));
+
+app.get(['/api/v1/admin/tickets/:ticketId', '/api/v1/admin/support/tickets/:ticketId'], guardAdminHost, requireAdminAuth(ROLES_SUPPORT), ah(async (req, res) => {
+  const ticket = await getSupportTicketById(req.params.ticketId);
+  if (!ticket) {
+    return res.status(404).json({ success: false, error: 'Support ticket not found' });
+  }
+
+  let client = null;
+  if (ticket.user_id) {
+    const user = await findUserById(ticket.user_id);
+    if (user) {
+      const profile = await getResource(ticket.user_id, 'merchant_profile', 'profile');
+      client = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        company: user.company,
+        phone: profile?.phone || profile?.businessPhone || profile?.business_phone || user.phone || null,
+        website: profile?.website || profile?.business_website || user.website || null,
+        createdAt: user.created_at
+      };
+    }
+  }
+
+  res.json({
+    success: true,
+    data: {
+      ...ticket,
+      client
+    }
+  });
+}));
+
+app.post(['/api/v1/admin/tickets/:ticketId/reply', '/api/v1/admin/support/tickets/:ticketId/reply'], guardAdminHost, requireAdminAuth(ROLES_SUPPORT), ah(async (req, res) => {
+  const message = String(req.body?.message || '').trim();
+  if (!message) {
+    return res.status(400).json({ success: false, error: 'Reply message cannot be empty' });
+  }
+  const ticket = await getSupportTicketById(req.params.ticketId);
+  if (!ticket) {
+    return res.status(404).json({ success: false, error: 'Support ticket not found' });
+  }
+
+  const reply = {
+    id: `rep_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`,
+    author: req.adminUser.name,
+    authorType: 'admin',
+    adminId: req.adminUser.id,
+    message,
+    createdAt: new Date().toISOString()
+  };
+
+  const updated = await addSupportTicketReply(ticket.id, reply);
+  if (ticket.status === 'open') {
+    await updateSupportTicketStatus(ticket.id, 'in_progress');
+    updated.status = 'in_progress';
+  }
+
+  await recordAdminAuditLog({
+    adminId: req.adminUser.id,
+    action: 'ticket_reply',
+    targetMerchantId: ticket.user_id,
+    targetResourceId: ticket.id,
+    details: { replyId: reply.id, messageLength: message.length },
+    ipAddress: getClientIp(req)
+  });
+
+  res.json({ success: true, data: updated });
+}));
+
+app.patch(['/api/v1/admin/tickets/:ticketId/status', '/api/v1/admin/support/tickets/:ticketId/status'], guardAdminHost, requireAdminAuth(ROLES_SUPPORT), ah(async (req, res) => {
+  const { status } = req.body || {};
+  const validStatuses = ['open', 'in_progress', 'resolved', 'closed'];
+  if (!status || !validStatuses.includes(status)) {
+    return res.status(400).json({ success: false, error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` });
+  }
+
+  const ticket = await getSupportTicketById(req.params.ticketId);
+  if (!ticket) {
+    return res.status(404).json({ success: false, error: 'Support ticket not found' });
+  }
+
+  const updated = await updateSupportTicketStatus(ticket.id, status);
+
+  await recordAdminAuditLog({
+    adminId: req.adminUser.id,
+    action: 'ticket_status_update',
+    targetMerchantId: ticket.user_id,
+    targetResourceId: ticket.id,
+    details: { previousStatus: ticket.status, newStatus: status },
+    ipAddress: getClientIp(req)
+  });
+
+  res.json({ success: true, data: updated });
+}));
+
+app.patch(['/api/v1/admin/tickets/:ticketId/priority', '/api/v1/admin/support/tickets/:ticketId/priority'], guardAdminHost, requireAdminAuth(ROLES_SUPPORT), ah(async (req, res) => {
+  const { priority } = req.body || {};
+  const validPriorities = ['low', 'normal', 'high', 'urgent'];
+  if (!priority || !validPriorities.includes(priority)) {
+    return res.status(400).json({ success: false, error: `Invalid priority. Must be one of: ${validPriorities.join(', ')}` });
+  }
+
+  const ticket = await getSupportTicketById(req.params.ticketId);
+  if (!ticket) {
+    return res.status(404).json({ success: false, error: 'Support ticket not found' });
+  }
+
+  const updated = await updateSupportTicketPriority(ticket.id, priority);
+
+  await recordAdminAuditLog({
+    adminId: req.adminUser.id,
+    action: 'ticket_priority_update',
+    targetMerchantId: ticket.user_id,
+    targetResourceId: ticket.id,
+    details: { previousPriority: ticket.priority, newPriority: priority },
+    ipAddress: getClientIp(req)
+  });
+
+  res.json({ success: true, data: updated });
+}));
+
+// 9. Chat Logs API (supporting both /api/v1/admin/support/chat-logs and /api/v1/admin/chat-logs)
+app.get(['/api/v1/admin/chat-logs', '/api/v1/admin/support/chat-logs'], guardAdminHost, requireAdminAuth(ROLES_SUPPORT), ah(async (req, res) => {
+  const { page, pageSize, merchantId, mode, from, to, search } = req.query;
+  const result = await listAdminChatLogs({ page, pageSize, merchantId, mode, from, to, search });
+
+  // Enrich each chat session with safe client metadata if merchantId is present
+  const enriched = await Promise.all(result.data.map(async (c) => {
+    let clientName = null;
+    let clientCompany = null;
+    let clientEmail = null;
+    if (c.merchantId) {
+      const user = await findUserById(c.merchantId);
+      if (user) {
+        clientName = user.name;
+        clientCompany = user.company;
+        clientEmail = user.email;
+      }
+    }
+    return {
+      ...c,
+      clientName,
+      clientCompany,
+      clientEmail
+    };
+  }));
+
+  res.json({ success: true, data: enriched, pagination: result.pagination });
+}));
+
+app.get(['/api/v1/admin/chat-logs/:sessionId', '/api/v1/admin/support/chat-logs/:sessionId'], guardAdminHost, requireAdminAuth(ROLES_SUPPORT), ah(async (req, res) => {
+  const session = await getSupportChatSession(req.params.sessionId);
+  if (!session) {
+    return res.status(404).json({ success: false, error: 'Chat session not found' });
+  }
+
+  // Sanitize transcript: filter out internal system messages and strip any sensitive fields
+  const sanitizedTranscript = (session.messages || [])
+    .filter(m => m.role !== 'system')
+    .map(m => ({
+      role: m.role || m.sender || 'user',
+      content: String(m.content || m.text || m.message || ''),
+      timestamp: m.timestamp || m.createdAt || null
+    }));
+
+  // Resolve safe client context if merchant_id is present
+  let client = null;
+  if (session.merchant_id) {
+    const user = await findUserById(session.merchant_id);
+    if (user) {
+      const profile = await getResource(session.merchant_id, 'merchant_profile', 'profile');
+      client = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        company: user.company,
+        phone: profile?.phone || profile?.businessPhone || profile?.business_phone || user.phone || null,
+        website: profile?.website || profile?.business_website || user.website || null,
+        createdAt: user.created_at
+      };
+    }
+  }
+
+  // Resolve related support ticket if ticket_id is present
+  let ticket = null;
+  if (session.ticket_id || session.ticketId) {
+    const t = await getSupportTicketById(session.ticket_id || session.ticketId);
+    if (t) {
+      ticket = {
+        id: t.id,
+        subject: t.subject,
+        status: t.status,
+        priority: t.priority
+      };
+    }
+  }
+
+  res.json({
+    success: true,
+    data: {
+      id: session.id,
+      merchantId: session.merchant_id,
+      mode: session.mode,
+      messageCount: sanitizedTranscript.length,
+      createdAt: session.created_at,
+      lastActivityAt: session.last_activity_at,
+      transcript: sanitizedTranscript,
+      client,
+      ticket
+    }
+  });
+}));
+
 // Merchant dashboard APIs require an authenticated merchant session. Public
 // checkout creation/status and Cashfree webhook callbacks stay accessible.
 app.use('/api/v1', async (req, res, next) => {
+  const currentPath = req.path || req.url || '';
+
+  // Phase 2a: Admin routes reside strictly under /api/v1/admin and manage their own auth
+  if (currentPath === '/admin' || currentPath.startsWith('/admin/') || (req.originalUrl && req.originalUrl.includes('/api/v1/admin'))) {
+    return next();
+  }
+
+  // Enforce domain isolation: merchant routes cannot be accessed from client.qivropay.com
+  if (req.isAdminHost && !currentPath.startsWith('/health')) {
+    return res.status(403).json({ success: false, error: 'Merchant routes are not accessible from client.qivropay.com' });
+  }
+
   const publicPaths = [
     '/health', '/auth/me', '/auth/login', '/auth/signup', '/auth/logout', '/auth/google',
     '/payments/session/',
     '/india/cashfree/create-order', '/india/cashfree/session/', '/india/cashfree/orders/', '/webhooks/cashfree',
     '/support/chat'
   ];
-  const currentPath = req.path || req.url || '';
   const isPublicPath = publicPaths.some((pathPrefix) =>
     currentPath === pathPrefix ||
     currentPath.startsWith(pathPrefix) ||

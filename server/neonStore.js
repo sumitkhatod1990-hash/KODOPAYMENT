@@ -56,6 +56,12 @@ const memoryResources = new Map(Object.entries(localStore.resources || {}));
 // Phase 10.8C: QivroPay merchant <-> Cashfree Partner merchant mapping,
 // keyed by QivroPay merchant_id (one row per QivroPay merchant).
 const memoryPartnerMerchants = new Map(Object.entries(localStore.partnerMerchants || {}));
+// Phase 2a: Admin and Support persistence memory stores
+const memoryAdminUsers = new Map(Object.entries(localStore.adminUsers || {}));
+const memoryAdminSessions = new Map(Object.entries(localStore.adminSessions || {}));
+const memoryAdminAuditLogs = new Map(Object.entries(localStore.adminAuditLogs || {}));
+const memorySupportTickets = new Map(Object.entries(localStore.supportTickets || {}));
+const memorySupportChatSessions = new Map(Object.entries(localStore.supportChatSessions || {}));
 
 function persistLocalStore() {
   // Never write local dev data alongside a real database, and never write to
@@ -68,7 +74,12 @@ function persistLocalStore() {
       sessions: Object.fromEntries(memorySessions),
       events: Object.fromEntries(memoryEvents),
       resources: Object.fromEntries(memoryResources),
-      partnerMerchants: Object.fromEntries(memoryPartnerMerchants)
+      partnerMerchants: Object.fromEntries(memoryPartnerMerchants),
+      adminUsers: Object.fromEntries(memoryAdminUsers),
+      adminSessions: Object.fromEntries(memoryAdminSessions),
+      adminAuditLogs: Object.fromEntries(memoryAdminAuditLogs),
+      supportTickets: Object.fromEntries(memorySupportTickets),
+      supportChatSessions: Object.fromEntries(memorySupportChatSessions)
     };
     fs.writeFileSync(LOCAL_STORE_PATH, JSON.stringify(data, null, 2), 'utf-8');
   } catch (error) {
@@ -128,6 +139,10 @@ export async function ensurePaymentStore() {
       await sql`
         CREATE INDEX IF NOT EXISTS qivropay_checkout_sessions_merchant_idx
           ON qivropay_checkout_sessions (merchant_id, created_at DESC)
+      `;
+      await sql`
+        CREATE INDEX IF NOT EXISTS qivropay_resources_global_type_idx
+          ON qivropay_resources (resource_type, created_at DESC)
       `;
     })().catch((error) => {
       schemaReady = undefined;
@@ -1175,4 +1190,1957 @@ export async function releasePartnerMerchantCreationClaim(merchantId) {
       persistLocalStore();
     }
   });
+}
+
+// ---------------------------------------------------------------
+// Phase 2a: Admin Platform & Support Store (client.qivropay.com)
+// Strict isolation from merchant tables. Uses dedicated tables for
+// admin credentials, sessions, audit logging, and customer support.
+// ---------------------------------------------------------------
+
+let adminSchemaReady;
+
+export async function ensureAdminStore() {
+  const sql = sqlClient();
+  if (!sql) return;
+  if (!adminSchemaReady) {
+    adminSchemaReady = (async () => {
+      // 1. Admin Users Table
+      await sql`
+        CREATE TABLE IF NOT EXISTS qivropay_admin_users (
+          id TEXT PRIMARY KEY,
+          email TEXT UNIQUE NOT NULL,
+          name TEXT NOT NULL,
+          password_hash TEXT NOT NULL,
+          role TEXT NOT NULL DEFAULT 'read_only',
+          status TEXT NOT NULL DEFAULT 'active',
+          mfa_secret TEXT,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `;
+      await sql`CREATE INDEX IF NOT EXISTS qivropay_admin_users_email_idx ON qivropay_admin_users (email)`;
+
+      // 2. Admin Sessions Table
+      await sql`
+        CREATE TABLE IF NOT EXISTS qivropay_admin_sessions (
+          token_hash TEXT PRIMARY KEY,
+          admin_id TEXT NOT NULL REFERENCES qivropay_admin_users(id) ON DELETE CASCADE,
+          ip_address TEXT,
+          user_agent TEXT,
+          expires_at TIMESTAMPTZ NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `;
+      await sql`CREATE INDEX IF NOT EXISTS qivropay_admin_sessions_admin_idx ON qivropay_admin_sessions (admin_id)`;
+
+      // 3. Admin Audit Log Table
+      await sql`
+        CREATE TABLE IF NOT EXISTS qivropay_admin_audit_logs (
+          id TEXT PRIMARY KEY,
+          admin_id TEXT NOT NULL REFERENCES qivropay_admin_users(id),
+          action TEXT NOT NULL,
+          target_merchant_id TEXT,
+          target_resource_id TEXT,
+          details JSONB NOT NULL DEFAULT '{}'::jsonb,
+          ip_address TEXT,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `;
+      await sql`CREATE INDEX IF NOT EXISTS qivropay_admin_audit_logs_created_idx ON qivropay_admin_audit_logs (created_at DESC)`;
+      await sql`CREATE INDEX IF NOT EXISTS qivropay_admin_audit_logs_merchant_idx ON qivropay_admin_audit_logs (target_merchant_id)`;
+
+      // 4. Support Tickets Table (Postgres migration from local JSON)
+      await sql`
+        CREATE TABLE IF NOT EXISTS qivropay_support_tickets (
+          id TEXT PRIMARY KEY,
+          user_id TEXT,
+          name TEXT NOT NULL,
+          email TEXT NOT NULL,
+          subject TEXT NOT NULL,
+          category TEXT NOT NULL DEFAULT 'General Support',
+          message TEXT NOT NULL,
+          priority TEXT NOT NULL DEFAULT 'normal',
+          status TEXT NOT NULL DEFAULT 'open',
+          response_sla TEXT NOT NULL DEFAULT '< 1 hour',
+          replies JSONB NOT NULL DEFAULT '[]'::jsonb,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `;
+      await sql`CREATE INDEX IF NOT EXISTS qivropay_support_tickets_user_idx ON qivropay_support_tickets (user_id, created_at DESC)`;
+      await sql`CREATE INDEX IF NOT EXISTS qivropay_support_tickets_status_idx ON qivropay_support_tickets (status, created_at DESC)`;
+
+      // 5. Support Chat Sessions Table
+      await sql`
+        CREATE TABLE IF NOT EXISTS qivropay_support_chat_sessions (
+          id TEXT PRIMARY KEY,
+          merchant_id TEXT,
+          mode TEXT NOT NULL,
+          messages JSONB NOT NULL DEFAULT '[]'::jsonb,
+          last_activity_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `;
+      await sql`CREATE INDEX IF NOT EXISTS qivropay_support_chat_merchant_idx ON qivropay_support_chat_sessions (merchant_id, last_activity_at DESC)`;
+      await sql`CREATE INDEX IF NOT EXISTS qivropay_support_tickets_priority_idx ON qivropay_support_tickets (priority, created_at DESC)`;
+      await sql`CREATE INDEX IF NOT EXISTS qivropay_support_chat_mode_idx ON qivropay_support_chat_sessions (mode, last_activity_at DESC)`;
+      await sql`CREATE INDEX IF NOT EXISTS qivropay_admin_audit_logs_action_idx ON qivropay_admin_audit_logs (action, created_at DESC)`;
+      await sql`CREATE INDEX IF NOT EXISTS qivropay_admin_audit_logs_admin_idx ON qivropay_admin_audit_logs (admin_id, created_at DESC)`;
+    })().catch((error) => {
+      adminSchemaReady = undefined;
+      console.error('Neon admin schema init failed:', error.message);
+      throw error;
+    });
+  }
+  await adminSchemaReady;
+}
+
+export async function createAdminUser({ email, name, password, role = 'read_only', status = 'active' }) {
+  const normalizedEmail = String(email || '').toLowerCase().trim();
+  const rawPassword = String(password || '');
+  const safeName = String(name || '').trim();
+
+  if (!normalizedEmail || !rawPassword || !safeName) {
+    throw new Error('Email, name, and password are required to create an admin user');
+  }
+  const id = `adm_${crypto.randomBytes(12).toString('hex')}`;
+  const password_hash = hashPassword(rawPassword);
+  const now = new Date().toISOString();
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        INSERT INTO qivropay_admin_users (id, email, name, password_hash, role, status, mfa_secret, created_at, updated_at)
+        VALUES (${id}, ${normalizedEmail}, ${safeName}, ${password_hash}, ${role}, ${status}, NULL, ${now}, ${now})
+        RETURNING id, email, name, role, status, created_at, updated_at
+      `;
+      if (rows && rows[0]) return rows[0];
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  if (memoryAdminUsers.has(normalizedEmail)) {
+    throw new Error(`Admin user with email ${normalizedEmail} already exists`);
+  }
+
+  const admin = {
+    id,
+    email: normalizedEmail,
+    name: safeName,
+    password_hash,
+    role,
+    status,
+    mfa_secret: null,
+    created_at: now,
+    updated_at: now
+  };
+  memoryAdminUsers.set(normalizedEmail, admin);
+  persistLocalStore();
+  return { id: admin.id, email: admin.email, name: admin.name, role: admin.role, status: admin.status, created_at: admin.created_at, updated_at: admin.updated_at };
+}
+
+export async function findAdminUserByEmail(email) {
+  const normalized = String(email || '').toLowerCase().trim();
+  if (!normalized) return null;
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        SELECT id, email, name, password_hash, role, status, created_at, updated_at
+        FROM qivropay_admin_users
+        WHERE email = ${normalized}
+        LIMIT 1
+      `;
+      if (rows && rows[0]) return rows[0];
+      return null;
+    } catch (e) {
+      throw e;
+    }
+  }
+  return memoryAdminUsers.get(normalized) || null;
+}
+
+export async function findAdminUserById(id) {
+  if (!id) return null;
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        SELECT id, email, name, role, status, created_at, updated_at
+        FROM qivropay_admin_users
+        WHERE id = ${id}
+        LIMIT 1
+      `;
+      if (rows && rows[0]) return rows[0];
+      return null;
+    } catch (e) {
+      throw e;
+    }
+  }
+  for (const admin of memoryAdminUsers.values()) {
+    if (admin.id === id) {
+      return { id: admin.id, email: admin.email, name: admin.name, role: admin.role, status: admin.status, created_at: admin.created_at, updated_at: admin.updated_at };
+    }
+  }
+  return null;
+}
+
+export async function listAdminUsers() {
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        SELECT id, email, name, role, status, created_at, updated_at
+        FROM qivropay_admin_users
+        ORDER BY created_at ASC
+      `;
+      return rows || [];
+    } catch (e) {
+      throw e;
+    }
+  }
+  return Array.from(memoryAdminUsers.values()).map(u => ({
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    role: u.role,
+    status: u.status,
+    created_at: u.created_at,
+    updated_at: u.updated_at
+  }));
+}
+
+export function checkAdminPassword(password, storedHash) {
+  return verifyPassword(password, storedHash);
+}
+
+export async function createAdminSession(adminId, { ipAddress = null, userAgent = null } = {}) {
+  const token = `adm_tok_${crypto.randomBytes(32).toString('base64url')}`;
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toISOString(); // 14-day validity
+  const now = new Date().toISOString();
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      await sql`
+        INSERT INTO qivropay_admin_sessions (token_hash, admin_id, ip_address, user_agent, expires_at, created_at)
+        VALUES (${tokenHash}, ${adminId}, ${ipAddress}, ${userAgent}, ${expiresAt}, ${now})
+      `;
+      return { token, expiresAt };
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  memoryAdminSessions.set(tokenHash, {
+    tokenHash,
+    adminId,
+    ipAddress,
+    userAgent,
+    expiresAt,
+    createdAt: now
+  });
+  persistLocalStore();
+  return { token, expiresAt };
+}
+
+export async function getAdminUserForSession(token) {
+  if (!token) return null;
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        SELECT u.id, u.email, u.name, u.role, u.status, u.created_at, u.updated_at
+        FROM qivropay_admin_sessions s
+        JOIN qivropay_admin_users u ON u.id = s.admin_id
+        WHERE s.token_hash = ${tokenHash} AND s.expires_at > NOW()
+        LIMIT 1
+      `;
+      if (rows && rows[0]) return rows[0];
+      return null;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  const session = memoryAdminSessions.get(tokenHash);
+  if (session && new Date(session.expiresAt) > new Date()) {
+    for (const u of memoryAdminUsers.values()) {
+      if (u.id === session.adminId) {
+        return {
+          id: u.id,
+          email: u.email,
+          name: u.name,
+          role: u.role,
+          status: u.status,
+          created_at: u.created_at,
+          updated_at: u.updated_at
+        };
+      }
+    }
+  }
+  return null;
+}
+
+export async function deleteAdminSession(token) {
+  if (!token) return;
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      await sql`DELETE FROM qivropay_admin_sessions WHERE token_hash = ${tokenHash}`;
+      return;
+    } catch (e) {
+      throw e;
+    }
+  }
+  memoryAdminSessions.delete(tokenHash);
+  persistLocalStore();
+}
+
+export async function recordAdminAuditLog({ adminId, action, targetMerchantId = null, targetResourceId = null, details = {}, ipAddress = null }) {
+  const id = `aud_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
+  const now = new Date().toISOString();
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        INSERT INTO qivropay_admin_audit_logs (id, admin_id, action, target_merchant_id, target_resource_id, details, ip_address, created_at)
+        VALUES (${id}, ${adminId}, ${action}, ${targetMerchantId}, ${targetResourceId}, ${JSON.stringify(details)}::jsonb, ${ipAddress}, ${now})
+        RETURNING id, admin_id, action, target_merchant_id, target_resource_id, details, ip_address, created_at
+      `;
+      if (rows && rows[0]) return rows[0];
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  const logEntry = {
+    id,
+    admin_id: adminId,
+    action,
+    target_merchant_id: targetMerchantId,
+    target_resource_id: targetResourceId,
+    details,
+    ip_address: ipAddress,
+    created_at: now
+  };
+  memoryAdminAuditLogs.set(id, logEntry);
+  persistLocalStore();
+  return logEntry;
+}
+
+export async function listAdminAuditLogs({ limit = 50, offset = 0, adminId = null, targetMerchantId = null } = {}) {
+  const safeLimit = Math.min(Math.max(1, parseInt(limit, 10) || 50), 100);
+  const safeOffset = Math.max(0, parseInt(offset, 10) || 0);
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      if (adminId && targetMerchantId) {
+        return await sql`
+          SELECT l.*, u.email as admin_email, u.name as admin_name
+          FROM qivropay_admin_audit_logs l
+          JOIN qivropay_admin_users u ON u.id = l.admin_id
+          WHERE l.admin_id = ${adminId} AND l.target_merchant_id = ${targetMerchantId}
+          ORDER BY l.created_at DESC
+          LIMIT ${safeLimit} OFFSET ${safeOffset}
+        `;
+      } else if (adminId) {
+        return await sql`
+          SELECT l.*, u.email as admin_email, u.name as admin_name
+          FROM qivropay_admin_audit_logs l
+          JOIN qivropay_admin_users u ON u.id = l.admin_id
+          WHERE l.admin_id = ${adminId}
+          ORDER BY l.created_at DESC
+          LIMIT ${safeLimit} OFFSET ${safeOffset}
+        `;
+      } else if (targetMerchantId) {
+        return await sql`
+          SELECT l.*, u.email as admin_email, u.name as admin_name
+          FROM qivropay_admin_audit_logs l
+          JOIN qivropay_admin_users u ON u.id = l.admin_id
+          WHERE l.target_merchant_id = ${targetMerchantId}
+          ORDER BY l.created_at DESC
+          LIMIT ${safeLimit} OFFSET ${safeOffset}
+        `;
+      } else {
+        return await sql`
+          SELECT l.*, u.email as admin_email, u.name as admin_name
+          FROM qivropay_admin_audit_logs l
+          JOIN qivropay_admin_users u ON u.id = l.admin_id
+          ORDER BY l.created_at DESC
+          LIMIT ${safeLimit} OFFSET ${safeOffset}
+        `;
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  let logs = Array.from(memoryAdminAuditLogs.values());
+  if (adminId) logs = logs.filter(l => l.admin_id === adminId);
+  if (targetMerchantId) logs = logs.filter(l => l.target_merchant_id === targetMerchantId);
+
+  logs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  return logs.slice(safeOffset, safeOffset + safeLimit).map(l => {
+    let admin_email = 'unknown';
+    let admin_name = 'Admin';
+    for (const u of memoryAdminUsers.values()) {
+      if (u.id === l.admin_id) {
+        admin_email = u.email;
+        admin_name = u.name;
+        break;
+      }
+    }
+    return { ...l, admin_email, admin_name };
+  });
+}
+
+export async function bootstrapAdminUser({ email, password, name = 'Platform Administrator', role = 'super_admin' }) {
+  const normalizedEmail = String(email || '').toLowerCase().trim();
+  const rawPassword = String(password || '');
+  if (!normalizedEmail) {
+    throw new Error('Explicit admin email is required for bootstrap');
+  }
+  if (!rawPassword || rawPassword.length < 12) {
+    throw new Error('Explicit admin password of at least 12 characters is required for bootstrap');
+  }
+
+  const existing = await findAdminUserByEmail(normalizedEmail);
+  if (existing) {
+    throw new Error(`Admin user with email "${normalizedEmail}" already exists`);
+  }
+
+  return await createAdminUser({
+    email: normalizedEmail,
+    name: String(name || 'Platform Administrator').trim(),
+    password: rawPassword,
+    role,
+    status: 'active'
+  });
+}
+
+// ---------------------------------------------------------------
+// Support Tickets & Chat Persistence
+// ---------------------------------------------------------------
+
+export async function createSupportTicket({ userId = null, name, email, subject, category = 'General Support', message, priority = 'normal', responseSLA = '< 1 hour', initialReply = null }) {
+  const ticketId = `TICK-${Date.now().toString().slice(-6)}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
+  const now = new Date().toISOString();
+  const replies = initialReply ? [initialReply] : [];
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        INSERT INTO qivropay_support_tickets (id, user_id, name, email, subject, category, message, priority, status, response_sla, replies, created_at, updated_at)
+        VALUES (${ticketId}, ${userId}, ${name}, ${email}, ${subject}, ${category}, ${message}, ${priority}, 'open', ${responseSLA}, ${JSON.stringify(replies)}::jsonb, ${now}, ${now})
+        RETURNING id, user_id, name, email, subject, category, message, priority, status, response_sla, replies, created_at, updated_at
+      `;
+      if (rows && rows[0]) return rows[0];
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  const ticket = {
+    id: ticketId,
+    user_id: userId,
+    name,
+    email,
+    subject,
+    category,
+    message,
+    priority,
+    status: 'open',
+    response_sla: responseSLA,
+    replies,
+    created_at: now,
+    updated_at: now
+  };
+  memorySupportTickets.set(ticketId, ticket);
+  persistLocalStore();
+  return ticket;
+}
+
+export async function listSupportTickets({ userId = null, status = null, limit = 50, offset = 0 } = {}) {
+  const safeLimit = Math.min(Math.max(1, parseInt(limit, 10) || 50), 100);
+  const safeOffset = Math.max(0, parseInt(offset, 10) || 0);
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      if (userId && status) {
+        return await sql`
+          SELECT * FROM qivropay_support_tickets
+          WHERE (user_id = ${userId} OR email = ${userId}) AND status = ${status}
+          ORDER BY created_at DESC
+          LIMIT ${safeLimit} OFFSET ${safeOffset}
+        `;
+      } else if (userId) {
+        return await sql`
+          SELECT * FROM qivropay_support_tickets
+          WHERE user_id = ${userId} OR email = ${userId}
+          ORDER BY created_at DESC
+          LIMIT ${safeLimit} OFFSET ${safeOffset}
+        `;
+      } else if (status) {
+        return await sql`
+          SELECT * FROM qivropay_support_tickets
+          WHERE status = ${status}
+          ORDER BY created_at DESC
+          LIMIT ${safeLimit} OFFSET ${safeOffset}
+        `;
+      } else {
+        return await sql`
+          SELECT * FROM qivropay_support_tickets
+          ORDER BY created_at DESC
+          LIMIT ${safeLimit} OFFSET ${safeOffset}
+        `;
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  let tickets = Array.from(memorySupportTickets.values());
+  if (userId) tickets = tickets.filter(t => t.user_id === userId || t.email === userId);
+  if (status) tickets = tickets.filter(t => t.status === status);
+  tickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  return tickets.slice(safeOffset, safeOffset + safeLimit);
+}
+
+export async function getSupportTicketById(id) {
+  if (!id) return null;
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`SELECT * FROM qivropay_support_tickets WHERE id = ${id} LIMIT 1`;
+      return rows?.[0] || null;
+    } catch (e) {
+      throw e;
+    }
+  }
+  return memorySupportTickets.get(id) || null;
+}
+
+export async function addSupportTicketReply(ticketId, reply) {
+  if (!ticketId || !reply) throw new Error('ticketId and reply are required');
+  const now = new Date().toISOString();
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const existing = await sql`SELECT replies FROM qivropay_support_tickets WHERE id = ${ticketId} LIMIT 1`;
+      if (!existing || !existing[0]) return null;
+      const currentReplies = Array.isArray(existing[0].replies) ? existing[0].replies : [];
+      currentReplies.push(reply);
+      const rows = await sql`
+        UPDATE qivropay_support_tickets
+        SET replies = ${JSON.stringify(currentReplies)}::jsonb, updated_at = ${now}
+        WHERE id = ${ticketId}
+        RETURNING *
+      `;
+      return rows?.[0] || null;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  const ticket = memorySupportTickets.get(ticketId);
+  if (!ticket) return null;
+  ticket.replies = ticket.replies || [];
+  ticket.replies.push(reply);
+  ticket.updated_at = now;
+  memorySupportTickets.set(ticketId, ticket);
+  persistLocalStore();
+  return ticket;
+}
+
+export async function updateSupportTicketStatus(ticketId, status) {
+  if (!ticketId || !status) throw new Error('ticketId and status are required');
+  const now = new Date().toISOString();
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        UPDATE qivropay_support_tickets
+        SET status = ${status}, updated_at = ${now}
+        WHERE id = ${ticketId}
+        RETURNING *
+      `;
+      return rows?.[0] || null;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  const ticket = memorySupportTickets.get(ticketId);
+  if (!ticket) return null;
+  ticket.status = status;
+  ticket.updated_at = now;
+  memorySupportTickets.set(ticketId, ticket);
+  persistLocalStore();
+  return ticket;
+}
+
+export async function saveSupportChatSession({ sessionId, merchantId = null, mode = 'public', messages = [] }) {
+  const sid = sessionId || `chat_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+  const now = new Date().toISOString();
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        INSERT INTO qivropay_support_chat_sessions (id, merchant_id, mode, messages, last_activity_at, created_at)
+        VALUES (${sid}, ${merchantId}, ${mode}, ${JSON.stringify(messages)}::jsonb, ${now}, ${now})
+        ON CONFLICT (id) DO UPDATE
+        SET messages = ${JSON.stringify(messages)}::jsonb, last_activity_at = ${now}, mode = ${mode}, merchant_id = COALESCE(qivropay_support_chat_sessions.merchant_id, ${merchantId})
+        RETURNING *
+      `;
+      return rows?.[0] || null;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  const existing = memorySupportChatSessions.get(sid);
+  const session = {
+    id: sid,
+    merchant_id: merchantId || existing?.merchant_id || null,
+    mode,
+    messages,
+    last_activity_at: now,
+    created_at: existing?.created_at || now
+  };
+  memorySupportChatSessions.set(sid, session);
+  persistLocalStore();
+  return session;
+}
+
+export async function listSupportChatSessions({ merchantId = null, limit = 50, offset = 0 } = {}) {
+  const safeLimit = Math.min(Math.max(1, parseInt(limit, 10) || 50), 100);
+  const safeOffset = Math.max(0, parseInt(offset, 10) || 0);
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      if (merchantId) {
+        return await sql`
+          SELECT * FROM qivropay_support_chat_sessions
+          WHERE merchant_id = ${merchantId}
+          ORDER BY last_activity_at DESC
+          LIMIT ${safeLimit} OFFSET ${safeOffset}
+        `;
+      } else {
+        return await sql`
+          SELECT * FROM qivropay_support_chat_sessions
+          ORDER BY last_activity_at DESC
+          LIMIT ${safeLimit} OFFSET ${safeOffset}
+        `;
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  let sessions = Array.from(memorySupportChatSessions.values());
+  if (merchantId) sessions = sessions.filter(s => s.merchant_id === merchantId);
+  sessions.sort((a, b) => new Date(b.last_activity_at) - new Date(a.last_activity_at));
+  return sessions.slice(safeOffset, safeOffset + safeLimit);
+}
+
+export async function getSupportChatSession(sessionId) {
+  if (!sessionId) return null;
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`SELECT * FROM qivropay_support_chat_sessions WHERE id = ${sessionId} LIMIT 1`;
+      return rows?.[0] || null;
+    } catch (e) {
+      throw e;
+    }
+  }
+  return memorySupportChatSessions.get(sessionId) || null;
+}
+
+// ---------------------------------------------------------------
+// Phase 2B: Core Admin Query Primitives & Aggregations
+// ---------------------------------------------------------------
+
+export async function findUserById(userId) {
+  if (!userId) return null;
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAuthStore();
+      const rows = await sql`
+        SELECT id, email, name, company, google_id, google_sub, created_at
+        FROM qivropay_users
+        WHERE id = ${userId}
+        LIMIT 1
+      `;
+      if (rows && rows[0]) return rows[0];
+      return null;
+    } catch (e) {
+      throw e;
+    }
+  }
+  for (const u of memoryUsers.values()) {
+    if (u.id === userId) {
+      return { id: u.id, email: u.email, name: u.name, company: u.company, google_id: u.google_id || null, google_sub: u.google_sub || null, created_at: u.created_at };
+    }
+  }
+  return null;
+}
+
+export async function getAdminOverviewStats() {
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAuthStore();
+      await ensurePaymentStore();
+      await ensurePartnerMerchantStore();
+      await ensureAdminStore();
+
+      const [merchantsAgg] = await sql`
+        SELECT
+          COUNT(*)::int as total_merchants,
+          COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '30 days')::int as new_merchants
+        FROM qivropay_users
+      `;
+
+      const [txAgg] = await sql`
+        SELECT
+          COUNT(*)::int as total_transactions,
+          COUNT(*) FILTER (WHERE payload->>'status' IN ('succeeded', 'refunded', 'partially_refunded', 'refund_pending'))::int as successful_transactions,
+          COUNT(*) FILTER (WHERE payload->>'status' = 'failed')::int as failed_transactions,
+          COUNT(*) FILTER (WHERE payload->>'status' IN ('refunded', 'partially_refunded'))::int as refunded_transactions,
+          COUNT(*) FILTER (WHERE payload->>'status' = 'refund_pending')::int as refund_pending_transactions,
+          COALESCE(SUM(CASE WHEN payload->>'status' IN ('succeeded', 'refunded', 'partially_refunded', 'refund_pending') THEN (payload->>'amount')::numeric ELSE 0 END), 0)::float as total_volume,
+          COUNT(DISTINCT merchant_id)::int as active_merchants
+        FROM qivropay_resources
+        WHERE resource_type = 'transaction'
+      `;
+
+      const [onboardingAgg] = await sql`
+        SELECT COUNT(*)::int as pending_onboarding
+        FROM qivropay_cashfree_partner_merchants
+        WHERE onboarding_status IS NULL OR onboarding_status != 'COMPLETED' OR kyc_status != 'APPROVED'
+      `;
+
+      const [supportAgg] = await sql`
+        SELECT
+          COUNT(*) FILTER (WHERE status IN ('open', 'in_progress'))::int as open_tickets
+        FROM qivropay_support_tickets
+      `;
+
+      const [chatAgg] = await sql`
+        SELECT COUNT(*)::int as unresolved_chats
+        FROM qivropay_support_chat_sessions
+        WHERE last_activity_at >= NOW() - INTERVAL '7 days'
+      `;
+
+      const recentSignups = await sql`
+        SELECT id, name, email, company, created_at
+        FROM qivropay_users
+        ORDER BY created_at DESC
+        LIMIT 5
+      `;
+
+      const recentTxRows = await sql`
+        SELECT merchant_id, payload, created_at
+        FROM qivropay_resources
+        WHERE resource_type = 'transaction'
+        ORDER BY created_at DESC
+        LIMIT 5
+      `;
+      const recentTransactions = recentTxRows.map(r => ({
+        id: r.payload?.id || r.payload?.orderId,
+        merchantId: r.merchant_id,
+        amount: Number(r.payload?.amount || 0),
+        currency: r.payload?.currency || 'INR',
+        status: r.payload?.status || 'unknown',
+        createdAt: r.created_at
+      }));
+
+      const recentSupportActivity = await sql`
+        SELECT id, user_id as merchant_id, email, subject, status, priority, created_at, updated_at
+        FROM qivropay_support_tickets
+        ORDER BY updated_at DESC
+        LIMIT 5
+      `;
+
+      return {
+        totalMerchants: merchantsAgg?.total_merchants || 0,
+        activeMerchants: txAgg?.active_merchants || 0,
+        newMerchants: merchantsAgg?.new_merchants || 0,
+        merchantsPendingOnboarding: onboardingAgg?.pending_onboarding || 0,
+        openSupportTickets: supportAgg?.open_tickets || 0,
+        unresolvedSupportChats: chatAgg?.unresolved_chats || 0,
+        totalTransactions: txAgg?.total_transactions || 0,
+        successfulTransactions: txAgg?.successful_transactions || 0,
+        failedTransactions: txAgg?.failed_transactions || 0,
+        refundedTransactions: txAgg?.refunded_transactions || 0,
+        refundPendingTransactions: txAgg?.refund_pending_transactions || 0,
+        totalPaymentVolume: txAgg?.total_volume || 0,
+        recentSignups: recentSignups || [],
+        recentTransactions: recentTransactions || [],
+        recentSupportActivity: recentSupportActivity || []
+      };
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Memory fallback
+  const now = Date.now();
+  const thirtyDaysAgo = now - (30 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000);
+
+  const usersList = Array.from(memoryUsers.values());
+  const totalMerchants = usersList.length;
+  const newMerchants = usersList.filter(u => new Date(u.created_at).getTime() >= thirtyDaysAgo).length;
+
+  const allTx = [];
+  const activeMerchantSet = new Set();
+  for (const [key, val] of memoryResources.entries()) {
+    if (key.includes(':transaction:')) {
+      const parts = key.split(':');
+      const merchantId = parts[0];
+      allTx.push({ merchantId, ...val });
+      activeMerchantSet.add(merchantId);
+    }
+  }
+
+  const totalTransactions = allTx.length;
+  const successfulTransactions = allTx.filter(t => ['succeeded', 'refunded', 'partially_refunded', 'refund_pending'].includes(t.status)).length;
+  const failedTransactions = allTx.filter(t => t.status === 'failed').length;
+  const refundedTransactions = allTx.filter(t => ['refunded', 'partially_refunded'].includes(t.status)).length;
+  const refundPendingTransactions = allTx.filter(t => t.status === 'refund_pending').length;
+  const totalPaymentVolume = allTx.filter(t => ['succeeded', 'refunded', 'partially_refunded', 'refund_pending'].includes(t.status))
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+  const pendingOnboarding = Array.from(memoryPartnerMerchants.values())
+    .filter(m => !m.onboarding_status || m.onboarding_status !== 'COMPLETED' || m.kyc_status !== 'APPROVED').length;
+
+  const tickets = Array.from(memorySupportTickets.values());
+  const openSupportTickets = tickets.filter(t => ['open', 'in_progress'].includes(t.status)).length;
+
+  const chats = Array.from(memorySupportChatSessions.values());
+  const unresolvedSupportChats = chats.filter(c => new Date(c.last_activity_at).getTime() >= sevenDaysAgo).length;
+
+  const recentSignups = usersList.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5)
+    .map(u => ({ id: u.id, name: u.name, email: u.email, company: u.company, createdAt: u.created_at }));
+
+  const recentTransactions = allTx.slice().sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).slice(0, 5)
+    .map(t => ({ id: t.id || t.orderId, merchantId: t.merchantId, amount: Number(t.amount || 0), currency: t.currency || 'INR', status: t.status || 'unknown', createdAt: t.createdAt }));
+
+  const recentSupportActivity = tickets.slice().sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)).slice(0, 5)
+    .map(t => ({ id: t.id, merchant_id: t.user_id, email: t.email, subject: t.subject, status: t.status, priority: t.priority, created_at: t.created_at, updated_at: t.updated_at }));
+
+  return {
+    totalMerchants,
+    activeMerchants: activeMerchantSet.size,
+    newMerchants,
+    merchantsPendingOnboarding: pendingOnboarding,
+    openSupportTickets,
+    unresolvedSupportChats,
+    totalTransactions,
+    successfulTransactions,
+    failedTransactions,
+    refundedTransactions,
+    refundPendingTransactions,
+    totalPaymentVolume: Number(totalPaymentVolume.toFixed(2)),
+    recentSignups,
+    recentTransactions,
+    recentSupportActivity
+  };
+}
+
+export async function listAdminClients({ page = 1, pageSize = 25, search = '', status = '', from = null, to = null } = {}) {
+  const safePage = Math.max(1, parseInt(page, 10) || 1);
+  const safeLimit = Math.min(100, Math.max(1, parseInt(pageSize, 10) || 25));
+  const safeOffset = (safePage - 1) * safeLimit;
+  const q = String(search || '').trim().toLowerCase();
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAuthStore();
+      await ensurePaymentStore();
+      await ensurePartnerMerchantStore();
+
+      let query = sql`
+        SELECT
+          u.id,
+          u.name,
+          u.email,
+          u.company,
+          u.created_at,
+          COALESCE(pm.onboarding_status, 'NOT_STARTED') as onboarding_status,
+          (SELECT MAX(s.created_at) FROM qivropay_auth_sessions s WHERE s.user_id = u.id) as last_login_at,
+          (SELECT COUNT(*)::int FROM qivropay_resources r WHERE r.merchant_id = u.id AND r.resource_type = 'transaction') as payment_count,
+          (SELECT COALESCE(SUM((r.payload->>'amount')::numeric), 0)::float FROM qivropay_resources r WHERE r.merchant_id = u.id AND r.resource_type = 'transaction' AND r.payload->>'status' IN ('succeeded', 'refunded', 'partially_refunded', 'refund_pending')) as payment_volume
+        FROM qivropay_users u
+        LEFT JOIN qivropay_cashfree_partner_merchants pm ON pm.merchant_id = u.id
+        WHERE 1=1
+      `;
+      // Fetch all for filter/pagination simplicity across driver differences
+      const rows = await sql`
+        SELECT
+          u.id,
+          u.name,
+          u.email,
+          u.company,
+          u.created_at,
+          COALESCE(pm.onboarding_status, 'NOT_STARTED') as onboarding_status,
+          (SELECT MAX(s.created_at) FROM qivropay_auth_sessions s WHERE s.user_id = u.id) as last_login_at,
+          (SELECT COUNT(*)::int FROM qivropay_resources r WHERE r.merchant_id = u.id AND r.resource_type = 'transaction') as payment_count,
+          (SELECT COALESCE(SUM((r.payload->>'amount')::numeric), 0)::float FROM qivropay_resources r WHERE r.merchant_id = u.id AND r.resource_type = 'transaction' AND r.payload->>'status' IN ('succeeded', 'refunded', 'partially_refunded', 'refund_pending')) as payment_volume
+        FROM qivropay_users u
+        LEFT JOIN qivropay_cashfree_partner_merchants pm ON pm.merchant_id = u.id
+        ORDER BY u.created_at DESC, u.id DESC
+      `;
+
+      let filtered = rows;
+      if (q) {
+        filtered = filtered.filter(r =>
+          r.id.toLowerCase().includes(q) ||
+          r.name.toLowerCase().includes(q) ||
+          r.email.toLowerCase().includes(q) ||
+          r.company.toLowerCase().includes(q)
+        );
+      }
+      if (from) {
+        const fromTime = new Date(from).getTime();
+        if (!isNaN(fromTime)) filtered = filtered.filter(r => new Date(r.created_at).getTime() >= fromTime);
+      }
+      if (to) {
+        const toTime = new Date(to).getTime();
+        if (!isNaN(toTime)) filtered = filtered.filter(r => new Date(r.created_at).getTime() <= toTime);
+      }
+      if (status && status !== 'all') {
+        filtered = filtered.filter(r => r.onboarding_status.toLowerCase() === status.toLowerCase());
+      }
+
+      const total = filtered.length;
+      const totalPages = Math.ceil(total / safeLimit) || 1;
+      const paged = filtered.slice(safeOffset, safeOffset + safeLimit).map(r => ({
+        id: r.id,
+        name: r.name,
+        email: r.email,
+        company: r.company,
+        createdAt: r.created_at,
+        lastLoginAt: r.last_login_at || null,
+        status: 'active',
+        onboardingStatus: r.onboarding_status,
+        paymentCount: r.payment_count || 0,
+        paymentVolume: Number((r.payment_volume || 0).toFixed(2))
+      }));
+
+      return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Memory fallback
+  let users = Array.from(memoryUsers.values()).map(u => {
+    const pm = memoryPartnerMerchants.get(u.id);
+    let lastLoginAt = null;
+    for (const s of memorySessions.values()) {
+      if (s.userId === u.id && (!lastLoginAt || new Date(s.createdAt) > new Date(lastLoginAt))) {
+        lastLoginAt = s.createdAt;
+      }
+    }
+
+    let paymentCount = 0;
+    let paymentVolume = 0;
+    for (const [key, val] of memoryResources.entries()) {
+      if (key.startsWith(`${u.id}:transaction:`)) {
+        paymentCount += 1;
+        if (['succeeded', 'refunded', 'partially_refunded', 'refund_pending'].includes(val.status)) {
+          paymentVolume += Number(val.amount || 0);
+        }
+      }
+    }
+
+    return {
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      company: u.company,
+      createdAt: u.created_at,
+      lastLoginAt,
+      status: 'active',
+      onboardingStatus: pm?.onboarding_status || 'NOT_STARTED',
+      paymentCount,
+      paymentVolume: Number(paymentVolume.toFixed(2))
+    };
+  });
+
+  if (q) {
+    users = users.filter(u =>
+      u.id.toLowerCase().includes(q) ||
+      u.name.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      u.company.toLowerCase().includes(q)
+    );
+  }
+  if (from) {
+    const fromTime = new Date(from).getTime();
+    if (!isNaN(fromTime)) users = users.filter(u => new Date(u.createdAt).getTime() >= fromTime);
+  }
+  if (to) {
+    const toTime = new Date(to).getTime();
+    if (!isNaN(toTime)) users = users.filter(u => new Date(u.createdAt).getTime() <= toTime);
+  }
+  if (status && status !== 'all') {
+    users = users.filter(u => u.onboardingStatus.toLowerCase() === status.toLowerCase());
+  }
+
+  users.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const total = users.length;
+  const totalPages = Math.ceil(total / safeLimit) || 1;
+  const paged = users.slice(safeOffset, safeOffset + safeLimit);
+
+  return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+}
+
+export async function getAdminClient360(merchantId) {
+  if (!merchantId) return null;
+  const user = await findUserById(merchantId);
+  if (!user) return null;
+
+  const profile = await getResource(merchantId, 'merchant_profile', 'profile');
+  const mapping = await getPartnerMerchantMapping(merchantId);
+  const transactions = await listResources(merchantId, 'transaction');
+  const products = await listResources(merchantId, 'product');
+  const customers = await listResources(merchantId, 'customer');
+  const tickets = await listSupportTickets({ userId: merchantId, limit: 100 });
+  const chats = await listSupportChatSessions({ merchantId, limit: 100 });
+
+  // Get checkout sessions for merchant
+  let checkoutSessions = [];
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensurePaymentStore();
+      const rows = await sql`
+        SELECT session_id, merchant_id, payload, status, created_at, expires_at
+        FROM qivropay_checkout_sessions
+        WHERE merchant_id = ${merchantId}
+        ORDER BY created_at DESC
+        LIMIT 10
+      `;
+      checkoutSessions = rows.map(r => ({
+        sessionId: r.session_id,
+        amount: r.payload?.totalAmount || r.payload?.amount || 0,
+        currency: r.payload?.currency || 'INR',
+        status: r.status,
+        createdAt: r.created_at,
+        expiresAt: r.expires_at
+      }));
+    } catch (e) {
+      console.error('Failed to load checkout sessions for 360:', e);
+    }
+  } else {
+    for (const [key, ev] of memoryEvents.entries()) {
+      if (key.startsWith('checkout:') && ev.payload?.merchantId === merchantId) {
+        checkoutSessions.push({
+          sessionId: ev.payload.sessionId,
+          amount: ev.payload.totalAmount || ev.payload.amount || 0,
+          currency: ev.payload.currency || 'INR',
+          status: ev.payload.status || 'open',
+          createdAt: ev.payload.createdAt,
+          expiresAt: ev.payload.expiresAt || null
+        });
+      }
+    }
+    checkoutSessions.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    checkoutSessions = checkoutSessions.slice(0, 10);
+  }
+
+  // Find last login
+  let lastLoginAt = null;
+  if (sql) {
+    try {
+      const rows = await sql`
+        SELECT created_at FROM qivropay_auth_sessions
+        WHERE user_id = ${merchantId}
+        ORDER BY created_at DESC LIMIT 1
+      `;
+      if (rows?.[0]) lastLoginAt = rows[0].created_at;
+    } catch {}
+  } else {
+    for (const s of memorySessions.values()) {
+      if (s.userId === merchantId && (!lastLoginAt || new Date(s.createdAt) > new Date(lastLoginAt))) {
+        lastLoginAt = s.createdAt;
+      }
+    }
+  }
+
+  // Payment summary
+  const totalCount = transactions.length;
+  const successfulCount = transactions.filter(t => t.status === 'succeeded').length;
+  const failedCount = transactions.filter(t => t.status === 'failed').length;
+  const refundedCount = transactions.filter(t => ['refunded', 'partially_refunded'].includes(t.status)).length;
+  const refundPendingCount = transactions.filter(t => t.status === 'refund_pending').length;
+  const totalVolume = transactions
+    .filter(t => ['succeeded', 'refunded', 'partially_refunded', 'refund_pending'].includes(t.status))
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+  // Activity timeline
+  const activity = [];
+  if (user.created_at) {
+    activity.push({
+      timestamp: user.created_at,
+      type: 'account',
+      title: 'Merchant Registered',
+      description: `Account created for ${user.email} (${user.company})`
+    });
+  }
+  if (mapping?.created_at) {
+    activity.push({
+      timestamp: mapping.created_at,
+      type: 'onboarding',
+      title: 'Cashfree Partner Linked',
+      description: `Mapped to Cashfree merchant ${mapping.cf_merchant_id}`
+    });
+  }
+  for (const t of transactions.slice(0, 5)) {
+    activity.push({
+      timestamp: t.createdAt,
+      type: 'payment',
+      title: `Payment ${t.status.toUpperCase()}`,
+      description: `${t.currency || 'INR'} ${t.amount} — Order ${t.id || t.orderId}`
+    });
+  }
+  for (const tk of tickets.slice(0, 5)) {
+    activity.push({
+      timestamp: tk.created_at,
+      type: 'support',
+      title: `Support Ticket: ${tk.subject}`,
+      description: `Status: ${tk.status} (${tk.priority} priority)`
+    });
+  }
+  activity.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  return {
+    account: {
+      merchantId: user.id,
+      name: user.name,
+      email: user.email,
+      company: user.company,
+      phone: profile?.phone || profile?.businessPhone || null,
+      website: profile?.website || null,
+      signupDate: user.created_at,
+      lastLoginAt,
+      authProvider: user.google_id ? 'google' : 'email'
+    },
+    onboarding: {
+      hasMapping: Boolean(mapping),
+      cfMerchantId: mapping?.cf_merchant_id || null,
+      onboardingStatus: mapping?.onboarding_status || 'NOT_STARTED',
+      kycStatus: mapping?.kyc_status || null,
+      fullKycStatus: mapping?.full_kyc_status || null,
+      activationStatus: mapping?.activation_status || null,
+      transactionAccess: mapping?.transaction_access || null,
+      updatedAt: mapping?.updated_at || null
+    },
+    payments: {
+      summary: {
+        totalCount,
+        totalVolume: Number(totalVolume.toFixed(2)),
+        successfulCount,
+        failedCount,
+        refundedCount,
+        refundPendingCount
+      },
+      recentTransactions: transactions.slice(0, 10).map(t => ({
+        id: t.id || t.orderId,
+        orderId: t.orderId || t.id,
+        amount: Number(t.amount || 0),
+        currency: t.currency || 'INR',
+        status: t.status,
+        customerEmail: t.customerEmail || '',
+        customerName: t.customerName || '',
+        paymentMethod: t.paymentMethod || 'cashfree',
+        refundedAmount: Number(t.refundedAmount || 0),
+        createdAt: t.createdAt
+      }))
+    },
+    products: products.slice(0, 10).map(p => ({
+      id: p.id,
+      name: p.name || 'Unnamed Product',
+      amount: Number(p.price || p.amount || 0),
+      currency: p.currency || 'INR',
+      status: p.status || 'active',
+      createdAt: p.createdAt || p.created_at || null
+    })),
+    paymentLinks: checkoutSessions,
+    customers: {
+      totalCustomers: customers.length,
+      recentCustomers: customers.slice(0, 10).map(c => ({
+        id: c.id,
+        name: c.name || 'Customer',
+        email: c.email,
+        totalSpent: Number(c.totalSpent || 0),
+        lastActive: c.lastActive || null
+      }))
+    },
+    support: {
+      totalTickets: tickets.length,
+      openTickets: tickets.filter(t => ['open', 'in_progress'].includes(t.status)).length,
+      recentTickets: tickets.slice(0, 10).map(t => ({
+        id: t.id,
+        subject: t.subject,
+        status: t.status,
+        priority: t.priority,
+        category: t.category,
+        createdAt: t.created_at,
+        updatedAt: t.updated_at
+      }))
+    },
+    chat: {
+      totalSessions: chats.length,
+      recentSessions: chats.slice(0, 10).map(c => ({
+        id: c.id,
+        mode: c.mode,
+        messageCount: Array.isArray(c.messages) ? c.messages.length : 0,
+        createdAt: c.created_at,
+        lastActivityAt: c.last_activity_at
+      }))
+    },
+    activity: activity.slice(0, 20)
+  };
+}
+
+export async function listAdminPayments({ page = 1, pageSize = 25, merchantId = null, status = null, search = '', minAmount = null, maxAmount = null, from = null, to = null, environment = null } = {}) {
+  const safePage = Math.max(1, parseInt(page, 10) || 1);
+  const safeLimit = Math.min(100, Math.max(1, parseInt(pageSize, 10) || 25));
+  const safeOffset = (safePage - 1) * safeLimit;
+  const q = String(search || '').trim().toLowerCase();
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensurePaymentStore();
+      await ensureAuthStore();
+      const rows = await sql`
+        SELECT
+          r.resource_id as id,
+          r.merchant_id,
+          u.name as merchant_name,
+          u.email as merchant_email,
+          u.company as merchant_company,
+          r.payload,
+          r.created_at
+        FROM qivropay_resources r
+        LEFT JOIN qivropay_users u ON u.id = r.merchant_id
+        WHERE r.resource_type = 'transaction'
+        ORDER BY r.created_at DESC, r.resource_id DESC
+      `;
+
+      let filtered = rows.map(r => ({
+        id: r.payload?.id || r.payload?.orderId || r.id,
+        merchantId: r.merchant_id,
+        merchantName: r.merchant_name || 'Merchant',
+        merchantEmail: r.merchant_email || '',
+        merchantCompany: r.merchant_company || '',
+        orderId: r.payload?.orderId || r.payload?.id || r.id,
+        amount: Number(r.payload?.amount || 0),
+        currency: r.payload?.currency || 'INR',
+        status: r.payload?.status || 'unknown',
+        customerEmail: r.payload?.customerEmail || '',
+        customerName: r.payload?.customerName || '',
+        paymentMethod: r.payload?.paymentMethod || 'cashfree',
+        refundedAmount: Number(r.payload?.refundedAmount || r.payload?.refundAmount || 0),
+        refundStatus: r.payload?.refundStatus || null,
+        environment: r.payload?.environment || (r.payload?.liveMode ? 'production' : (r.payload?.mode === 'live' ? 'production' : 'sandbox')),
+        createdAt: r.created_at
+      }));
+
+      if (merchantId) filtered = filtered.filter(p => p.merchantId === merchantId);
+      if (status && status !== 'all') filtered = filtered.filter(p => p.status.toLowerCase() === status.toLowerCase());
+      if (environment && environment !== 'all') filtered = filtered.filter(p => (p.environment || '').toLowerCase() === environment.toLowerCase());
+      if (minAmount != null && !isNaN(Number(minAmount))) filtered = filtered.filter(p => p.amount >= Number(minAmount));
+      if (maxAmount != null && !isNaN(Number(maxAmount))) filtered = filtered.filter(p => p.amount <= Number(maxAmount));
+      if (from) {
+        const fromTime = new Date(from).getTime();
+        if (!isNaN(fromTime)) filtered = filtered.filter(p => new Date(p.createdAt).getTime() >= fromTime);
+      }
+      if (to) {
+        const toTime = new Date(to).getTime();
+        if (!isNaN(toTime)) filtered = filtered.filter(p => new Date(p.createdAt).getTime() <= toTime);
+      }
+      if (q) {
+        filtered = filtered.filter(p =>
+          String(p.id).toLowerCase().includes(q) ||
+          String(p.orderId).toLowerCase().includes(q) ||
+          String(p.customerEmail).toLowerCase().includes(q) ||
+          String(p.customerName).toLowerCase().includes(q) ||
+          String(p.merchantName).toLowerCase().includes(q) ||
+          String(p.merchantCompany).toLowerCase().includes(q) ||
+          String(p.merchantId).toLowerCase().includes(q)
+        );
+      }
+
+      const total = filtered.length;
+      const totalPages = Math.ceil(total / safeLimit) || 1;
+      const paged = filtered.slice(safeOffset, safeOffset + safeLimit);
+
+      return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Memory fallback
+  const allPayments = [];
+  for (const [key, val] of memoryResources.entries()) {
+    if (key.includes(':transaction:')) {
+      const merchantIdPart = key.split(':')[0];
+      const u = memoryUsers.get(merchantIdPart) || Array.from(memoryUsers.values()).find(user => user.id === merchantIdPart);
+      allPayments.push({
+        id: val.id || val.orderId,
+        merchantId: merchantIdPart,
+        merchantName: u?.name || 'Merchant',
+        merchantEmail: u?.email || '',
+        merchantCompany: u?.company || '',
+        orderId: val.orderId || val.id,
+        amount: Number(val.amount || 0),
+        currency: val.currency || 'INR',
+        status: val.status || 'unknown',
+        customerEmail: val.customerEmail || '',
+        customerName: val.customerName || '',
+        paymentMethod: val.paymentMethod || 'cashfree',
+        refundedAmount: Number(val.refundedAmount || val.refundAmount || 0),
+        refundStatus: val.refundStatus || null,
+        environment: val.environment || (val.liveMode ? 'production' : (val.mode === 'live' ? 'production' : 'sandbox')),
+        createdAt: val.createdAt || new Date().toISOString()
+      });
+    }
+  }
+
+  let filtered = allPayments;
+  if (merchantId) filtered = filtered.filter(p => p.merchantId === merchantId);
+  if (status && status !== 'all') filtered = filtered.filter(p => p.status.toLowerCase() === status.toLowerCase());
+  if (environment && environment !== 'all') filtered = filtered.filter(p => (p.environment || '').toLowerCase() === environment.toLowerCase());
+  if (minAmount != null && !isNaN(Number(minAmount))) filtered = filtered.filter(p => p.amount >= Number(minAmount));
+  if (maxAmount != null && !isNaN(Number(maxAmount))) filtered = filtered.filter(p => p.amount <= Number(maxAmount));
+  if (from) {
+    const fromTime = new Date(from).getTime();
+    if (!isNaN(fromTime)) filtered = filtered.filter(p => new Date(p.createdAt).getTime() >= fromTime);
+  }
+  if (to) {
+    const toTime = new Date(to).getTime();
+    if (!isNaN(toTime)) filtered = filtered.filter(p => new Date(p.createdAt).getTime() <= toTime);
+  }
+  if (q) {
+    filtered = filtered.filter(p =>
+      String(p.id).toLowerCase().includes(q) ||
+      String(p.orderId).toLowerCase().includes(q) ||
+      String(p.customerEmail).toLowerCase().includes(q) ||
+      String(p.customerName).toLowerCase().includes(q) ||
+      String(p.merchantName).toLowerCase().includes(q) ||
+      String(p.merchantCompany).toLowerCase().includes(q) ||
+      String(p.merchantId).toLowerCase().includes(q)
+    );
+  }
+
+  filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const total = filtered.length;
+  const totalPages = Math.ceil(total / safeLimit) || 1;
+  const paged = filtered.slice(safeOffset, safeOffset + safeLimit);
+
+  return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+}
+
+export async function getAdminPaymentById(paymentId) {
+  if (!paymentId) return null;
+  const rawId = String(paymentId).trim();
+
+  let transactionRow = null;
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensurePaymentStore();
+      await ensureAuthStore();
+      const rows = await sql`
+        SELECT
+          r.resource_id as id,
+          r.merchant_id,
+          u.name as merchant_name,
+          u.email as merchant_email,
+          u.company as merchant_company,
+          r.payload,
+          r.created_at
+        FROM qivropay_resources r
+        LEFT JOIN qivropay_users u ON u.id = r.merchant_id
+        WHERE r.resource_type = 'transaction'
+          AND (r.resource_id = ${rawId} OR r.payload->>'id' = ${rawId} OR r.payload->>'orderId' = ${rawId})
+        LIMIT 1
+      `;
+      if (rows && rows[0]) {
+        transactionRow = rows[0];
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  if (!transactionRow) {
+    for (const [key, val] of memoryResources.entries()) {
+      if (key.includes(':transaction:')) {
+        const resourceId = key.split(':')[2];
+        if (resourceId === rawId || val.id === rawId || val.orderId === rawId) {
+          const merchantIdPart = key.split(':')[0];
+          const u = memoryUsers.get(merchantIdPart) || Array.from(memoryUsers.values()).find(user => user.id === merchantIdPart);
+          transactionRow = {
+            id: val.id || val.orderId || resourceId,
+            merchant_id: merchantIdPart,
+            merchant_name: u?.name || 'Merchant',
+            merchant_email: u?.email || '',
+            merchant_company: u?.company || '',
+            payload: val,
+            created_at: val.createdAt || new Date().toISOString()
+          };
+          break;
+        }
+      }
+    }
+  }
+
+  if (!transactionRow) return null;
+
+  const p = transactionRow.payload || {};
+  const merchantId = transactionRow.merchant_id;
+  const orderId = p.orderId || p.id || transactionRow.id;
+  const amount = Number(p.amount || 0);
+  const currency = p.currency || 'INR';
+  const status = p.status || 'unknown';
+  const createdAt = p.createdAt || transactionRow.created_at;
+  const environment = p.environment || (p.liveMode ? 'production' : (p.mode === 'live' ? 'production' : 'sandbox'));
+
+  // Merchant details
+  const merchant = {
+    id: merchantId,
+    name: transactionRow.merchant_name || 'Merchant',
+    email: transactionRow.merchant_email || '',
+    company: transactionRow.merchant_company || null
+  };
+
+  // Customer details
+  const customer = {
+    name: p.customerName || null,
+    email: p.customerEmail || null,
+    phone: p.customerPhone || null
+  };
+
+  // Cashfree / Gateway processing references
+  const processing = {
+    cfOrderId: p.cfOrderId || p.orderId || null,
+    cfPaymentId: p.cfPaymentId || p.paymentId || null,
+    paymentMethod: p.paymentMethod || 'cashfree',
+    gatewayStatus: p.gatewayStatus || p.status || null,
+    bankReference: p.bankReference || p.referenceId || null
+  };
+
+  // Refund details (only if exists)
+  let refund = null;
+  const hasRefund = Number(p.refundedAmount || p.refundAmount || 0) > 0 || Boolean(p.refundId) || Boolean(p.refundStatus) || ['refunded', 'partially_refunded', 'refund_pending'].includes(status);
+  if (hasRefund) {
+    refund = {
+      hasRefund: true,
+      refundId: p.refundId || null,
+      amount: Number(p.refundedAmount || p.refundAmount || 0),
+      status: p.refundStatus || (status === 'refund_pending' ? 'PENDING' : (status === 'partially_refunded' ? 'PARTIALLY_REFUNDED' : 'SUCCESS')),
+      note: p.refundNote || null,
+      refundedAt: p.refundedAt || p.updatedAt || null
+    };
+  }
+
+  // Settlement details (only if exists)
+  let settlement = null;
+  const line = await getResource(merchantId, 'cf_settlement_line', orderId);
+  if (line?.cfSettlementId) {
+    const s = await getResource(merchantId, 'cf_settlement', line.cfSettlementId);
+    if (s) {
+      settlement = {
+        cfSettlementId: s.id || line.cfSettlementId,
+        status: s.status,
+        settlementUtr: s.settlementUtr || null,
+        settlementCurrency: s.settlementCurrency || 'INR',
+        settlementType: s.settlementType || null,
+        settlementInitiatedOn: s.settlementInitiatedOn || null,
+        settlementProcessedOn: s.settlementProcessedOn || null,
+        updatedAt: s.fetchedAt || s.updatedAt || null
+      };
+    }
+  }
+
+  // Reconciliation details (only if exists)
+  let reconciliation = null;
+  const recon = await getResource(merchantId, 'payment_reconciliation', orderId);
+  if (recon) {
+    reconciliation = {
+      state: recon.state,
+      discrepancy: recon.discrepancy || null,
+      lastCheckedAt: recon.lastCheckedAt || null
+    };
+  }
+
+  // Related support tickets
+  let relatedTicket = null;
+  const tickets = await listSupportTickets({ userId: merchantId, limit: 20 });
+  if (Array.isArray(tickets) && tickets.length > 0) {
+    const matching = tickets.find(t =>
+      (t.subject && t.subject.includes(orderId)) ||
+      (t.message && t.message.includes(orderId))
+    );
+    const chosen = matching || tickets[0];
+    if (chosen) {
+      relatedTicket = {
+        id: chosen.id,
+        subject: chosen.subject,
+        status: chosen.status,
+        priority: chosen.priority,
+        createdAt: chosen.created_at
+      };
+    }
+  }
+
+  return {
+    id: transactionRow.id,
+    orderId,
+    amount,
+    currency,
+    status,
+    createdAt,
+    environment,
+    merchant,
+    customer,
+    processing,
+    refund,
+    settlement,
+    reconciliation,
+    relatedTicket
+  };
+}
+
+export async function listAdminOnboarding({ page = 1, pageSize = 25, onboardingStatus = null, kycStatus = null, activationStatus = null } = {}) {
+  const safePage = Math.max(1, parseInt(page, 10) || 1);
+  const safeLimit = Math.min(100, Math.max(1, parseInt(pageSize, 10) || 25));
+  const safeOffset = (safePage - 1) * safeLimit;
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensurePartnerMerchantStore();
+      await ensureAuthStore();
+
+      const rows = await sql`
+        SELECT
+          m.merchant_id,
+          u.name as merchant_name,
+          u.email as merchant_email,
+          m.cf_merchant_id,
+          m.onboarding_status,
+          m.kyc_status,
+          m.full_kyc_status,
+          m.activation_status,
+          m.transaction_access,
+          m.created_at,
+          m.updated_at
+        FROM qivropay_cashfree_partner_merchants m
+        LEFT JOIN qivropay_users u ON u.id = m.merchant_id
+        ORDER BY m.updated_at DESC
+      `;
+
+      let filtered = rows;
+      if (onboardingStatus && onboardingStatus !== 'all') {
+        filtered = filtered.filter(r => (r.onboarding_status || '').toLowerCase() === onboardingStatus.toLowerCase());
+      }
+      if (kycStatus && kycStatus !== 'all') {
+        filtered = filtered.filter(r => (r.kyc_status || '').toLowerCase() === kycStatus.toLowerCase());
+      }
+      if (activationStatus && activationStatus !== 'all') {
+        filtered = filtered.filter(r => (r.activation_status || '').toLowerCase() === activationStatus.toLowerCase());
+      }
+
+      const total = filtered.length;
+      const totalPages = Math.ceil(total / safeLimit) || 1;
+      const paged = filtered.slice(safeOffset, safeOffset + safeLimit).map(r => ({
+        merchantId: r.merchant_id,
+        merchantName: r.merchant_name || 'Merchant',
+        merchantEmail: r.merchant_email || '',
+        cfMerchantId: r.cf_merchant_id,
+        onboardingStatus: r.onboarding_status || 'NOT_STARTED',
+        kycStatus: r.kyc_status || null,
+        fullKycStatus: r.full_kyc_status || null,
+        activationStatus: r.activation_status || null,
+        transactionAccess: r.transaction_access || null,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at
+      }));
+
+      return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Memory fallback
+  let list = Array.from(memoryPartnerMerchants.values()).map(m => {
+    const u = memoryUsers.get(m.merchant_id) || Array.from(memoryUsers.values()).find(user => user.id === m.merchant_id);
+    return {
+      merchantId: m.merchant_id,
+      merchantName: u?.name || 'Merchant',
+      merchantEmail: u?.email || '',
+      cfMerchantId: m.cf_merchant_id,
+      onboardingStatus: m.onboarding_status || 'NOT_STARTED',
+      kycStatus: m.kyc_status || null,
+      fullKycStatus: m.full_kyc_status || null,
+      activationStatus: m.activation_status || null,
+      transactionAccess: m.transaction_access || null,
+      createdAt: m.created_at,
+      updatedAt: m.updated_at
+    };
+  });
+
+  if (onboardingStatus && onboardingStatus !== 'all') {
+    list = list.filter(r => (r.onboardingStatus || '').toLowerCase() === onboardingStatus.toLowerCase());
+  }
+  if (kycStatus && kycStatus !== 'all') {
+    list = list.filter(r => (r.kycStatus || '').toLowerCase() === kycStatus.toLowerCase());
+  }
+  if (activationStatus && activationStatus !== 'all') {
+    list = list.filter(r => (r.activationStatus || '').toLowerCase() === activationStatus.toLowerCase());
+  }
+
+  list.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  const total = list.length;
+  const totalPages = Math.ceil(total / safeLimit) || 1;
+  const paged = list.slice(safeOffset, safeOffset + safeLimit);
+
+  return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+}
+
+export async function listAdminAuditLogsFiltered({ page = 1, pageSize = 25, adminId = null, action = null, targetMerchantId = null, from = null, to = null } = {}) {
+  const safePage = Math.max(1, parseInt(page, 10) || 1);
+  const safeLimit = Math.min(100, Math.max(1, parseInt(pageSize, 10) || 25));
+  const safeOffset = (safePage - 1) * safeLimit;
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        SELECT
+          l.id,
+          l.admin_id,
+          u.name as admin_name,
+          u.email as admin_email,
+          u.role as admin_role,
+          l.action,
+          l.target_merchant_id,
+          l.target_resource_id,
+          l.details,
+          l.ip_address,
+          l.created_at
+        FROM qivropay_admin_audit_logs l
+        LEFT JOIN qivropay_admin_users u ON u.id = l.admin_id
+        ORDER BY l.created_at DESC
+      `;
+
+      let filtered = rows;
+      if (adminId) filtered = filtered.filter(l => l.admin_id === adminId);
+      if (action) filtered = filtered.filter(l => l.action.toLowerCase() === action.toLowerCase());
+      if (targetMerchantId) filtered = filtered.filter(l => l.target_merchant_id === targetMerchantId);
+      if (from) {
+        const fromTime = new Date(from).getTime();
+        if (!isNaN(fromTime)) filtered = filtered.filter(l => new Date(l.created_at).getTime() >= fromTime);
+      }
+      if (to) {
+        const toTime = new Date(to).getTime();
+        if (!isNaN(toTime)) filtered = filtered.filter(l => new Date(l.created_at).getTime() <= toTime);
+      }
+
+      const total = filtered.length;
+      const totalPages = Math.ceil(total / safeLimit) || 1;
+      const paged = filtered.slice(safeOffset, safeOffset + safeLimit).map(l => ({
+        id: l.id,
+        adminId: l.admin_id,
+        adminName: l.admin_name || 'Admin',
+        adminEmail: l.admin_email || 'admin@qivropay.internal',
+        adminRole: l.admin_role || 'super_admin',
+        action: l.action,
+        targetMerchantId: l.target_merchant_id,
+        targetResourceId: l.target_resource_id,
+        details: l.details || {},
+        ipAddress: l.ip_address,
+        createdAt: l.created_at
+      }));
+
+      return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Memory fallback
+  let logs = Array.from(memoryAdminAuditLogs.values()).map(l => {
+    let admin_email = 'unknown';
+    let admin_name = 'Admin';
+    let admin_role = 'super_admin';
+    for (const u of memoryAdminUsers.values()) {
+      if (u.id === l.admin_id) {
+        admin_email = u.email;
+        admin_name = u.name;
+        admin_role = u.role;
+        break;
+      }
+    }
+    return {
+      id: l.id,
+      adminId: l.admin_id,
+      adminName: admin_name,
+      adminEmail: admin_email,
+      adminRole: admin_role,
+      action: l.action,
+      targetMerchantId: l.target_merchant_id,
+      targetResourceId: l.target_resource_id,
+      details: l.details || {},
+      ipAddress: l.ip_address,
+      createdAt: l.created_at
+    };
+  });
+
+  if (adminId) logs = logs.filter(l => l.adminId === adminId);
+  if (action) logs = logs.filter(l => l.action.toLowerCase() === action.toLowerCase());
+  if (targetMerchantId) logs = logs.filter(l => l.targetMerchantId === targetMerchantId);
+  if (from) {
+    const fromTime = new Date(from).getTime();
+    if (!isNaN(fromTime)) logs = logs.filter(l => new Date(l.createdAt).getTime() >= fromTime);
+  }
+  if (to) {
+    const toTime = new Date(to).getTime();
+    if (!isNaN(toTime)) logs = logs.filter(l => new Date(l.createdAt).getTime() <= toTime);
+  }
+
+  logs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const total = logs.length;
+  const totalPages = Math.ceil(total / safeLimit) || 1;
+  const paged = logs.slice(safeOffset, safeOffset + safeLimit);
+
+  return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+}
+
+export async function listAdminTicketsFiltered({ page = 1, pageSize = 25, search = '', status = null, priority = null, merchantId = null, from = null, to = null } = {}) {
+  const safePage = Math.max(1, parseInt(page, 10) || 1);
+  const safeLimit = Math.min(100, Math.max(1, parseInt(pageSize, 10) || 25));
+  const safeOffset = (safePage - 1) * safeLimit;
+  const q = String(search || '').trim().toLowerCase();
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        SELECT * FROM qivropay_support_tickets
+        ORDER BY created_at DESC
+      `;
+
+      let filtered = rows;
+      if (merchantId) filtered = filtered.filter(t => t.user_id === merchantId || t.email === merchantId);
+      if (status && status !== 'all') filtered = filtered.filter(t => t.status.toLowerCase() === status.toLowerCase());
+      if (priority && priority !== 'all') filtered = filtered.filter(t => t.priority.toLowerCase() === priority.toLowerCase());
+      if (from) {
+        const fromTime = new Date(from).getTime();
+        if (!isNaN(fromTime)) filtered = filtered.filter(t => new Date(t.created_at).getTime() >= fromTime);
+      }
+      if (to) {
+        const toTime = new Date(to).getTime();
+        if (!isNaN(toTime)) filtered = filtered.filter(t => new Date(t.created_at).getTime() <= toTime);
+      }
+      if (q) {
+        filtered = filtered.filter(t =>
+          String(t.id).toLowerCase().includes(q) ||
+          String(t.subject).toLowerCase().includes(q) ||
+          String(t.email).toLowerCase().includes(q) ||
+          String(t.name).toLowerCase().includes(q)
+        );
+      }
+
+      const total = filtered.length;
+      const totalPages = Math.ceil(total / safeLimit) || 1;
+      const paged = filtered.slice(safeOffset, safeOffset + safeLimit);
+
+      return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Memory fallback
+  let tickets = Array.from(memorySupportTickets.values());
+  if (merchantId) tickets = tickets.filter(t => t.user_id === merchantId || t.email === merchantId);
+  if (status && status !== 'all') tickets = tickets.filter(t => t.status.toLowerCase() === status.toLowerCase());
+  if (priority && priority !== 'all') tickets = tickets.filter(t => t.priority.toLowerCase() === priority.toLowerCase());
+  if (from) {
+    const fromTime = new Date(from).getTime();
+    if (!isNaN(fromTime)) tickets = tickets.filter(t => new Date(t.created_at).getTime() >= fromTime);
+  }
+  if (to) {
+    const toTime = new Date(to).getTime();
+    if (!isNaN(toTime)) tickets = tickets.filter(t => new Date(t.created_at).getTime() <= toTime);
+  }
+  if (q) {
+    tickets = tickets.filter(t =>
+      String(t.id).toLowerCase().includes(q) ||
+      String(t.subject).toLowerCase().includes(q) ||
+      String(t.email).toLowerCase().includes(q) ||
+      String(t.name).toLowerCase().includes(q)
+    );
+  }
+
+  tickets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  const total = tickets.length;
+  const totalPages = Math.ceil(total / safeLimit) || 1;
+  const paged = tickets.slice(safeOffset, safeOffset + safeLimit);
+
+  return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+}
+
+export async function updateSupportTicketPriority(ticketId, priority) {
+  if (!ticketId || !priority) throw new Error('ticketId and priority are required');
+  const validPriorities = ['low', 'normal', 'high', 'urgent'];
+  if (!validPriorities.includes(priority)) {
+    throw new Error(`Invalid priority: must be one of ${validPriorities.join(', ')}`);
+  }
+
+  const now = new Date().toISOString();
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        UPDATE qivropay_support_tickets
+        SET priority = ${priority}, updated_at = ${now}
+        WHERE id = ${ticketId}
+        RETURNING *
+      `;
+      return rows?.[0] || null;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  const ticket = memorySupportTickets.get(ticketId);
+  if (!ticket) return null;
+  ticket.priority = priority;
+  ticket.updated_at = now;
+  memorySupportTickets.set(ticketId, ticket);
+  persistLocalStore();
+  return ticket;
+}
+
+export async function listAdminChatLogs({ page = 1, pageSize = 25, merchantId = null, mode = null, from = null, to = null, search = '' } = {}) {
+  const safePage = Math.max(1, parseInt(page, 10) || 1);
+  const safeLimit = Math.min(100, Math.max(1, parseInt(pageSize, 10) || 25));
+  const safeOffset = (safePage - 1) * safeLimit;
+  const q = String(search || '').trim().toLowerCase();
+
+  const sql = sqlClient();
+  if (sql) {
+    try {
+      await ensureAdminStore();
+      const rows = await sql`
+        SELECT id, merchant_id, mode, messages, last_activity_at, created_at
+        FROM qivropay_support_chat_sessions
+        ORDER BY last_activity_at DESC
+      `;
+
+      let filtered = rows.map(r => ({
+        id: r.id,
+        merchantId: r.merchant_id,
+        mode: r.mode,
+        messageCount: Array.isArray(r.messages) ? r.messages.length : 0,
+        createdAt: r.created_at,
+        lastActivityAt: r.last_activity_at
+      }));
+
+      if (merchantId) filtered = filtered.filter(c => c.merchantId === merchantId);
+      if (mode && mode !== 'all') filtered = filtered.filter(c => c.mode.toLowerCase() === mode.toLowerCase());
+      if (from) {
+        const fromTime = new Date(from).getTime();
+        if (!isNaN(fromTime)) filtered = filtered.filter(c => new Date(c.createdAt).getTime() >= fromTime);
+      }
+      if (to) {
+        const toTime = new Date(to).getTime();
+        if (!isNaN(toTime)) filtered = filtered.filter(c => new Date(c.createdAt).getTime() <= toTime);
+      }
+      if (q) filtered = filtered.filter(c => c.id.toLowerCase().includes(q) || String(c.merchantId || '').toLowerCase().includes(q));
+
+      const total = filtered.length;
+      const totalPages = Math.ceil(total / safeLimit) || 1;
+      const paged = filtered.slice(safeOffset, safeOffset + safeLimit);
+
+      return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Memory fallback
+  let chats = Array.from(memorySupportChatSessions.values()).map(c => ({
+    id: c.id,
+    merchantId: c.merchant_id,
+    mode: c.mode,
+    messageCount: Array.isArray(c.messages) ? c.messages.length : 0,
+    createdAt: c.created_at,
+    lastActivityAt: c.last_activity_at
+  }));
+
+  if (merchantId) chats = chats.filter(c => c.merchantId === merchantId);
+  if (mode && mode !== 'all') chats = chats.filter(c => c.mode.toLowerCase() === mode.toLowerCase());
+  if (from) {
+    const fromTime = new Date(from).getTime();
+    if (!isNaN(fromTime)) chats = chats.filter(c => new Date(c.createdAt).getTime() >= fromTime);
+  }
+  if (to) {
+    const toTime = new Date(to).getTime();
+    if (!isNaN(toTime)) chats = chats.filter(c => new Date(c.createdAt).getTime() <= toTime);
+  }
+  if (q) chats = chats.filter(c => c.id.toLowerCase().includes(q) || String(c.merchantId || '').toLowerCase().includes(q));
+
+  chats.sort((a, b) => new Date(b.lastActivityAt) - new Date(a.lastActivityAt));
+  const total = chats.length;
+  const totalPages = Math.ceil(total / safeLimit) || 1;
+  const paged = chats.slice(safeOffset, safeOffset + safeLimit);
+
+  return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
 }

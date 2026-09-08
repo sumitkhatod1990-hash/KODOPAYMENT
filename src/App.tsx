@@ -4,6 +4,7 @@ import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { Hero } from './components/landing/Hero';
 import { ProductPreview } from './components/landing/ProductPreview';
+import { PaymentInfrastructure } from './components/landing/PaymentInfrastructure';
 import { BentoFeatures } from './components/landing/BentoFeatures';
 import { ArchitectureFlow } from './components/landing/ArchitectureFlow';
 import { CodeIntegration } from './components/landing/CodeIntegration';
@@ -69,6 +70,7 @@ export const App: React.FC = () => {
       <main className="flex-1">
         <Hero />
         <ProductPreview />
+        <PaymentInfrastructure />
         <BentoFeatures />
         <ArchitectureFlow />
         <CodeIntegration />
