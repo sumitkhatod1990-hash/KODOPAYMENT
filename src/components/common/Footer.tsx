@@ -23,7 +23,7 @@ export const Footer: React.FC = () => {
           <div className="col-span-2 space-y-4">
             <Logo size="lg" showSubtitle={true} onClick={() => setCurrentView('landing')} />
             <p className="text-xs text-[#86868b] max-w-sm leading-relaxed">
-              A merchant checkout and payment product for businesses in India, built on Cashfree's payment infrastructure.
+              A merchant checkout and payment product for businesses in India, built on secure payment infrastructure.
             </p>
           </div>
 

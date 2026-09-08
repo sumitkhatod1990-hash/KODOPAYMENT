@@ -18,7 +18,7 @@ export const ArchitectureFlow: React.FC = () => {
     checkout: {
       title: 'Customer Checkout',
       badge: 'UPI & Cards',
-      desc: 'UPI QR and card checkout hosted by Cashfree, embedded in your branded QivroPay checkout page so the customer never leaves it.',
+      desc: 'UPI QR and card checkout hosted by secure payment infrastructure, embedded in your branded QivroPay checkout page so the customer never leaves it.',
       metrics: ['UPI QR checkout', 'Visa / Mastercard / RuPay', 'Signed checkout sessions']
     },
     billing: {
@@ -30,20 +30,20 @@ export const ArchitectureFlow: React.FC = () => {
     ledger: {
       title: 'Payments Ledger',
       badge: 'Real-Time',
-      desc: 'Payments are recorded in your dashboard as soon as Cashfree confirms them via a signed webhook. Status is never trusted from the browser alone.',
+      desc: 'Payments are recorded in your dashboard as soon as the payment rail confirms them via a signed webhook. Status is never trusted from the browser alone.',
       metrics: ['Signature-verified webhooks', 'Idempotent recording', 'Live status updates']
     },
     rails: {
       title: 'Payment Rails',
       badge: 'India',
-      desc: 'Secure server-side order creation with Cashfree checkout and payment-status verification across UPI and cards.',
+      desc: 'Secure server-side order creation with hosted checkout and payment-status verification across UPI and cards.',
       metrics: ['UPI QR', 'Visa / Mastercard / RuPay', 'Signed order creation']
     },
     settlement: {
       title: 'Settlement',
-      badge: 'Handled by Cashfree',
-      desc: 'Settlement is handled by Cashfree. QivroPay does not yet offer merchant-configurable payout routing in this version.',
-      metrics: ['Settlement via Cashfree', 'No manual reconciliation', 'Visible in your ledger']
+      badge: 'Handled securely',
+      desc: 'Settlement is handled through secure payment infrastructure. QivroPay does not yet offer merchant-configurable payout routing in this version.',
+      metrics: ['Secure settlement flow', 'No manual reconciliation', 'Visible in your ledger']
     }
   };
 
@@ -55,7 +55,7 @@ export const ArchitectureFlow: React.FC = () => {
       accent: 'text-[#0071e3] border-[#0071e3]',
       ring: 'ring-[#0071e3]/20',
       title: 'Customer → Payment',
-      desc: 'UPI QR and card checkout via Cashfree.'
+      desc: 'UPI QR and card checkout through secure payment rails.'
     },
     {
       key: 'billing',
@@ -73,7 +73,7 @@ export const ArchitectureFlow: React.FC = () => {
       accent: 'text-emerald-600 border-emerald-600',
       ring: 'ring-emerald-600/20',
       title: 'Payments Ledger',
-      desc: 'Payments are recorded automatically once Cashfree confirms them.'
+      desc: 'Payments are recorded automatically once the payment rail confirms them.'
     }
   ];
 
@@ -89,7 +89,7 @@ export const ArchitectureFlow: React.FC = () => {
     {
       key: 'ledger',
       label: 'PAYMENTS LEDGER',
-      sub: 'Recorded from Cashfree webhooks',
+      sub: 'Recorded from verified webhooks',
       icon: <Layers className="w-5 h-5" />,
       accent: 'text-[#0071e3] border-[#0071e3]',
       ring: 'ring-[#0071e3]/20'
@@ -97,7 +97,7 @@ export const ArchitectureFlow: React.FC = () => {
     {
       key: 'settlement',
       label: 'SETTLEMENT',
-      sub: 'Handled by Cashfree',
+      sub: 'Handled securely',
       icon: <Building className="w-5 h-5" />,
       accent: 'text-emerald-600 border-emerald-600',
       ring: 'ring-emerald-600/20'
@@ -117,7 +117,7 @@ export const ArchitectureFlow: React.FC = () => {
             The Complete End-to-End Flow.
           </h2>
           <p className="text-base sm:text-lg text-[#6E717D] max-w-2xl mx-auto">
-            From customer checkout to your payments ledger, powered by Cashfree.
+            From customer checkout to your payments ledger, powered by secure payment infrastructure.
           </p>
         </div>
 

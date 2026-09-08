@@ -4,7 +4,7 @@ import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { Hero } from './components/landing/Hero';
 import { ProductPreview } from './components/landing/ProductPreview';
-import { PaymentInfrastructure } from './components/landing/PaymentInfrastructure';
+import { FeatureCards } from './components/landing/FeatureCards';
 import { BentoFeatures } from './components/landing/BentoFeatures';
 import { ArchitectureFlow } from './components/landing/ArchitectureFlow';
 import { CodeIntegration } from './components/landing/CodeIntegration';
@@ -69,8 +69,33 @@ export const App: React.FC = () => {
       
       <main className="flex-1">
         <Hero />
+
+        {/* Built for Indian businesses showcase */}
+        <section className="bg-[#f7f6f2] px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-8 flex items-end justify-between gap-6 text-[#151a4a]">
+              <div>
+                <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.24em] text-[#7054E8]">
+                  Built for Indian businesses
+                </p>
+                <h2 className="max-w-xl text-3xl font-bold tracking-tight sm:text-5xl">
+                  Payments made simple for what’s next.
+                </h2>
+              </div>
+              <span className="hidden text-sm text-[#4d5475]/60 sm:block">
+                UPI · Cards · Net Banking · Wallets
+              </span>
+            </div>
+            <img
+              src="/qivropay-businesses.png"
+              alt="QivroPay helping Indian businesses accept payments"
+              className="qp-image-lock mx-auto aspect-[16/8] max-w-5xl rounded-[1.5rem] object-cover shadow-[0_18px_50px_-28px_rgba(21,26,74,.3)]"
+            />
+          </div>
+        </section>
+
         <ProductPreview />
-        <PaymentInfrastructure />
+        <FeatureCards />
         <BentoFeatures />
         <ArchitectureFlow />
         <CodeIntegration />

@@ -411,3 +411,63 @@
 .animate-glow {
   animation: pulseGlow 3s ease-in-out infinite;
 }
+
+/* Landing Hero Animations & Media Utilities */
+@keyframes qp-hero-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes qp-phone-float {
+  0%, to {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.25deg);
+  }
+}
+
+.hero-reveal {
+  opacity: 0;
+  animation: qp-hero-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-reveal-delay-1 {
+  animation-delay: 0.12s;
+}
+
+.hero-reveal-delay-2 {
+  animation-delay: 0.24s;
+}
+
+.hero-phone {
+  animation: qp-phone-float 6s ease-in-out 1s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-reveal {
+    opacity: 1;
+    animation: none;
+  }
+  .hero-phone {
+    animation: none;
+  }
+}
+
+.qp-image-lock {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.qp-image-frame {
+  overflow: hidden;
+  contain: layout paint;
+}
