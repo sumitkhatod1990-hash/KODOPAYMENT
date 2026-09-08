@@ -758,6 +758,16 @@ export const AdminClient360Page: React.FC<Props> = ({ merchantId }) => {
                   <span>{new Date(onboarding.updatedAt).toLocaleString()}</span>
                 </div>
               )}
+
+              <div className="pt-2 border-t border-slate-800/60">
+                <button
+                  onClick={() => navigateAdmin(`/onboarding/${merchantId}`)}
+                  className="w-full py-1.5 px-3 bg-slate-800/80 hover:bg-slate-700 text-blue-400 hover:text-blue-300 text-[11px] font-medium rounded-xl border border-slate-700/80 transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <FileCheck className="w-3.5 h-3.5" />
+                  View Onboarding Workspace &rarr;
+                </button>
+              </div>
             </div>
           </div>
 

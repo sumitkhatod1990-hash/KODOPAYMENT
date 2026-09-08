@@ -72,7 +72,7 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Onboarding / KYC',
     path: '/onboarding',
     icon: FileCheck,
-    allowedRoles: ['super_admin', 'compliance_officer', 'read_only']
+    allowedRoles: ['super_admin', 'compliance_officer', 'support_agent', 'read_only']
   },
   {
     id: 'audit-logs',

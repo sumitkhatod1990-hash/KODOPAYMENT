@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { deriveOnboardingState, describeOnboardingState } from '../src/lib/cashfreeOnboardingState.js';
 
 let schemaReady;
 
@@ -2770,7 +2771,7 @@ export async function getAdminPaymentById(paymentId) {
   };
 }
 
-export async function listAdminOnboarding({ page = 1, pageSize = 25, onboardingStatus = null, kycStatus = null, activationStatus = null } = {}) {
+export async function listAdminOnboarding({ page = 1, pageSize = 25, onboardingStatus = null, kycStatus = null, activationStatus = null, search = '', from = null, to = null } = {}) {
   const safePage = Math.max(1, parseInt(page, 10) || 1);
   const safeLimit = Math.min(100, Math.max(1, parseInt(pageSize, 10) || 25));
   const safeOffset = (safePage - 1) * safeLimit;
@@ -2783,48 +2784,102 @@ export async function listAdminOnboarding({ page = 1, pageSize = 25, onboardingS
 
       const rows = await sql`
         SELECT
-          m.merchant_id,
+          u.id as merchant_id,
           u.name as merchant_name,
+          u.company as merchant_company,
           u.email as merchant_email,
+          u.created_at as merchant_created_at,
           m.cf_merchant_id,
           m.onboarding_status,
           m.kyc_status,
           m.full_kyc_status,
           m.activation_status,
           m.transaction_access,
-          m.created_at,
-          m.updated_at
-        FROM qivropay_cashfree_partner_merchants m
-        LEFT JOIN qivropay_users u ON u.id = m.merchant_id
-        ORDER BY m.updated_at DESC
+          m.created_at as mapping_created_at,
+          m.updated_at as mapping_updated_at
+        FROM qivropay_users u
+        LEFT JOIN qivropay_cashfree_partner_merchants m ON m.merchant_id = u.id
+        ORDER BY COALESCE(m.updated_at, u.created_at) DESC
       `;
 
-      let filtered = rows;
+      const allItems = rows.map(r => {
+        const started = Boolean(r.cf_merchant_id);
+        const derived = deriveOnboardingState({
+          started,
+          stale: false,
+          cfMerchantId: r.cf_merchant_id || null,
+          onboardingStatus: r.onboarding_status || null,
+          kycStatus: r.kyc_status || null,
+          fullKycStatus: r.full_kyc_status || null,
+          activationStatus: r.activation_status || null,
+          transactionAccess: r.transaction_access || null,
+          updatedAt: r.mapping_updated_at || null,
+          errorMessage: null
+        });
+        const stateDesc = describeOnboardingState(derived);
+        return {
+          merchantId: r.merchant_id,
+          merchantName: r.merchant_name || 'Merchant',
+          company: r.merchant_company || '',
+          merchantEmail: r.merchant_email || '',
+          cfMerchantId: r.cf_merchant_id || null,
+          onboardingState: derived.state,
+          onboardingStatus: r.onboarding_status || derived.state,
+          rawOnboardingStatus: r.onboarding_status || null,
+          kycStatus: r.kyc_status || null,
+          fullKycStatus: r.full_kyc_status || null,
+          activationStatus: r.activation_status || null,
+          transactionAccess: r.transaction_access || null,
+          stateReason: derived.reason,
+          stateTitle: stateDesc.title,
+          stateDetail: stateDesc.detail,
+          stateTone: stateDesc.tone,
+          createdAt: r.merchant_created_at || r.mapping_created_at,
+          updatedAt: r.mapping_updated_at || null,
+          lastSyncedAt: r.mapping_updated_at || null,
+          hasPartnerMapping: Boolean(r.cf_merchant_id)
+        };
+      });
+
+      let filtered = allItems;
+      const q = String(search || '').trim().toLowerCase();
+      if (q) {
+        filtered = filtered.filter(item =>
+          item.merchantId.toLowerCase().includes(q) ||
+          (item.merchantName || '').toLowerCase().includes(q) ||
+          (item.company || '').toLowerCase().includes(q) ||
+          (item.merchantEmail || '').toLowerCase().includes(q) ||
+          (item.cfMerchantId || '').toLowerCase().includes(q)
+        );
+      }
       if (onboardingStatus && onboardingStatus !== 'all') {
-        filtered = filtered.filter(r => (r.onboarding_status || '').toLowerCase() === onboardingStatus.toLowerCase());
+        filtered = filtered.filter(r =>
+          (r.onboardingState || '').toLowerCase() === onboardingStatus.toLowerCase() ||
+          (r.rawOnboardingStatus || '').toLowerCase() === onboardingStatus.toLowerCase()
+        );
       }
       if (kycStatus && kycStatus !== 'all') {
-        filtered = filtered.filter(r => (r.kyc_status || '').toLowerCase() === kycStatus.toLowerCase());
+        filtered = filtered.filter(r => (r.kycStatus || '').toLowerCase() === kycStatus.toLowerCase());
       }
       if (activationStatus && activationStatus !== 'all') {
-        filtered = filtered.filter(r => (r.activation_status || '').toLowerCase() === activationStatus.toLowerCase());
+        filtered = filtered.filter(r => (r.activationStatus || '').toLowerCase() === activationStatus.toLowerCase());
+      }
+      if (from) {
+        const fromTime = new Date(from).getTime();
+        if (!isNaN(fromTime)) {
+          filtered = filtered.filter(r => new Date(r.createdAt || 0).getTime() >= fromTime);
+        }
+      }
+      if (to) {
+        const toTime = new Date(to).getTime();
+        if (!isNaN(toTime)) {
+          filtered = filtered.filter(r => new Date(r.createdAt || 0).getTime() <= toTime);
+        }
       }
 
       const total = filtered.length;
       const totalPages = Math.ceil(total / safeLimit) || 1;
-      const paged = filtered.slice(safeOffset, safeOffset + safeLimit).map(r => ({
-        merchantId: r.merchant_id,
-        merchantName: r.merchant_name || 'Merchant',
-        merchantEmail: r.merchant_email || '',
-        cfMerchantId: r.cf_merchant_id,
-        onboardingStatus: r.onboarding_status || 'NOT_STARTED',
-        kycStatus: r.kyc_status || null,
-        fullKycStatus: r.full_kyc_status || null,
-        activationStatus: r.activation_status || null,
-        transactionAccess: r.transaction_access || null,
-        createdAt: r.created_at,
-        updatedAt: r.updated_at
-      }));
+      const paged = filtered.slice(safeOffset, safeOffset + safeLimit);
 
       return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
     } catch (e) {
@@ -2833,39 +2888,204 @@ export async function listAdminOnboarding({ page = 1, pageSize = 25, onboardingS
   }
 
   // Memory fallback
-  let list = Array.from(memoryPartnerMerchants.values()).map(m => {
-    const u = memoryUsers.get(m.merchant_id) || Array.from(memoryUsers.values()).find(user => user.id === m.merchant_id);
-    return {
-      merchantId: m.merchant_id,
-      merchantName: u?.name || 'Merchant',
-      merchantEmail: u?.email || '',
-      cfMerchantId: m.cf_merchant_id,
-      onboardingStatus: m.onboarding_status || 'NOT_STARTED',
-      kycStatus: m.kyc_status || null,
-      fullKycStatus: m.full_kyc_status || null,
-      activationStatus: m.activation_status || null,
-      transactionAccess: m.transaction_access || null,
-      createdAt: m.created_at,
-      updatedAt: m.updated_at
-    };
-  });
+  const userMap = new Map();
+  for (const u of memoryUsers.values()) {
+    userMap.set(u.id, u);
+  }
 
+  const allMerchantIds = new Set([...userMap.keys(), ...memoryPartnerMerchants.keys()]);
+  const allItems = [];
+  for (const mId of allMerchantIds) {
+    const u = userMap.get(mId) || null;
+    const m = memoryPartnerMerchants.get(mId) || null;
+    const started = Boolean(m && m.cf_merchant_id);
+    const derived = deriveOnboardingState({
+      started,
+      stale: false,
+      cfMerchantId: m?.cf_merchant_id || null,
+      onboardingStatus: m?.onboarding_status || null,
+      kycStatus: m?.kyc_status || null,
+      fullKycStatus: m?.full_kyc_status || null,
+      activationStatus: m?.activation_status || null,
+      transactionAccess: m?.transaction_access || null,
+      updatedAt: m?.updated_at || null,
+      errorMessage: null
+    });
+    const stateDesc = describeOnboardingState(derived);
+    allItems.push({
+      merchantId: mId,
+      merchantName: u?.name || 'Merchant',
+      company: u?.company || '',
+      merchantEmail: u?.email || '',
+      cfMerchantId: m?.cf_merchant_id || null,
+      onboardingState: derived.state,
+      onboardingStatus: m?.onboarding_status || derived.state,
+      rawOnboardingStatus: m?.onboarding_status || null,
+      kycStatus: m?.kyc_status || null,
+      fullKycStatus: m?.full_kyc_status || null,
+      activationStatus: m?.activation_status || null,
+      transactionAccess: m?.transaction_access || null,
+      stateReason: derived.reason,
+      stateTitle: stateDesc.title,
+      stateDetail: stateDesc.detail,
+      stateTone: stateDesc.tone,
+      createdAt: u?.created_at || m?.created_at || new Date().toISOString(),
+      updatedAt: m?.updated_at || null,
+      lastSyncedAt: m?.updated_at || null,
+      hasPartnerMapping: Boolean(m?.cf_merchant_id)
+    });
+  }
+
+  allItems.sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
+
+  let filtered = allItems;
+  const q = String(search || '').trim().toLowerCase();
+  if (q) {
+    filtered = filtered.filter(item =>
+      item.merchantId.toLowerCase().includes(q) ||
+      (item.merchantName || '').toLowerCase().includes(q) ||
+      (item.company || '').toLowerCase().includes(q) ||
+      (item.merchantEmail || '').toLowerCase().includes(q) ||
+      (item.cfMerchantId || '').toLowerCase().includes(q)
+    );
+  }
   if (onboardingStatus && onboardingStatus !== 'all') {
-    list = list.filter(r => (r.onboardingStatus || '').toLowerCase() === onboardingStatus.toLowerCase());
+    filtered = filtered.filter(r =>
+      (r.onboardingState || '').toLowerCase() === onboardingStatus.toLowerCase() ||
+      (r.rawOnboardingStatus || '').toLowerCase() === onboardingStatus.toLowerCase()
+    );
   }
   if (kycStatus && kycStatus !== 'all') {
-    list = list.filter(r => (r.kycStatus || '').toLowerCase() === kycStatus.toLowerCase());
+    filtered = filtered.filter(r => (r.kycStatus || '').toLowerCase() === kycStatus.toLowerCase());
   }
   if (activationStatus && activationStatus !== 'all') {
-    list = list.filter(r => (r.activationStatus || '').toLowerCase() === activationStatus.toLowerCase());
+    filtered = filtered.filter(r => (r.activationStatus || '').toLowerCase() === activationStatus.toLowerCase());
+  }
+  if (from) {
+    const fromTime = new Date(from).getTime();
+    if (!isNaN(fromTime)) {
+      filtered = filtered.filter(r => new Date(r.createdAt || 0).getTime() >= fromTime);
+    }
+  }
+  if (to) {
+    const toTime = new Date(to).getTime();
+    if (!isNaN(toTime)) {
+      filtered = filtered.filter(r => new Date(r.createdAt || 0).getTime() <= toTime);
+    }
   }
 
-  list.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-  const total = list.length;
+  const total = filtered.length;
   const totalPages = Math.ceil(total / safeLimit) || 1;
-  const paged = list.slice(safeOffset, safeOffset + safeLimit);
+  const paged = filtered.slice(safeOffset, safeOffset + safeLimit);
 
   return { data: paged, pagination: { page: safePage, pageSize: safeLimit, total, totalPages } };
+}
+
+export async function getAdminOnboardingDetail(merchantId) {
+  if (!merchantId) return null;
+  const user = await findUserById(merchantId);
+  if (!user) return null;
+
+  const profile = await getResource(merchantId, 'merchant_profile', 'profile').catch(() => null);
+  const mapping = await getPartnerMerchantMapping(merchantId).catch(() => null);
+  const tickets = await listSupportTickets({ userId: merchantId, limit: 50 }).catch(() => []);
+
+  const started = Boolean(mapping && mapping.cf_merchant_id);
+  const derived = deriveOnboardingState({
+    started,
+    stale: false,
+    cfMerchantId: mapping?.cf_merchant_id || null,
+    onboardingStatus: mapping?.onboarding_status || null,
+    kycStatus: mapping?.kyc_status || null,
+    fullKycStatus: mapping?.full_kyc_status || null,
+    activationStatus: mapping?.activation_status || null,
+    transactionAccess: mapping?.transaction_access || null,
+    updatedAt: mapping?.updated_at || null,
+    errorMessage: null
+  });
+
+  const stateDesc = describeOnboardingState(derived);
+
+  // Build authentic chronological timeline based on stored timestamps
+  const timeline = [];
+  if (user.created_at) {
+    timeline.push({
+      event: 'merchant_created',
+      label: 'Merchant Registered',
+      description: 'Account registered on QivroPay platform',
+      timestamp: user.created_at,
+      status: 'completed'
+    });
+  }
+  if (mapping?.created_at) {
+    timeline.push({
+      event: 'partner_mapped',
+      label: 'Cashfree Partner Mapped',
+      description: `Linked to Cashfree Partner Merchant ID: ${mapping.cf_merchant_id}`,
+      timestamp: mapping.created_at,
+      status: 'completed'
+    });
+  }
+  if (mapping?.updated_at && (!mapping.created_at || new Date(mapping.updated_at).getTime() > new Date(mapping.created_at).getTime())) {
+    timeline.push({
+      event: 'status_synced',
+      label: 'Authoritative Status Synced',
+      description: `Latest Cashfree Partner KYC & onboarding status synced (${derived.state})`,
+      timestamp: mapping.updated_at,
+      status: 'completed'
+    });
+  }
+
+  const relatedTickets = (tickets || []).map(t => ({
+    id: t.id,
+    ticketId: t.ticket_id || t.id,
+    subject: t.subject,
+    status: t.status,
+    priority: t.priority,
+    createdAt: t.created_at,
+    updatedAt: t.updated_at
+  }));
+
+  // Sanitized output strictly without secrets or credentials
+  return {
+    merchant: {
+      id: user.id,
+      name: user.name || 'Merchant',
+      email: user.email,
+      company: user.company || '',
+      phone: profile?.contactPhone || profile?.phone || null,
+      signupDate: user.created_at,
+      profileStatus: profile?.status || (profile ? 'configured' : 'pending')
+    },
+    partner: {
+      hasMapping: Boolean(mapping?.cf_merchant_id),
+      cfMerchantId: mapping?.cf_merchant_id || null,
+      onboardingStatus: mapping?.onboarding_status || null,
+      activationStatus: mapping?.activation_status || null,
+      transactionAccess: mapping?.transaction_access || null,
+      createdAt: mapping?.created_at || null,
+      lastSyncedAt: mapping?.updated_at || null
+    },
+    kyc: {
+      onboardingState: derived.state,
+      stateReason: derived.reason,
+      stateTitle: stateDesc.title,
+      stateDetail: stateDesc.detail,
+      stateTone: stateDesc.tone,
+      minKycStatus: mapping?.kyc_status || null,
+      fullKycStatus: mapping?.full_kyc_status || null,
+      isMinKycApproved: mapping?.kyc_status === 'MIN_KYC_APPROVED',
+      isFullKycApproved: mapping?.full_kyc_status === 'FULL_KYC_APPROVED' || mapping?.full_kyc_status === 'APPROVED',
+      isPaymentActive: mapping?.activation_status === 'ACTIVE' || mapping?.transaction_access === 'full'
+    },
+    timeline,
+    relatedTickets,
+    links: {
+      client360: `/clients/${user.id}`,
+      payments: `/payments?search=${encodeURIComponent(user.id)}`,
+      tickets: `/tickets?search=${encodeURIComponent(user.id)}`
+    }
+  };
 }
 
 export async function listAdminAuditLogsFiltered({ page = 1, pageSize = 25, adminId = null, action = null, targetMerchantId = null, from = null, to = null } = {}) {

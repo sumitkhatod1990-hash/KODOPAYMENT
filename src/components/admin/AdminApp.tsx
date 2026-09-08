@@ -13,6 +13,7 @@ import { AdminChatLogDetailPage } from './AdminChatLogDetailPage';
 import { AdminPaymentsPage } from './AdminPaymentsPage';
 import { AdminPaymentDetailPage } from './AdminPaymentDetailPage';
 import { AdminOnboardingPage } from './AdminOnboardingPage';
+import { AdminOnboardingDetailPage } from './AdminOnboardingDetailPage';
 import { AdminAuditLogsPage } from './AdminAuditLogsPage';
 import { Shield, Loader2, AlertCircle } from 'lucide-react';
 
@@ -160,10 +161,14 @@ export const AdminApp: React.FC = () => {
       return <AdminPaymentsPage />;
     }
 
+    // Onboarding Detail route: /onboarding/:merchantId
+    const onboardingDetailMatch = currentPath.match(/^\/onboarding\/([^/]+)\/?$/);
+    if (onboardingDetailMatch) {
+      const merchantId = decodeURIComponent(onboardingDetailMatch[1]);
+      return <AdminOnboardingDetailPage merchantId={merchantId} />;
+    }
+
     if (currentPath === '/onboarding' || currentPath === '/onboarding/') {
-      if (!isSuperAdmin && !isCompliance && !isReadOnly) {
-        return <AccessRestrictedModule module="Onboarding / KYC Queue" requiredRoles={['super_admin', 'compliance_officer', 'read_only']} />;
-      }
       return <AdminOnboardingPage />;
     }
 

@@ -830,12 +830,12 @@ async function run() {
     assert.equal(resChats.status, 403, 'Compliance officer must be rejected from chat logs with 403');
   });
 
-  await test('10.2: RBAC matrix - Support Agent cannot access onboarding or audit logs', async () => {
-    // Onboarding queue
+  await test('10.2: RBAC matrix - Support Agent onboarding read access (Phase 2C-6) and sync/audit restriction', async () => {
+    // Onboarding queue (Phase 2C-6 grants read access to all 4 roles)
     const resOnboard = await fetch(`${BASE}/api/v1/admin/onboarding`, {
       headers: { 'x-forwarded-host': 'client.qivropay.com', 'Cookie': supportCookie }
     });
-    assert.equal(resOnboard.status, 403, 'Support agent must be rejected from onboarding with 403');
+    assert.equal(resOnboard.status, 200, 'Support agent can read onboarding queue');
 
     // KYC sync
     const resSync = await fetch(`${BASE}/api/v1/admin/onboarding/${merchantA.id}/sync`, {

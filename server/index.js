@@ -5,11 +5,12 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
-import { ensurePaymentStore, recordCashfreeWebhook, recordPaymentOrder, getPaymentOrderForSession, getPaymentOrder, ensureAuthStore, createUser, findUserByEmail, checkUserPassword, createAuthSession, getUserForSession, deleteAuthSession, upsertGoogleUser, createCheckoutSession, getCheckoutSession, saveResource, listResources, getResource, deleteResource, findApiKey, persistenceMode, beginRefundClaim, releaseRefundClaim, claimWelcomeEmail, ensureAdminStore, createAdminUser, findAdminUserByEmail, findAdminUserById, listAdminUsers, checkAdminPassword, createAdminSession, getAdminUserForSession, deleteAdminSession, recordAdminAuditLog, listAdminAuditLogs, bootstrapAdminUser, createSupportTicket, listSupportTickets, getSupportTicketById, addSupportTicketReply, updateSupportTicketStatus, saveSupportChatSession, listSupportChatSessions, getSupportChatSession, findUserById, getAdminOverviewStats, listAdminClients, getAdminClient360, listAdminPayments, getAdminPaymentById, listAdminOnboarding, listAdminAuditLogsFiltered, listAdminTicketsFiltered, updateSupportTicketPriority, listAdminChatLogs, getPartnerMerchantMapping } from './neonStore.js';
+import { ensurePaymentStore, recordCashfreeWebhook, recordPaymentOrder, getPaymentOrderForSession, getPaymentOrder, ensureAuthStore, createUser, findUserByEmail, checkUserPassword, createAuthSession, getUserForSession, deleteAuthSession, upsertGoogleUser, createCheckoutSession, getCheckoutSession, saveResource, listResources, getResource, deleteResource, findApiKey, persistenceMode, beginRefundClaim, releaseRefundClaim, claimWelcomeEmail, ensureAdminStore, createAdminUser, findAdminUserByEmail, findAdminUserById, listAdminUsers, checkAdminPassword, createAdminSession, getAdminUserForSession, deleteAdminSession, recordAdminAuditLog, listAdminAuditLogs, bootstrapAdminUser, createSupportTicket, listSupportTickets, getSupportTicketById, addSupportTicketReply, updateSupportTicketStatus, saveSupportChatSession, listSupportChatSessions, getSupportChatSession, findUserById, getAdminOverviewStats, listAdminClients, getAdminClient360, listAdminPayments, getAdminPaymentById, listAdminOnboarding, getAdminOnboardingDetail, listAdminAuditLogsFiltered, listAdminTicketsFiltered, updateSupportTicketPriority, listAdminChatLogs, getPartnerMerchantMapping } from './neonStore.js';
 import { verifyGoogleIdToken, googleClientId } from './googleAuth.js';
 import { applyRefundStatus } from './cashfreeRefundOutcome.js';
 import { recordCashfreeOrderOutcome } from './cashfreeOrderOutcome.js';
 import { refreshMerchantStatus } from './cashfreePartnerMerchantStatus.js';
+import { deriveOnboardingState } from '../src/lib/cashfreeOnboardingState.js';
 import { createOrLinkCashfreeMerchant, getCashfreePartnerOnboardingLink, PartnerOnboardingConflictError } from './cashfreePartnerMerchantOnboarding.js';
 import { CashfreePartnerError, resolvePartnerEnvironment } from './cashfreePartner.js';
 import { reconcilePayment, reconcileMerchantPayments, listStoredReconciliations, listStoredSettlements, ReconciliationError } from './paymentReconciliation.js';
@@ -643,7 +644,7 @@ const ROLES_OVERVIEW = ROLES_ALL;
 const ROLES_CLIENTS = ROLES_ALL;
 const ROLES_PAYMENTS = ROLES_ALL;
 const ROLES_PAYMENT_OPERATIONS = ['super_admin', 'compliance_officer'];
-const ROLES_ONBOARDING_READ = ['super_admin', 'compliance_officer', 'read_only'];
+const ROLES_ONBOARDING_READ = ROLES_ALL;
 const ROLES_ONBOARDING_SYNC = ['super_admin', 'compliance_officer'];
 const ROLES_AUDIT_LOGS = ['super_admin', 'compliance_officer', 'read_only'];
 const ROLES_SUPPORT = ['super_admin', 'support_agent'];
@@ -932,9 +933,19 @@ app.post('/api/v1/admin/payments/:paymentId/refresh-reconciliation', guardAdminH
 
 // 5. Onboarding / KYC Queue API
 app.get('/api/v1/admin/onboarding', guardAdminHost, requireAdminAuth(ROLES_ONBOARDING_READ), ah(async (req, res) => {
-  const { page, pageSize, onboardingStatus, kycStatus, activationStatus } = req.query;
-  const result = await listAdminOnboarding({ page, pageSize, onboardingStatus, kycStatus, activationStatus });
+  const { page, pageSize, onboardingStatus, kycStatus, activationStatus, search, from, to } = req.query;
+  const result = await listAdminOnboarding({ page, pageSize, onboardingStatus, kycStatus, activationStatus, search, from, to });
   res.json({ success: true, data: result.data, pagination: result.pagination });
+}));
+
+// 5b. Onboarding Detail API (Phase 2C-6)
+app.get('/api/v1/admin/onboarding/:merchantId', guardAdminHost, requireAdminAuth(ROLES_ONBOARDING_READ), ah(async (req, res) => {
+  const merchantId = String(req.params.merchantId || '').trim();
+  const detail = await getAdminOnboardingDetail(merchantId);
+  if (!detail) {
+    return res.status(404).json({ success: false, error: 'Merchant not found' });
+  }
+  res.json({ success: true, data: detail });
 }));
 
 // 6. Onboarding Sync API
@@ -949,15 +960,68 @@ app.post('/api/v1/admin/onboarding/:merchantId/sync', guardAdminHost, requireAdm
     return res.status(404).json({ success: false, error: 'Merchant has no Cashfree Partner onboarding record' });
   }
 
+  const prevDerived = deriveOnboardingState({
+    started: true,
+    cfMerchantId: mapping.cf_merchant_id,
+    onboardingStatus: mapping.onboarding_status,
+    kycStatus: mapping.kyc_status,
+    fullKycStatus: mapping.full_kyc_status,
+    activationStatus: mapping.activation_status,
+    transactionAccess: mapping.transaction_access,
+    updatedAt: mapping.updated_at
+  });
+
   let syncResult;
   try {
     syncResult = await refreshMerchantStatus(merchantId);
   } catch (err) {
     console.error('Cashfree Partner sync error:', err);
+    await recordAdminAuditLog({
+      adminId: req.adminUser.id,
+      action: 'ONBOARDING_STATUS_SYNC',
+      targetMerchantId: merchantId,
+      targetResourceId: mapping.cf_merchant_id,
+      details: {
+        adminEmail: req.adminUser.email,
+        adminRole: req.adminUser.role,
+        cfMerchantId: mapping.cf_merchant_id,
+        previousStatus: {
+          onboardingStatus: mapping.onboarding_status,
+          kycStatus: mapping.kyc_status,
+          fullKycStatus: mapping.full_kyc_status,
+          activationStatus: mapping.activation_status
+        },
+        previousOnboardingState: prevDerived.state,
+        outcome: 'failed',
+        error: err.message || 'Service error'
+      },
+      ipAddress: getClientIp(req)
+    });
     return res.status(502).json({ success: false, error: 'Failed to contact Cashfree Partner service' });
   }
 
   if (syncResult.error) {
+    await recordAdminAuditLog({
+      adminId: req.adminUser.id,
+      action: 'ONBOARDING_STATUS_SYNC',
+      targetMerchantId: merchantId,
+      targetResourceId: mapping.cf_merchant_id,
+      details: {
+        adminEmail: req.adminUser.email,
+        adminRole: req.adminUser.role,
+        cfMerchantId: mapping.cf_merchant_id,
+        previousStatus: {
+          onboardingStatus: mapping.onboarding_status,
+          kycStatus: mapping.kyc_status,
+          fullKycStatus: mapping.full_kyc_status,
+          activationStatus: mapping.activation_status
+        },
+        previousOnboardingState: prevDerived.state,
+        outcome: 'failed',
+        error: syncResult.error.message || 'Cashfree service error'
+      },
+      ipAddress: getClientIp(req)
+    });
     return res.status(502).json({
       success: false,
       error: 'Cashfree Partner service unavailable: ' + (syncResult.error.message || 'Service error'),
@@ -965,38 +1029,64 @@ app.post('/api/v1/admin/onboarding/:merchantId/sync', guardAdminHost, requireAdm
     });
   }
 
+  const newDerived = deriveOnboardingState({
+    started: true,
+    cfMerchantId: syncResult.mapping?.cf_merchant_id,
+    onboardingStatus: syncResult.mapping?.onboarding_status,
+    kycStatus: syncResult.mapping?.kyc_status,
+    fullKycStatus: syncResult.mapping?.full_kyc_status,
+    activationStatus: syncResult.mapping?.activation_status,
+    transactionAccess: syncResult.mapping?.transaction_access,
+    updatedAt: syncResult.mapping?.updated_at
+  });
+
   await recordAdminAuditLog({
     adminId: req.adminUser.id,
-    action: 'kyc_sync',
+    action: 'ONBOARDING_STATUS_SYNC',
     targetMerchantId: merchantId,
     targetResourceId: mapping.cf_merchant_id,
     details: {
+      adminEmail: req.adminUser.email,
+      adminRole: req.adminUser.role,
       cfMerchantId: mapping.cf_merchant_id,
       previousStatus: {
         onboardingStatus: mapping.onboarding_status,
         kycStatus: mapping.kyc_status,
-        activationStatus: mapping.activation_status
+        fullKycStatus: mapping.full_kyc_status,
+        activationStatus: mapping.activation_status,
+        transactionAccess: mapping.transaction_access
       },
       newStatus: {
         onboardingStatus: syncResult.mapping?.onboarding_status,
         kycStatus: syncResult.mapping?.kyc_status,
-        activationStatus: syncResult.mapping?.activation_status
-      }
+        fullKycStatus: syncResult.mapping?.full_kyc_status,
+        activationStatus: syncResult.mapping?.activation_status,
+        transactionAccess: syncResult.mapping?.transaction_access
+      },
+      previousOnboardingState: prevDerived.state,
+      newOnboardingState: newDerived.state,
+      previousActivationStatus: mapping.activation_status || null,
+      newActivationStatus: syncResult.mapping?.activation_status || null,
+      outcome: 'success'
     },
     ipAddress: getClientIp(req)
   });
+
+  const updatedDetail = await getAdminOnboardingDetail(merchantId);
 
   res.json({
     success: true,
     data: {
       merchantId: syncResult.mapping.merchant_id,
       cfMerchantId: syncResult.mapping.cf_merchant_id,
+      onboardingState: newDerived.state,
       onboardingStatus: syncResult.mapping.onboarding_status,
       kycStatus: syncResult.mapping.kyc_status,
       fullKycStatus: syncResult.mapping.full_kyc_status,
       activationStatus: syncResult.mapping.activation_status,
       transactionAccess: syncResult.mapping.transaction_access,
-      updatedAt: syncResult.mapping.updated_at
+      updatedAt: syncResult.mapping.updated_at,
+      detail: updatedDetail
     }
   });
 }));
