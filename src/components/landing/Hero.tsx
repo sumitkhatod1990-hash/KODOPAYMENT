@@ -8,12 +8,10 @@ export const Hero: React.FC = () => {
   const { user } = useAuth();
 
   const handleBookDemo = () => {
-    const pricingEl = document.getElementById('pricing');
-    if (pricingEl) {
-      pricingEl.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      setCurrentView('auth', { mode: 'signup' });
-    }
+    // A demo request starts with merchant signup. The pricing section is
+    // informational and is not a booking flow, so scrolling there made this
+    // CTA appear to do nothing for users.
+    setCurrentView('auth', { mode: 'signup' });
   };
 
   return (
