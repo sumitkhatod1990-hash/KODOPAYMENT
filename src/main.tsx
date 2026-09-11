@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 import { isAdminDomain } from './utils/adminDomain';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import { AdminApp } from './components/admin/AdminApp';
+import { GlobalCurrencyProvider } from './context/GlobalCurrencyContext';
 import './index.css';
 
 interface ErrorBoundaryProps {
@@ -108,9 +109,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </AdminAuthProvider>
       ) : (
         <AuthProvider>
-          <AppProvider>
-            <App />
-          </AppProvider>
+          <GlobalCurrencyProvider><AppProvider><App /></AppProvider></GlobalCurrencyProvider>
         </AuthProvider>
       )}
     </ErrorBoundary>
