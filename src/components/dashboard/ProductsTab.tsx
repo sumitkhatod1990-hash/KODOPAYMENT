@@ -3,11 +3,14 @@ import { useApp } from '../../context/AppContext';
 import { Product, ProductType } from '../../types';
 import { Modal } from '../common/Modal';
 import { Plus, Trash2, ExternalLink, Copy, CheckCircle2, Coins, CreditCard, Key, Zap, Package } from 'lucide-react';
+import { SUPPORTED_CURRENCIES, CURRENCY_METADATA, formatCurrency } from '../../lib/currency';
+import { useRegion } from '../../context/RegionContext';
 
 const emptyErrors: { name?: string; price?: string } = {};
 
 export const ProductsTab: React.FC = () => {
   const { products, refreshData, deleteProduct, createCheckoutSession, setCurrentView } = useApp();
+  const { currency: preferredCurrency } = useRegion();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -15,7 +18,7 @@ export const ProductsTab: React.FC = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const currency = 'INR';
+  const [currency, setCurrency] = useState<string>(preferredCurrency || 'USD');
   const [type, setType] = useState<ProductType>('one_time');
   const [credits, setCredits] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,6 +29,7 @@ export const ProductsTab: React.FC = () => {
     setName('');
     setDescription('');
     setPrice('');
+    setCurrency(preferredCurrency || 'USD');
     setType('one_time');
     setCredits('');
     setErrors(emptyErrors);
@@ -200,7 +204,7 @@ export const ProductsTab: React.FC = () => {
 
               <div className="pt-2">
                 <div className="text-2xl font-black text-[#1d1d1f] font-mono">
-                  ₹{product.price.toFixed(2)} <span className="text-xs font-normal text-[#86868b]">INR</span>
+                  {formatCurrency(product.price, product.currency || 'USD')} <span className="text-xs font-normal text-[#86868b]">{product.currency || 'USD'}</span>
                 </div>
                 {product.type === 'credits' && (
                   <div className="text-xs font-semibold text-[#0071e3] mt-0.5">
@@ -289,13 +293,29 @@ export const ProductsTab: React.FC = () => {
             />
           </div>
 
-          <div className={`grid gap-4 ${type === 'credits' ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <label htmlFor="product-price" className="font-semibold text-[#1d1d1f]">Price (INR)</label>
+              <label htmlFor="product-currency" className="font-semibold text-[#1d1d1f]">Currency</label>
+              <select
+                id="product-currency"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                className="w-full p-2.5 rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] focus:border-[#0071e3] outline-none font-medium text-xs"
+              >
+                {SUPPORTED_CURRENCIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c} ({CURRENCY_METADATA[c]?.symbol || c})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={`space-y-1.5 ${type === 'credits' ? 'sm:col-span-1' : 'sm:col-span-2'}`}>
+              <label htmlFor="product-price" className="font-semibold text-[#1d1d1f]">Price ({currency})</label>
               <input
                 id="product-price"
                 type="number"
-                step="0.01"
+                step={currency === 'JPY' ? '1' : '0.01'}
                 min="0"
                 inputMode="decimal"
                 placeholder="0.00"
@@ -309,8 +329,8 @@ export const ProductsTab: React.FC = () => {
             </div>
 
             {type === 'credits' && (
-              <div className="space-y-1.5">
-                <label htmlFor="product-credits" className="font-semibold text-[#1d1d1f]">Credits included</label>
+              <div className="space-y-1.5 sm:col-span-1">
+                <label htmlFor="product-credits" className="font-semibold text-[#1d1d1f]">Credits</label>
                 <input
                   id="product-credits"
                   type="number"

@@ -907,17 +907,25 @@ export async function ensurePartnerMerchantStore() {
     partnerSchemaReady = (async () => {
       await sql`
         CREATE TABLE IF NOT EXISTS qivropay_cashfree_partner_merchants (
-          merchant_id TEXT PRIMARY KEY,
-          cf_merchant_id TEXT NOT NULL UNIQUE,
+          merchant_id TEXT NOT NULL,
+          cf_merchant_id TEXT NOT NULL,
+          environment TEXT NOT NULL DEFAULT 'sandbox',
           onboarding_status TEXT,
           kyc_status TEXT,
           full_kyc_status TEXT,
           activation_status TEXT,
           transaction_access TEXT,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          PRIMARY KEY (merchant_id, environment)
         )
       `;
+      try {
+        await sql`ALTER TABLE qivropay_cashfree_partner_merchants ADD COLUMN IF NOT EXISTS environment TEXT NOT NULL DEFAULT 'sandbox'`;
+      } catch {}
+      try {
+        await sql`CREATE UNIQUE INDEX IF NOT EXISTS qivropay_partner_merchants_cf_env_idx ON qivropay_cashfree_partner_merchants (cf_merchant_id, environment)`;
+      } catch {}
     })().catch((error) => {
       partnerSchemaReady = undefined;
       console.error('Neon partner merchant schema init failed:', error.message);
@@ -940,6 +948,7 @@ function toPartnerMappingRow(record) {
   return {
     merchant_id: record.merchant_id,
     cf_merchant_id: record.cf_merchant_id,
+    environment: record.environment || 'sandbox',
     onboarding_status: record.onboarding_status ?? null,
     kyc_status: record.kyc_status ?? null,
     full_kyc_status: record.full_kyc_status ?? null,
@@ -950,33 +959,26 @@ function toPartnerMappingRow(record) {
   };
 }
 
-// Creates the mapping row for a QivroPay merchant that does not yet have
-// one, pointed at a Cashfree merchant_id that is not yet claimed by any
-// other QivroPay merchant. Throws PartnerMappingError('duplicate_merchant')
-// or PartnerMappingError('duplicate_cf_merchant') rather than silently
-// overwriting or silently succeeding — callers must treat both as 409s, not
-// retry them as transient failures.
-export async function createPartnerMerchantMapping({ merchantId, cfMerchantId }) {
+// Creates the mapping row for a QivroPay merchant and Cashfree merchant_id,
+// scoped by operational environment ('sandbox' | 'production').
+export async function createPartnerMerchantMapping({ merchantId, cfMerchantId, environment = 'sandbox' }) {
+  const env = (String(environment || 'sandbox').toLowerCase() === 'production' || String(environment || 'sandbox').toLowerCase() === 'prod') ? 'production' : 'sandbox';
   const sql = sqlClient();
   if (sql) {
     try {
       await ensurePartnerMerchantStore();
-      const existingByMerchant = await sql`SELECT merchant_id FROM qivropay_cashfree_partner_merchants WHERE merchant_id = ${merchantId} LIMIT 1`;
+      const existingByMerchant = await sql`SELECT merchant_id FROM qivropay_cashfree_partner_merchants WHERE merchant_id = ${merchantId} AND environment = ${env} LIMIT 1`;
       if (existingByMerchant.length > 0) throw new PartnerMappingError('This QivroPay merchant is already mapped to a Cashfree merchant', 'duplicate_merchant');
-      const existingByCf = await sql`SELECT merchant_id FROM qivropay_cashfree_partner_merchants WHERE cf_merchant_id = ${cfMerchantId} LIMIT 1`;
+      const existingByCf = await sql`SELECT merchant_id FROM qivropay_cashfree_partner_merchants WHERE cf_merchant_id = ${cfMerchantId} AND environment = ${env} LIMIT 1`;
       if (existingByCf.length > 0) throw new PartnerMappingError('This Cashfree merchant is already mapped to a QivroPay merchant', 'duplicate_cf_merchant');
       try {
         const rows = await sql`
-          INSERT INTO qivropay_cashfree_partner_merchants (merchant_id, cf_merchant_id)
-          VALUES (${merchantId}, ${cfMerchantId})
+          INSERT INTO qivropay_cashfree_partner_merchants (merchant_id, cf_merchant_id, environment)
+          VALUES (${merchantId}, ${cfMerchantId}, ${env})
           RETURNING *
         `;
         return toPartnerMappingRow(rows[0]);
       } catch (e) {
-        // Backstop for a race between the pre-checks above and this insert —
-        // the real unique constraints are the source of truth, the SELECTs
-        // above are only there to report which one collided in the common
-        // (non-racing) case.
         if (e.code === '23505') {
           throw new PartnerMappingError('This QivroPay merchant or Cashfree merchant is already mapped', 'duplicate_mapping');
         }
@@ -986,11 +988,13 @@ export async function createPartnerMerchantMapping({ merchantId, cfMerchantId })
       throw e;
     }
   }
-  if (memoryPartnerMerchants.has(merchantId)) {
+
+  const mapKey = `${merchantId}:${env}`;
+  if (memoryPartnerMerchants.has(mapKey) || (env === 'sandbox' && memoryPartnerMerchants.has(merchantId))) {
     throw new PartnerMappingError('This QivroPay merchant is already mapped to a Cashfree merchant', 'duplicate_merchant');
   }
   for (const record of memoryPartnerMerchants.values()) {
-    if (record.cf_merchant_id === cfMerchantId) {
+    if (record.cf_merchant_id === cfMerchantId && (record.environment || 'sandbox') === env) {
       throw new PartnerMappingError('This Cashfree merchant is already mapped to a QivroPay merchant', 'duplicate_cf_merchant');
     }
   }
@@ -998,6 +1002,7 @@ export async function createPartnerMerchantMapping({ merchantId, cfMerchantId })
   const record = {
     merchant_id: merchantId,
     cf_merchant_id: cfMerchantId,
+    environment: env,
     onboarding_status: null,
     kyc_status: null,
     full_kyc_status: null,
@@ -1006,33 +1011,58 @@ export async function createPartnerMerchantMapping({ merchantId, cfMerchantId })
     created_at: now,
     updated_at: now
   };
-  memoryPartnerMerchants.set(merchantId, record);
+  memoryPartnerMerchants.set(mapKey, record);
+  if (env === 'sandbox') {
+    memoryPartnerMerchants.set(merchantId, record);
+  }
   persistLocalStore();
   return toPartnerMappingRow(record);
 }
 
-export async function getPartnerMerchantMapping(merchantId) {
+export async function getPartnerMerchantMapping(merchantId, environment = null) {
+  const env = environment ? ((String(environment).toLowerCase() === 'production' || String(environment).toLowerCase() === 'prod') ? 'production' : 'sandbox') : null;
   const sql = sqlClient();
   if (sql) {
     try {
       await ensurePartnerMerchantStore();
-      const rows = await sql`SELECT * FROM qivropay_cashfree_partner_merchants WHERE merchant_id = ${merchantId} LIMIT 1`;
+      let rows;
+      if (env) {
+        rows = await sql`SELECT * FROM qivropay_cashfree_partner_merchants WHERE merchant_id = ${merchantId} AND environment = ${env} LIMIT 1`;
+      } else {
+        rows = await sql`SELECT * FROM qivropay_cashfree_partner_merchants WHERE merchant_id = ${merchantId} ORDER BY (environment = 'production') DESC, created_at DESC LIMIT 1`;
+      }
       if (rows?.[0]) return toPartnerMappingRow(rows[0]);
       return null;
     } catch (e) {
       throw e;
     }
   }
-  return toPartnerMappingRow(memoryPartnerMerchants.get(merchantId) || null);
+
+  if (env) {
+    const record = memoryPartnerMerchants.get(`${merchantId}:${env}`);
+    if (record) return toPartnerMappingRow(record);
+    if (env === 'sandbox' && memoryPartnerMerchants.has(merchantId)) {
+      return toPartnerMappingRow(memoryPartnerMerchants.get(merchantId));
+    }
+    return null;
+  }
+  if (memoryPartnerMerchants.has(`${merchantId}:production`)) {
+    return toPartnerMappingRow(memoryPartnerMerchants.get(`${merchantId}:production`));
+  }
+  if (memoryPartnerMerchants.has(`${merchantId}:sandbox`)) {
+    return toPartnerMappingRow(memoryPartnerMerchants.get(`${merchantId}:sandbox`));
+  }
+  if (memoryPartnerMerchants.has(merchantId)) {
+    return toPartnerMappingRow(memoryPartnerMerchants.get(merchantId));
+  }
+  for (const record of memoryPartnerMerchants.values()) {
+    if (record.merchant_id === merchantId) return toPartnerMappingRow(record);
+  }
+  return null;
 }
 
-// Overwrites the last-known-status columns for an existing mapping with
-// values freshly fetched from Cashfree. Fields not present in `statusFields`
-// are left untouched (not cleared) — a caller normalizing a partial Cashfree
-// response should only pass the fields it actually observed. Returns null,
-// without writing anything, if no mapping exists for merchantId (callers
-// must createPartnerMerchantMapping first; this never creates one).
-export async function updatePartnerMerchantStatus(merchantId, statusFields) {
+export async function updatePartnerMerchantStatus(merchantId, statusFields, environment = null) {
+  const env = environment ? ((String(environment).toLowerCase() === 'production' || String(environment).toLowerCase() === 'prod') ? 'production' : 'sandbox') : null;
   const fields = ['onboardingStatus', 'kycStatus', 'fullKycStatus', 'activationStatus', 'transactionAccess'];
   const columnFor = {
     onboardingStatus: 'onboarding_status',
@@ -1045,8 +1075,14 @@ export async function updatePartnerMerchantStatus(merchantId, statusFields) {
   if (sql) {
     try {
       await ensurePartnerMerchantStore();
-      const existing = await sql`SELECT * FROM qivropay_cashfree_partner_merchants WHERE merchant_id = ${merchantId} LIMIT 1`;
+      let existing;
+      if (env) {
+        existing = await sql`SELECT * FROM qivropay_cashfree_partner_merchants WHERE merchant_id = ${merchantId} AND environment = ${env} LIMIT 1`;
+      } else {
+        existing = await sql`SELECT * FROM qivropay_cashfree_partner_merchants WHERE merchant_id = ${merchantId} ORDER BY (environment = 'production') DESC, created_at DESC LIMIT 1`;
+      }
       if (!existing?.[0]) return null;
+      const targetEnv = existing[0].environment || 'sandbox';
       const merged = { ...existing[0] };
       for (const field of fields) {
         if (Object.prototype.hasOwnProperty.call(statusFields || {}, field)) {
@@ -1061,7 +1097,7 @@ export async function updatePartnerMerchantStatus(merchantId, statusFields) {
             activation_status = ${merged.activation_status},
             transaction_access = ${merged.transaction_access},
             updated_at = NOW()
-        WHERE merchant_id = ${merchantId}
+        WHERE merchant_id = ${merchantId} AND environment = ${targetEnv}
         RETURNING *
       `;
       return toPartnerMappingRow(rows[0]);
@@ -1069,16 +1105,30 @@ export async function updatePartnerMerchantStatus(merchantId, statusFields) {
       throw e;
     }
   }
-  const existing = memoryPartnerMerchants.get(merchantId);
-  if (!existing) return null;
-  const updated = { ...existing };
+
+  let record = env ? memoryPartnerMerchants.get(`${merchantId}:${env}`) : null;
+  if (!record && env === 'sandbox') record = memoryPartnerMerchants.get(merchantId);
+  if (!record) {
+    record = memoryPartnerMerchants.get(`${merchantId}:production`) || memoryPartnerMerchants.get(`${merchantId}:sandbox`) || memoryPartnerMerchants.get(merchantId);
+    if (!record) {
+      for (const r of memoryPartnerMerchants.values()) {
+        if (r.merchant_id === merchantId) { record = r; break; }
+      }
+    }
+  }
+  if (!record) return null;
+  const updated = { ...record };
   for (const field of fields) {
     if (Object.prototype.hasOwnProperty.call(statusFields || {}, field)) {
       updated[columnFor[field]] = statusFields[field];
     }
   }
   updated.updated_at = new Date().toISOString();
-  memoryPartnerMerchants.set(merchantId, updated);
+  const targetEnv = updated.environment || 'sandbox';
+  memoryPartnerMerchants.set(`${merchantId}:${targetEnv}`, updated);
+  if (targetEnv === 'sandbox') {
+    memoryPartnerMerchants.set(merchantId, updated);
+  }
   persistLocalStore();
   return toPartnerMappingRow(updated);
 }
@@ -2043,8 +2093,12 @@ export async function getAdminOverviewStats() {
   const totalPaymentVolume = allTx.filter(t => ['succeeded', 'refunded', 'partially_refunded', 'refund_pending'].includes(t.status))
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
-  const pendingOnboarding = Array.from(memoryPartnerMerchants.values())
+  const uniquePartnerMerchants = Array.from(
+    new Map(Array.from(memoryPartnerMerchants.values()).map(m => [`${m.merchant_id}:${m.environment || 'sandbox'}`, m])).values()
+  );
+  const pendingOnboarding = uniquePartnerMerchants
     .filter(m => !m.onboarding_status || m.onboarding_status !== 'COMPLETED' || m.kyc_status !== 'APPROVED').length;
+
 
   const tickets = Array.from(memorySupportTickets.values());
   const openSupportTickets = tickets.filter(t => ['open', 'in_progress'].includes(t.status)).length;
@@ -2169,7 +2223,8 @@ export async function listAdminClients({ page = 1, pageSize = 25, search = '', s
 
   // Memory fallback
   let users = Array.from(memoryUsers.values()).map(u => {
-    const pm = memoryPartnerMerchants.get(u.id);
+    const pm = memoryPartnerMerchants.get(u.id) || memoryPartnerMerchants.get(`${u.id}:production`) || memoryPartnerMerchants.get(`${u.id}:sandbox`) || null;
+
     let lastLoginAt = null;
     for (const s of memorySessions.values()) {
       if (s.userId === u.id && (!lastLoginAt || new Date(s.createdAt) > new Date(lastLoginAt))) {
@@ -2439,7 +2494,7 @@ export async function getAdminClient360(merchantId) {
   };
 }
 
-export async function listAdminPayments({ page = 1, pageSize = 25, merchantId = null, status = null, search = '', minAmount = null, maxAmount = null, from = null, to = null, environment = null } = {}) {
+export async function listAdminPayments({ page = 1, pageSize = 25, merchantId = null, status = null, search = '', minAmount = null, maxAmount = null, from = null, to = null, environment = null, currency = null } = {}) {
   const safePage = Math.max(1, parseInt(page, 10) || 1);
   const safeLimit = Math.min(100, Math.max(1, parseInt(pageSize, 10) || 25));
   const safeOffset = (safePage - 1) * safeLimit;
@@ -2480,13 +2535,14 @@ export async function listAdminPayments({ page = 1, pageSize = 25, merchantId = 
         paymentMethod: r.payload?.paymentMethod || 'cashfree',
         refundedAmount: Number(r.payload?.refundedAmount || r.payload?.refundAmount || 0),
         refundStatus: r.payload?.refundStatus || null,
-        environment: r.payload?.environment || (r.payload?.liveMode ? 'production' : (r.payload?.mode === 'live' ? 'production' : 'sandbox')),
+        environment: (r.payload?.environment === 'production' || r.payload?.liveMode || r.payload?.mode === 'live') ? 'production' : 'sandbox',
         createdAt: r.created_at
       }));
 
       if (merchantId) filtered = filtered.filter(p => p.merchantId === merchantId);
       if (status && status !== 'all') filtered = filtered.filter(p => p.status.toLowerCase() === status.toLowerCase());
       if (environment && environment !== 'all') filtered = filtered.filter(p => (p.environment || '').toLowerCase() === environment.toLowerCase());
+      if (currency && currency !== 'all') filtered = filtered.filter(p => (p.currency || 'INR').toUpperCase() === currency.toUpperCase());
       if (minAmount != null && !isNaN(Number(minAmount))) filtered = filtered.filter(p => p.amount >= Number(minAmount));
       if (maxAmount != null && !isNaN(Number(maxAmount))) filtered = filtered.filter(p => p.amount <= Number(maxAmount));
       if (from) {
@@ -2550,6 +2606,7 @@ export async function listAdminPayments({ page = 1, pageSize = 25, merchantId = 
   if (merchantId) filtered = filtered.filter(p => p.merchantId === merchantId);
   if (status && status !== 'all') filtered = filtered.filter(p => p.status.toLowerCase() === status.toLowerCase());
   if (environment && environment !== 'all') filtered = filtered.filter(p => (p.environment || '').toLowerCase() === environment.toLowerCase());
+  if (currency && currency !== 'all') filtered = filtered.filter(p => (p.currency || 'INR').toUpperCase() === currency.toUpperCase());
   if (minAmount != null && !isNaN(Number(minAmount))) filtered = filtered.filter(p => p.amount >= Number(minAmount));
   if (maxAmount != null && !isNaN(Number(maxAmount))) filtered = filtered.filter(p => p.amount <= Number(maxAmount));
   if (from) {
@@ -2893,11 +2950,14 @@ export async function listAdminOnboarding({ page = 1, pageSize = 25, onboardingS
     userMap.set(u.id, u);
   }
 
-  const allMerchantIds = new Set([...userMap.keys(), ...memoryPartnerMerchants.keys()]);
+  const allMerchantIds = new Set([
+    ...userMap.keys(),
+    ...Array.from(memoryPartnerMerchants.values()).map(m => m.merchant_id).filter(Boolean)
+  ]);
   const allItems = [];
   for (const mId of allMerchantIds) {
     const u = userMap.get(mId) || null;
-    const m = memoryPartnerMerchants.get(mId) || null;
+    const m = memoryPartnerMerchants.get(`${mId}:production`) || memoryPartnerMerchants.get(`${mId}:sandbox`) || memoryPartnerMerchants.get(mId) || null;
     const started = Boolean(m && m.cf_merchant_id);
     const derived = deriveOnboardingState({
       started,

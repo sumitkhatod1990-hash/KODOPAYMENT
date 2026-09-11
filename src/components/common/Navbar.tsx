@@ -3,8 +3,8 @@ import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { Logo } from './Logo';
 import { ArrowRight, Menu, X } from 'lucide-react';
+import { RegionSelector } from './RegionSelector';
 import { trackMetaEvent } from '../../utils/metaPixel';
-import { GLOBAL_CURRENCIES, useGlobalCurrency } from '../../context/GlobalCurrencyContext';
 
 // Scrolls to an in-page landing anchor, navigating to the landing view first
 // if we're not already there. Only used for genuinely public destinations
@@ -28,7 +28,6 @@ export const Navbar: React.FC = () => {
   const { user } = useAuth();
   const goToSection = useScrollToLandingSection();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { currency, setCurrency } = useGlobalCurrency();
   const headerRef = useRef<HTMLElement>(null);
 
   const openSignup = (source: string) => {
@@ -42,6 +41,8 @@ export const Navbar: React.FC = () => {
 
   const navLinks = [
     { label: 'Product', onClick: () => goToSection('product') },
+    { label: 'Solutions', onClick: () => goToSection('solutions') },
+    { label: 'Developers', onClick: () => goToSection('developers') },
     { label: 'Documentation', onClick: () => setCurrentView('docs') },
     { label: 'Pricing', onClick: () => goToSection('pricing') },
   ];
@@ -88,10 +89,7 @@ export const Navbar: React.FC = () => {
 
         {/* Right: Actions */}
         <div className="hidden md:flex items-center gap-3">
-          <label className="sr-only" htmlFor="global-currency">Display currency</label>
-          <select id="global-currency" value={currency} onChange={(event) => setCurrency(event.target.value as typeof currency)} className="rounded-xl border border-black/10 bg-white px-2.5 py-2 text-xs font-semibold text-[#0A0D14]">
-            {GLOBAL_CURRENCIES.map(item => <option key={item.code} value={item.code}>{item.label} · {item.code}</option>)}
-          </select>
+          <RegionSelector />
           {user ? (
             <button
               onClick={() => setCurrentView('dashboard')}
@@ -119,20 +117,23 @@ export const Navbar: React.FC = () => {
           )}
         </div>
 
-        {/* Mobile menu toggle */}
-        <button
-          className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl border border-black/10 text-[#0A0D14]"
-          onClick={() => setMobileOpen(v => !v)}
-          aria-label="Toggle menu"
-          aria-expanded={mobileOpen}
-        >
-          {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-        </button>
+        {/* Mobile menu toggle & region selector */}
+        <div className="md:hidden flex items-center gap-2">
+          <RegionSelector compact />
+          <button
+            className="w-9 h-9 flex items-center justify-center rounded-xl border border-black/10 text-[#0A0D14]"
+            onClick={() => setMobileOpen(v => !v)}
+            aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu panel */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-black/[0.06] bg-[#FAFAFC] px-4 sm:px-6 py-4 space-y-1">
+        <div className="md:hidden border-t border-black/[0.06] bg-[#FAFAFC] px-4 sm:px-6 py-4 space-y-2">
           {navLinks.map(link => (
             <button
               key={link.label}
@@ -143,9 +144,6 @@ export const Navbar: React.FC = () => {
             </button>
           ))}
           <div className="pt-2 flex flex-col gap-2">
-            <select value={currency} onChange={(event) => setCurrency(event.target.value as typeof currency)} className="rounded-xl border border-black/10 bg-white px-3 py-3 text-sm font-semibold text-[#0A0D14]">
-              {GLOBAL_CURRENCIES.map(item => <option key={item.code} value={item.code}>{item.label} · {item.code}</option>)}
-            </select>
             {user ? (
               <button
                 onClick={() => { setCurrentView('dashboard'); setMobileOpen(false); }}

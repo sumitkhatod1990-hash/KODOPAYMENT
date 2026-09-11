@@ -60,7 +60,7 @@ req.Header.Set("Content-Type", "application/json")`,
   };
 
   return (
-    <section className="py-24 md:py-36 bg-[#f5f5f7] border-t border-black/5">
+    <section id="developers" className="py-24 md:py-36 bg-[#f5f5f7] border-t border-black/5 scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}

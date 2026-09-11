@@ -7,8 +7,8 @@ export interface PPPRule {
   symbol: '₹';
 }
 
-// QivroPay currently supports India-only payments. This prevents a fallback
-// country rule from ever surfacing a foreign currency at checkout.
+// Regional PPP rule definition for INR transactions.
+// Checkout currency integrity is strictly preserved per session data.
 export const PPP_DATABASE: Record<string, PPPRule> = {
   IN: { countryCode: 'IN', countryName: 'India', discountPercentage: 0, currency: 'INR', rateVsINR: 1, symbol: '₹' }
 };

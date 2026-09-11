@@ -56,7 +56,7 @@ export const PaymentMarquee: React.FC = () => {
   return (
     <div className="relative mt-14 sm:mt-20 md:mt-24 border-t border-black/[0.06] pt-10 sm:pt-12">
       <p className="text-center text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-[0.16em] text-[#9296A3] mb-7 sm:mb-8">
-        Payments your customers already use
+        Global cards &amp; regional payment methods
       </p>
 
       <span className="sr-only">Supported payment methods: {methodNames}.</span>

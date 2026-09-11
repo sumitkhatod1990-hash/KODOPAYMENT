@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import { Link2, Copy, CheckCircle2, ExternalLink } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
+import { SUPPORTED_CURRENCIES, CURRENCY_METADATA, getCurrencyDecimals } from '../../lib/currency';
+import { useRegion } from '../../context/RegionContext';
 
 const MAX_TITLE_LENGTH = 140;
 
 export const PaymentLinksTab: React.FC = () => {
+  const { activeEnvironment } = useApp();
+  const { currency: preferredCurrency } = useRegion();
   // Fields start empty — no prepopulated demo title or amount.
   const [title, setTitle] = useState('');
   const [amountInput, setAmountInput] = useState('');
+  const [currency, setCurrency] = useState<string>(preferredCurrency || 'USD');
   const [fieldErrors, setFieldErrors] = useState<{ title?: string; amount?: string }>({});
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -23,10 +29,14 @@ export const PaymentLinksTab: React.FC = () => {
     }
 
     const trimmedAmount = amountInput.trim();
+    const decimals = getCurrencyDecimals(currency);
+    const regex = decimals === 0 ? /^\d+$/ : /^\d+(\.\d{1,2})?$/;
     if (!trimmedAmount) {
       next.amount = 'Amount is required';
-    } else if (!/^\d+(\.\d{1,2})?$/.test(trimmedAmount)) {
-      next.amount = 'Enter a valid amount with up to 2 decimal places';
+    } else if (!regex.test(trimmedAmount)) {
+      next.amount = decimals === 0
+        ? 'Enter a valid whole number for this currency'
+        : 'Enter a valid amount with up to 2 decimal places';
     } else if (Number(trimmedAmount) <= 0) {
       next.amount = 'Amount must be greater than 0';
     }
@@ -50,7 +60,8 @@ export const PaymentLinksTab: React.FC = () => {
         body: JSON.stringify({
           title: title.trim(),
           amount: Number(amountInput.trim()),
-          currency: 'INR',
+          currency,
+          environment: activeEnvironment === 'live' ? 'production' : 'sandbox',
         }),
       });
       const data = await res.json();
@@ -83,13 +94,25 @@ export const PaymentLinksTab: React.FC = () => {
   return (
     <div className="space-y-8 animate-fade-in max-w-4xl">
 
-      <div>
-        <h2 className="text-2xl font-bold text-[#1d1d1f] font-heading">
-          Instant Payment Links Generator
-        </h2>
-        <p className="text-xs sm:text-sm text-[#86868b]">
-          Generate shareable INR checkout links for clients, WhatsApp, email, or invoices.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-bold text-[#1d1d1f] font-heading">
+            Instant Payment Links Generator
+          </h2>
+          <p className="text-xs sm:text-sm text-[#86868b]">
+            Generate shareable global checkout links for clients, international customers, WhatsApp, email, or invoices.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${
+            activeEnvironment === 'live'
+              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+          }`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${activeEnvironment === 'live' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+            {activeEnvironment === 'live' ? 'Live Link' : 'Sandbox Test Link'}
+          </span>
+        </div>
       </div>
 
       <div className="p-8 rounded-3xl bg-white border border-black/10 shadow-sm space-y-6">
@@ -110,26 +133,37 @@ export const PaymentLinksTab: React.FC = () => {
             {fieldErrors.title && <p id="payment-link-title-error" className="text-red-600 dark:text-red-400">{fieldErrors.title}</p>}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <label htmlFor="payment-link-amount" className="font-semibold text-[#1d1d1f]">Amount to Charge</label>
+              <label htmlFor="payment-link-currency" className="font-semibold text-[#1d1d1f]">Currency</label>
+              <select
+                id="payment-link-currency"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                className="w-full p-3 rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] focus:border-[#0071e3] outline-none text-sm font-medium"
+              >
+                {SUPPORTED_CURRENCIES.map((code) => (
+                  <option key={code} value={code}>
+                    {code} ({CURRENCY_METADATA[code]?.symbol || code}) - {CURRENCY_METADATA[code]?.name || code}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="sm:col-span-2 space-y-1.5">
+              <label htmlFor="payment-link-amount" className="font-semibold text-[#1d1d1f]">Amount ({currency})</label>
               <input
                 id="payment-link-amount"
                 type="text"
                 inputMode="decimal"
                 value={amountInput}
                 onChange={(e) => setAmountInput(e.target.value)}
-                placeholder="499.00"
+                placeholder={currency === 'JPY' ? '5000' : '49.00'}
                 aria-invalid={Boolean(fieldErrors.amount)}
                 aria-describedby={fieldErrors.amount ? 'payment-link-amount-error' : undefined}
                 className={`w-full p-3 rounded-xl border bg-[#f5f5f7] text-[#1d1d1f] focus:border-[#0071e3] outline-none font-mono text-sm ${fieldErrors.amount ? 'border-red-400' : 'border-black/10'}`}
               />
               {fieldErrors.amount && <p id="payment-link-amount-error" className="text-red-600 dark:text-red-400">{fieldErrors.amount}</p>}
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="font-semibold text-[#1d1d1f]">Default Currency</label>
-              <div className="w-full p-3 rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] text-sm font-mono">INR (₹) · India</div>
             </div>
           </div>
 

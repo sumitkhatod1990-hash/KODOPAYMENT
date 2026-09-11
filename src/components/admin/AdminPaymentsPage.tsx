@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { formatINR, navigateAdmin } from '../../utils/adminDomain';
+import { formatCurrency, SUPPORTED_CURRENCIES, CURRENCY_METADATA } from '../../lib/currency';
 import {
   CreditCard,
   RefreshCw,
@@ -56,6 +57,7 @@ export const AdminPaymentsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [debouncedSearch, setDebouncedSearch] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [currencyFilter, setCurrencyFilter] = useState<string>('all');
   const [envFilter, setEnvFilter] = useState<string>('all');
   const [datePreset, setDatePreset] = useState<string>('all');
   const [fromDate, setFromDate] = useState<string>('');
@@ -104,7 +106,7 @@ export const AdminPaymentsPage: React.FC = () => {
   // Reset page on filter changes
   useEffect(() => {
     setPage(1);
-  }, [statusFilter, envFilter, datePreset, fromDate, toDate]);
+  }, [statusFilter, currencyFilter, envFilter, datePreset, fromDate, toDate]);
 
   const fetchPayments = async () => {
     setLoading(true);
@@ -114,6 +116,7 @@ export const AdminPaymentsPage: React.FC = () => {
       params.set('page', String(page));
       params.set('pageSize', '25');
       if (statusFilter !== 'all') params.set('status', statusFilter);
+      if (currencyFilter !== 'all') params.set('currency', currencyFilter);
       if (envFilter !== 'all') params.set('environment', envFilter);
       if (debouncedSearch) params.set('search', debouncedSearch);
       if (fromDate) params.set('from', fromDate);
@@ -152,7 +155,7 @@ export const AdminPaymentsPage: React.FC = () => {
 
   useEffect(() => {
     fetchPayments();
-  }, [page, debouncedSearch, statusFilter, envFilter, fromDate, toDate]);
+  }, [page, debouncedSearch, statusFilter, currencyFilter, envFilter, fromDate, toDate]);
 
   const copyToClipboard = (text: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -165,6 +168,7 @@ export const AdminPaymentsPage: React.FC = () => {
     setSearchQuery('');
     setDebouncedSearch('');
     setStatusFilter('all');
+    setCurrencyFilter('all');
     setEnvFilter('all');
     setDatePreset('all');
     setFromDate('');
@@ -175,6 +179,7 @@ export const AdminPaymentsPage: React.FC = () => {
   const hasActiveFilters = Boolean(
     debouncedSearch ||
     statusFilter !== 'all' ||
+    currencyFilter !== 'all' ||
     envFilter !== 'all' ||
     datePreset !== 'all' ||
     fromDate ||
@@ -198,13 +203,22 @@ export const AdminPaymentsPage: React.FC = () => {
     return 'bg-slate-700/30 text-slate-300 border-slate-600/30';
   };
 
-  // Metrics derived from visible dataset
+  // Metrics derived from visible dataset — per currency breakdown
   const metrics = useMemo(() => {
     const totalCount = pagination.total || payments.length;
-    const totalVolume = payments.reduce((acc, p) => acc + (p.status === 'succeeded' ? p.amount : 0), 0);
     const succeededCount = payments.filter(p => p.status === 'succeeded').length;
-    const refundedVolume = payments.reduce((acc, p) => acc + (p.refundedAmount || 0), 0);
-    return { totalCount, totalVolume, succeededCount, refundedVolume };
+    const volumeByCurrency: Record<string, number> = {};
+    const refundByCurrency: Record<string, number> = {};
+    payments.forEach(p => {
+      const c = (p.currency || 'INR').toUpperCase();
+      if (p.status === 'succeeded') {
+        volumeByCurrency[c] = (volumeByCurrency[c] || 0) + (p.amount || 0);
+      }
+      if (p.refundedAmount > 0) {
+        refundByCurrency[c] = (refundByCurrency[c] || 0) + (p.refundedAmount || 0);
+      }
+    });
+    return { totalCount, succeededCount, volumeByCurrency, refundByCurrency };
   }, [payments, pagination]);
 
   return (
@@ -255,8 +269,12 @@ export const AdminPaymentsPage: React.FC = () => {
             <span className="text-[11px] text-slate-400 font-medium">Payment Volume (In View)</span>
             <TrendingUp className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="text-lg font-bold text-white font-mono mt-1">
-            {formatINR(metrics.totalVolume)}
+          <div className="text-sm font-bold text-white font-mono mt-1 truncate">
+            {currencyFilter !== 'all'
+              ? formatCurrency(metrics.volumeByCurrency[currencyFilter] || 0, currencyFilter)
+              : Object.keys(metrics.volumeByCurrency).length > 0
+                ? Object.entries(metrics.volumeByCurrency).map(([c, v]) => formatCurrency(v, c)).join(' · ')
+                : '0.00'}
           </div>
         </div>
 
@@ -275,23 +293,27 @@ export const AdminPaymentsPage: React.FC = () => {
             <span className="text-[11px] text-slate-400 font-medium">Refunded Volume</span>
             <RotateCcw className="w-4 h-4 text-indigo-400" />
           </div>
-          <div className="text-lg font-bold text-white font-mono mt-1">
-            {formatINR(metrics.refundedVolume)}
+          <div className="text-sm font-bold text-white font-mono mt-1 truncate">
+            {currencyFilter !== 'all'
+              ? formatCurrency(metrics.refundByCurrency[currencyFilter] || 0, currencyFilter)
+              : Object.keys(metrics.refundByCurrency).length > 0
+                ? Object.entries(metrics.refundByCurrency).map(([c, v]) => formatCurrency(v, c)).join(' · ')
+                : '0.00'}
           </div>
         </div>
       </div>
 
       {/* Filter Toolbar */}
       <div className="p-4 rounded-2xl bg-[#0F172A] border border-slate-800/80 space-y-3">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3">
           {/* Search Input */}
-          <div className="md:col-span-2 relative">
+          <div className="sm:col-span-2 md:col-span-2 relative">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by order ID, transaction ID, customer, merchant..."
+              placeholder="Search order, transaction, customer, merchant..."
               className="w-full pl-9 pr-8 py-2 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
             />
             {searchQuery && (
@@ -313,11 +335,28 @@ export const AdminPaymentsPage: React.FC = () => {
               aria-label="Filter payments by status"
               className="w-full py-2 px-3 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
             >
-              <option value="all">All Payment Statuses</option>
+              <option value="all">All Statuses</option>
               <option value="succeeded">Succeeded</option>
               <option value="failed">Failed</option>
               <option value="refunded">Refunded</option>
               <option value="refund_pending">Refund Pending</option>
+            </select>
+          </div>
+
+          {/* Currency Dropdown */}
+          <div>
+            <select
+              value={currencyFilter}
+              onChange={(e) => setCurrencyFilter(e.target.value)}
+              aria-label="Filter by currency"
+              className="w-full py-2 px-3 bg-slate-900 border border-slate-700/80 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500 font-mono"
+            >
+              <option value="all">All Currencies</option>
+              {SUPPORTED_CURRENCIES.map((c) => (
+                <option key={c} value={c}>
+                  {c} ({CURRENCY_METADATA[c]?.symbol || c})
+                </option>
+              ))}
             </select>
           </div>
 
@@ -453,7 +492,7 @@ export const AdminPaymentsPage: React.FC = () => {
                   <th className="py-3 px-4">Order / Transaction</th>
                   <th className="py-3 px-4">Merchant</th>
                   <th className="py-3 px-4">Customer</th>
-                  <th className="py-3 px-4 text-right">Amount (INR)</th>
+                  <th className="py-3 px-4 text-right">Amount</th>
                   <th className="py-3 px-4">Status</th>
                   <th className="py-3 px-4">Environment</th>
                   <th className="py-3 px-4">Date</th>
@@ -516,10 +555,10 @@ export const AdminPaymentsPage: React.FC = () => {
 
                       {/* Amount */}
                       <td className="py-3.5 px-4 text-right font-bold text-white font-mono text-xs">
-                        <div>{formatINR(p.amount)}</div>
+                        <div>{formatCurrency(p.amount, p.currency || 'INR')}</div>
                         {p.refundedAmount > 0 && (
                           <div className="text-[10px] text-indigo-400 font-normal">
-                            Ref: {formatINR(p.refundedAmount)}
+                            Ref: {formatCurrency(p.refundedAmount, p.currency || 'INR')}
                           </div>
                         )}
                       </td>
@@ -601,7 +640,7 @@ export const AdminPaymentsPage: React.FC = () => {
                       <div className="text-[10px] text-slate-500 font-mono">{p.merchantEmail}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-bold text-white font-mono">{formatINR(p.amount)}</div>
+                      <div className="text-sm font-bold text-white font-mono">{formatCurrency(p.amount, p.currency || 'INR')}</div>
                       <span
                         className={`inline-flex items-center text-[9px] font-semibold px-1.5 py-0.2 rounded border ${
                           isProd

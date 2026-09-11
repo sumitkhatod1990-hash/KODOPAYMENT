@@ -17,9 +17,9 @@ export const ArchitectureFlow: React.FC = () => {
   const nodeDetails = {
     checkout: {
       title: 'Customer Checkout',
-      badge: 'UPI & Cards',
-      desc: 'UPI QR and card checkout hosted by secure payment infrastructure, embedded in your branded QivroPay checkout page so the customer never leaves it.',
-      metrics: ['UPI QR checkout', 'Visa / Mastercard / RuPay', 'Signed checkout sessions']
+      badge: 'Cards & Regional Rails',
+      desc: 'International cards and regional payment checkout hosted by secure payment infrastructure, embedded in your branded QivroPay checkout page so the customer never leaves it.',
+      metrics: ['Multi-currency cards', 'Domestic UPI & RuPay', 'Signed checkout sessions']
     },
     billing: {
       title: 'Products & Payment Links',
@@ -35,7 +35,7 @@ export const ArchitectureFlow: React.FC = () => {
     },
     rails: {
       title: 'Payment Rails',
-      badge: 'India',
+      badge: 'Global & Domestic',
       desc: 'Secure server-side order creation with hosted checkout and payment-status verification across UPI and cards.',
       metrics: ['UPI QR', 'Visa / Mastercard / RuPay', 'Signed order creation']
     },
@@ -51,11 +51,11 @@ export const ArchitectureFlow: React.FC = () => {
     {
       key: 'checkout',
       step: '01 · CHECKOUT',
-      icon: <Smartphone className="w-4 h-4" />,
+      icon: <CreditCard className="w-4 h-4" />,
       accent: 'text-[#0071e3] border-[#0071e3]',
       ring: 'ring-[#0071e3]/20',
       title: 'Customer → Payment',
-      desc: 'UPI QR and card checkout through secure payment rails.'
+      desc: 'Multi-currency cards and regional rails through secure payment infrastructure.'
     },
     {
       key: 'billing',
@@ -81,7 +81,7 @@ export const ArchitectureFlow: React.FC = () => {
     {
       key: 'rails',
       label: 'PAYMENT RAILS',
-      sub: 'UPI · Visa · Mastercard · RuPay',
+      sub: 'Cards · Multi-Currency · Regional Rails',
       icon: <CreditCard className="w-5 h-5" />,
       accent: 'text-[#0071e3] border-[#0071e3]',
       ring: 'ring-[#0071e3]/20'

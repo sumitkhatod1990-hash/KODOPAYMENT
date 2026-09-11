@@ -35,7 +35,7 @@ export const PrivacyPolicyPage: React.FC = () => {
               1. Overview &amp; Scope
             </h2>
             <p className="text-xs sm:text-sm text-[#3a3a3c] leading-relaxed">
-              QivroPay (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) operates a merchant payment software and checkout platform designed for businesses in India. QivroPay provides software tools, API infrastructure, checkout session generation, and merchant dashboard management. Payment processing, acquiring, and financial settlements are executed through authorized third-party payment infrastructure partners, including Cashfree Payments India Private Limited.
+              QivroPay (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) operates a merchant payment software and checkout platform designed for businesses selling worldwide. QivroPay provides software tools, API infrastructure, checkout session generation, and merchant dashboard management. Payment processing, acquiring, and financial settlements are executed through authorized third-party payment infrastructure partners, including Cashfree Payments India Private Limited.
             </p>
             <p className="text-xs sm:text-sm text-[#3a3a3c] leading-relaxed">
               This Privacy Policy explains how QivroPay collects, uses, stores, and protects personal and business information when you visit our website (qivropay.com), register for an account, integrate our API, or authenticate using third-party identity providers such as Google Sign-In.

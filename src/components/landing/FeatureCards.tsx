@@ -16,6 +16,8 @@ import {
   Boxes,
   Users
 } from 'lucide-react';
+import { useRegion } from '../../context/RegionContext';
+import { formatCurrency } from '../../lib/currency';
 
 interface FeatureCardItem {
   title: string;
@@ -26,60 +28,62 @@ interface FeatureCardItem {
   accent: string;
 }
 
-const FEATURE_CARDS: FeatureCardItem[] = [
-  {
-    title: 'Credits, Usage & Subscriptions',
-    copy: 'Credit-based billing, usage metering, subscriptions with addons, and one-time payments, all built in.',
-    icon: Coins,
-    tone: 'from-emerald-50 to-white',
-    detail: [
-      ['Single payment', CircleDollarSign],
-      ['Subscription', Repeat2],
-      ['Usage based billing', Gauge]
-    ],
-    accent: 'text-emerald-600'
-  },
-  {
-    title: 'Global Merchant of Record',
-    copy: 'Collect payments from 190+ countries with 80+ currencies and popular payment methods.',
-    icon: Globe,
-    tone: 'from-blue-50 to-white',
-    detail: [
-      ['UPI', Smartphone],
-      ['Cards', CreditCard],
-      ['Wallets', WalletCards],
-      ['Net banking', Landmark]
-    ],
-    accent: 'text-blue-600'
-  },
-  {
-    title: 'Faster Monetisation',
-    copy: 'Start collecting revenue in minutes, not weeks.',
-    icon: BarChart3,
-    tone: 'from-violet-50 to-white',
-    detail: [
-      ['New MRR  ₹600', TrendingUp],
-      ['Expansion MRR  ₹200', BarChart3],
-      ['↑ 88% vs last month', Activity]
-    ],
-    accent: 'text-violet-600'
-  },
-  {
-    title: 'Built for AI & SaaS',
-    copy: 'Issue credits, meter tokens, track API calls, and bill overages. Designed for how AI companies monetize.',
-    icon: Sparkles,
-    tone: 'from-amber-50 to-white',
-    detail: [
-      ['CREDITS', Coins],
-      ['TOKENS', Boxes],
-      ['SEATS', Users],
-      ['USAGE', Gauge]
-    ],
-    accent: 'text-amber-600'
-  }
-];
-
 export const FeatureCards: React.FC = () => {
+  const { currency } = useRegion();
+
+  const cards: FeatureCardItem[] = [
+    {
+      title: 'Credits, Usage & Subscriptions',
+      copy: 'Credit-based billing, usage metering, subscriptions with addons, and one-time payments, all built in.',
+      icon: Coins,
+      tone: 'from-emerald-50 to-white',
+      detail: [
+        ['Single payment', CircleDollarSign],
+        ['Subscription', Repeat2],
+        ['Usage based billing', Gauge]
+      ],
+      accent: 'text-emerald-600'
+    },
+    {
+      title: 'Global Payment Rails',
+      copy: 'Accept payments across 9 major ISO currencies with UPI, international cards, and net banking powered by Cashfree.',
+      icon: Globe,
+      tone: 'from-blue-50 to-white',
+      detail: [
+        ['Cards', CreditCard],
+        ['UPI', Smartphone],
+        ['Net banking', Landmark],
+        ['9 Currencies', Coins]
+      ],
+      accent: 'text-blue-600'
+    },
+    {
+      title: 'Faster Monetisation',
+      copy: 'Start collecting revenue in minutes, not weeks.',
+      icon: BarChart3,
+      tone: 'from-violet-50 to-white',
+      detail: [
+        [`New MRR  ${formatCurrency(600, currency)}`, TrendingUp],
+        [`Expansion MRR  ${formatCurrency(200, currency)}`, BarChart3],
+        ['↑ 88% vs last month', Activity]
+      ],
+      accent: 'text-violet-600'
+    },
+    {
+      title: 'Built for AI & SaaS',
+      copy: 'Issue credits, meter tokens, track API calls, and bill overages. Designed for how AI companies monetize.',
+      icon: Sparkles,
+      tone: 'from-amber-50 to-white',
+      detail: [
+        ['CREDITS', Coins],
+        ['TOKENS', Boxes],
+        ['SEATS', Users],
+        ['USAGE', Gauge]
+      ],
+      accent: 'text-amber-600'
+    }
+  ];
+
   return (
     <section className="bg-[#f7f6f2] px-4 py-20 sm:px-6 md:py-28 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -93,7 +97,7 @@ export const FeatureCards: React.FC = () => {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          {FEATURE_CARDS.map(({ title, copy, icon: Icon, tone, detail, accent }) => (
+          {cards.map(({ title, copy, icon: Icon, tone, detail, accent }) => (
             <article
               key={title}
               className={`rounded-[2rem] border border-black/[0.06] bg-gradient-to-br ${tone} p-7 shadow-[0_20px_60px_-45px_rgba(21,26,74,.35)] sm:p-10`}

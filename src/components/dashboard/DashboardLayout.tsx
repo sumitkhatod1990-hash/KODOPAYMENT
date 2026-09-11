@@ -13,7 +13,7 @@ import { SettingsTab } from './SettingsTab';
 import { PaymentSetupTab } from './PaymentSetupTab';
 import { SettlementsTab } from './SettlementsTab';
 import { SupportChat } from '../common/SupportChat';
-import { LayoutDashboard, CreditCard, Package, Link2, Users, Code2, Settings, ShieldCheck, Landmark, ArrowLeft, LogOut, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Package, Link2, Users, Code2, Settings, ShieldCheck, Landmark, ArrowLeft, LogOut, Moon, Sun, ShieldAlert, CheckCircle2 } from 'lucide-react';
 
 
 type CoreTab = 'home' | 'verification' | 'payments' | 'settlements' | 'products' | 'payment-links' | 'customers' | 'developer' | 'settings';
@@ -37,9 +37,12 @@ export const DashboardLayout: React.FC = () => (
 );
 
 const DashboardLayoutShell: React.FC = () => {
-  const { dashboardTab, setDashboardTab, setCurrentView, isTestMode, setIsTestMode } = useApp();
+  const { dashboardTab, setDashboardTab, setCurrentView, activeEnvironment, switchEnvironment, isLiveEligible, liveEligibilityReason } = useApp();
   const { user, signOut } = useAuth();
   const { dark, toggleDark } = useDashboardTheme();
+  const [showLiveEligibilityModal, setShowLiveEligibilityModal] = React.useState(false);
+  const [showLiveConfirmModal, setShowLiveConfirmModal] = React.useState(false);
+  const [switchingEnv, setSwitchingEnv] = React.useState(false);
 
   const active = (nav.some(item => item.id === dashboardTab) ? dashboardTab : 'home') as CoreTab;
   const title = nav.find(item => item.id === active)?.label || 'Overview';
@@ -86,12 +89,48 @@ const DashboardLayoutShell: React.FC = () => {
 
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="h-16 shrink-0 bg-white dark:bg-[#0c0f17] border-b border-black/10 dark:border-white/10 px-4 sm:px-7 flex items-center justify-between">
-          <div><div className="text-lg font-bold">{title}</div><div className="text-xs text-slate-500 hidden sm:block">Payments, customers and checkout infrastructure</div></div>
-          <div className="flex items-center gap-2">
-            <div className="hidden sm:flex rounded-xl border border-black/10 dark:border-white/10 p-1 text-[11px] font-bold" aria-label="Workspace mode">
-              <button onClick={() => setIsTestMode(true)} className={`rounded-lg px-2.5 py-1.5 transition ${isTestMode ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-200' : 'text-slate-500'}`}>Test mode</button>
-              <button onClick={() => setIsTestMode(false)} className={`rounded-lg px-2.5 py-1.5 transition ${!isTestMode ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200' : 'text-slate-500'}`}>Live mode</button>
+          <div><div className="text-lg font-bold">{title}</div><div className="text-xs text-slate-500 hidden sm:block">Global payments & checkout infrastructure</div></div>
+          <div className="flex items-center gap-3">
+            {/* Mode Switcher: TEST / LIVE */}
+            <div className="flex items-center bg-slate-100 dark:bg-white/10 p-1 rounded-xl text-xs font-bold" role="group" aria-label="Environment switcher">
+              <button
+                type="button"
+                onClick={() => {
+                  if (activeEnvironment === 'live') {
+                    switchEnvironment('test');
+                  }
+                }}
+                className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
+                  activeEnvironment === 'test'
+                    ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold shadow-xs'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${activeEnvironment === 'test' ? 'bg-amber-500 animate-pulse' : 'bg-slate-400'}`} />
+                TEST
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (activeEnvironment === 'test') {
+                    if (!isLiveEligible) {
+                      setShowLiveEligibilityModal(true);
+                    } else {
+                      setShowLiveConfirmModal(true);
+                    }
+                  }
+                }}
+                className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
+                  activeEnvironment === 'live'
+                    ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${activeEnvironment === 'live' ? 'bg-white' : 'bg-slate-400'}`} />
+                LIVE
+              </button>
             </div>
+
             <button onClick={toggleDark} className="w-9 h-9 rounded-xl border border-black/10 dark:border-white/10 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/5" aria-label="Toggle theme">{dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}</button>
             <button onClick={() => setDashboardTab('payment-links' as any)} className="hidden sm:flex px-4 py-2 rounded-xl bg-[#111827] text-white text-xs font-bold">Create payment link</button>
           </div>
@@ -116,6 +155,106 @@ const DashboardLayoutShell: React.FC = () => {
         </nav>
       </div>
       <SupportChat />
+
+      {/* Ineligible for Live Payments Modal */}
+      {showLiveEligibilityModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="bg-white dark:bg-[#12161f] border border-black/10 dark:border-white/10 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold text-lg">
+                <ShieldAlert className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Complete Verification for Live Payments</h3>
+                <p className="text-xs text-slate-500">Live mode requires Cashfree production onboarding</p>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 text-xs text-amber-800 dark:text-amber-300 space-y-1">
+              <div className="font-semibold">Verification Status:</div>
+              <div>{liveEligibilityReason || 'Cashfree Partner account is not yet verified or active for live processing.'}</div>
+            </div>
+
+            <div className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+              <p className="font-semibold text-slate-700 dark:text-slate-300">Live payments require:</p>
+              <ul className="list-disc list-inside space-y-1 pl-1">
+                <li>Cashfree Partner sub-merchant account created</li>
+                <li>Minimum KYC approved by Cashfree risk & compliance</li>
+                <li>Active payment processing status with full transaction access</li>
+              </ul>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-black/5 dark:border-white/10">
+              <button
+                type="button"
+                onClick={() => setShowLiveEligibilityModal(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
+              >
+                Stay in Test Mode
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLiveEligibilityModal(false);
+                  setDashboardTab('verification' as any);
+                }}
+                className="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition"
+              >
+                Go to Verification
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Switch to Live Mode Modal */}
+      {showLiveConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="bg-white dark:bg-[#12161f] border border-black/10 dark:border-white/10 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold text-lg">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Switch to Live Mode</h3>
+                <p className="text-xs text-slate-500">Real payment processing via Cashfree</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              You are switching to <strong>Live Production mode</strong>. All customer payments, checkout sessions, and API transactions will process real funds through Cashfree production rails.
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-black/5 dark:border-white/10">
+              <button
+                type="button"
+                disabled={switchingEnv}
+                onClick={() => setShowLiveConfirmModal(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={switchingEnv}
+                onClick={async () => {
+                  setSwitchingEnv(true);
+                  const res = await switchEnvironment('live');
+                  setSwitchingEnv(false);
+                  if (res.success) {
+                    setShowLiveConfirmModal(false);
+                  } else {
+                    alert(res.error || 'Failed to switch to Live mode');
+                  }
+                }}
+                className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition"
+              >
+                {switchingEnv ? 'Switching...' : 'Confirm Live Mode'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </div>
   );

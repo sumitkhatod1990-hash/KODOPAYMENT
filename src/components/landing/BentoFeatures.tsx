@@ -26,7 +26,7 @@ export const BentoFeatures: React.FC = () => {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="opp-badge">
-            <span>🇮🇳 BUILT FOR INDIAN PAYMENTS</span>
+            <span>GLOBAL PAYMENT INFRASTRUCTURE</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-[#0A0D14] tracking-tight">
             What you actually get.
@@ -100,24 +100,24 @@ export const BentoFeatures: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 3: UPI & Card Checkout (5 Cols) */}
+          {/* Card 3: Multi-Currency & Card Checkout (5 Cols) */}
           <div className="md:col-span-5 opp-card p-8 sm:p-10 flex flex-col justify-between space-y-6">
             <div className="space-y-3">
               <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center">
-                <Smartphone className="w-5 h-5" />
+                <CreditCard className="w-5 h-5" />
               </div>
               <h3 className="text-2xl font-bold text-[#0A0D14] font-heading">
-                UPI &amp; Card Checkout
+                Multi-Currency &amp; Card Checkout
               </h3>
               <p className="text-sm text-[#6E717D] leading-relaxed">
-                Customers pay by scanning a UPI QR code or entering card details in secure fields hosted by Cashfree, never on your server.
+                Customers pay via international cards across 9 supported currencies, with domestic UPI and RuPay rails for Indian customers—hosted securely by Cashfree.
               </p>
             </div>
 
             <div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-100 text-xs font-mono text-purple-800 space-y-1.5">
               <div className="font-bold flex items-center gap-1.5">
                 <Zap className="w-4 h-4 text-purple-700" />
-                <span>UPI QR &amp; RuPay/Visa/Mastercard</span>
+                <span>International Cards · 9 Currencies · Regional UPI</span>
               </div>
               <p className="text-[11px] text-purple-700">
                 Amounts are signed server-side, so a link can't be tampered with in the browser.
@@ -147,7 +147,7 @@ export const BentoFeatures: React.FC = () => {
 {`POST /api/v1/payments/create-session
 Authorization: Bearer qivro_test_...
 
-{ "productId": "prod_...", "currency": "INR" }`}
+{ "productId": "prod_...", "currency": "USD" }`}
               </pre>
             </div>
           </div>

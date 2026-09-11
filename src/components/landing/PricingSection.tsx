@@ -1,13 +1,10 @@
 import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
-
-// QivroPay's commercial/settlement model with Cashfree has not been
-// finalized yet (Phase 10.5) — this deliberately does not quote a rate.
-// Replace the "Production pricing" status once the fee model is
-// implemented and charged.
-const sandboxCapabilities = ['INR payments', 'UPI & Cards', 'Sandbox API keys'];
+import { useRegion } from '../../context/RegionContext';
 
 export const PricingSection: React.FC = () => {
+  const { currency } = useRegion();
+  const sandboxCapabilities = [`${currency} & multi-currency`, 'UPI & International Cards', 'Sandbox API keys'];
   return (
     <section id="pricing" className="py-14 md:py-20 bg-white border-t border-black/[0.06] scroll-mt-24">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">

@@ -33,3 +33,6 @@ logs/
 
 # Local development persistence (isolated from production data)
 server/.data/
+.vercel
+.env*
+screenshots/

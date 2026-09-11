@@ -102,11 +102,12 @@ export class PartnerOnboardingConflictError extends Error {
 // for a conflict this function cannot safely resolve automatically (see the
 // file-level comment). Throws CashfreePartnerError, unmodified, for any
 // other Cashfree failure — the caller sanitizes/maps that to a 502.
-export async function createOrLinkCashfreeMerchant(merchantId, profile) {
+export async function createOrLinkCashfreeMerchant(merchantId, profile, environment = 'sandbox') {
   if (!merchantId) throw new Error('createOrLinkCashfreeMerchant requires merchantId');
   const { merchantEmail, merchantName, pocPhone, merchantSiteUrl } = profile || {};
+  const targetEnv = environment === 'production' || environment === 'prod' ? 'production' : 'sandbox';
 
-  const existing = await getStoredMapping(merchantId);
+  const existing = await getStoredMapping(merchantId, targetEnv);
   if (existing) return { created: false, mapping: existing, error: null };
 
   const claim = await beginPartnerMerchantCreationClaim(merchantId);
@@ -117,27 +118,27 @@ export async function createOrLinkCashfreeMerchant(merchantId, profile) {
     );
   }
 
-  const cfMerchantId = merchantId;
+  const cfMerchantId = targetEnv === 'production' ? `${merchantId}_live` : merchantId;
   let recoveredFromConflict = false;
 
   try {
     // Re-check after winning the claim: another request could have created
     // and persisted the mapping between the check above and the claim being
     // granted.
-    const recheck = await getStoredMapping(merchantId);
+    const recheck = await getStoredMapping(merchantId, targetEnv);
     if (recheck) {
       await completePartnerMerchantCreationClaim(merchantId);
       return { created: false, mapping: recheck, error: null };
     }
 
     try {
-      await createMerchant({ merchantId: cfMerchantId, merchantEmail, merchantName, pocPhone, merchantSiteUrl });
+      await createMerchant({ merchantId: cfMerchantId, merchantEmail, merchantName, pocPhone, merchantSiteUrl, environment: targetEnv });
     } catch (err) {
       if (!(err instanceof CashfreePartnerError) || err.status !== 409) throw err;
 
       let statusResponse;
       try {
-        statusResponse = await getMerchantStatus(cfMerchantId);
+        statusResponse = await getMerchantStatus(cfMerchantId, targetEnv);
       } catch (statusErr) {
         if (statusErr instanceof CashfreePartnerError && statusErr.status === 404) {
           throw new PartnerOnboardingConflictError(
@@ -158,16 +159,16 @@ export async function createOrLinkCashfreeMerchant(merchantId, profile) {
 
     let mapping;
     try {
-      mapping = await createPartnerMerchantMapping({ merchantId, cfMerchantId });
+      mapping = await createPartnerMerchantMapping({ merchantId, cfMerchantId, environment: targetEnv });
     } catch (e) {
       if (!(e instanceof PartnerMappingError)) throw e;
       // Lost a race to another request that persisted the mapping between
       // our recheck above and this insert — converge on what is stored,
       // this is not an error.
-      mapping = await getStoredMapping(merchantId);
+      mapping = await getStoredMapping(merchantId, targetEnv);
     }
 
-    const refreshed = await refreshMerchantStatus(merchantId);
+    const refreshed = await refreshMerchantStatus(merchantId, targetEnv);
     await completePartnerMerchantCreationClaim(merchantId);
     return { created: !recoveredFromConflict, mapping: refreshed.mapping || mapping, error: refreshed.error };
   } catch (err) {
@@ -189,15 +190,16 @@ export async function createOrLinkCashfreeMerchant(merchantId, profile) {
 // itself rejects the request (e.g. its documented 409 "product already
 // active for merchant" once KYC/activation no longer needs a new link) —
 // this is a real, expected Cashfree response, not this wrapper failing.
-export async function getCashfreePartnerOnboardingLink(merchantId, returnUrl) {
+export async function getCashfreePartnerOnboardingLink(merchantId, returnUrl, environment = null) {
   if (!merchantId) throw new Error('getCashfreePartnerOnboardingLink requires merchantId');
   if (!returnUrl) throw new Error('getCashfreePartnerOnboardingLink requires returnUrl');
 
-  const mapping = await getStoredMapping(merchantId);
+  const mapping = await getStoredMapping(merchantId, environment);
   if (!mapping) return { started: false, link: null, error: null };
 
+  const targetEnv = mapping.environment || environment || 'sandbox';
   try {
-    const { data } = await createEmbeddableOnboardingLink(mapping.cf_merchant_id, returnUrl);
+    const { data } = await createEmbeddableOnboardingLink(mapping.cf_merchant_id, returnUrl, targetEnv);
     return {
       started: true,
       link: {

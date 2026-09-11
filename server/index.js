@@ -17,6 +17,9 @@ import { reconcilePayment, reconcileMerchantPayments, listStoredReconciliations,
 import Groq from 'groq-sdk';
 import { buildPublicSystemPrompt, buildMerchantSystemPrompt } from './supportAiContext.js';
 import { sendWelcomeEmail } from './brevoEmail.js';
+import { isSupportedCurrency, SUPPORTED_CURRENCIES, formatCurrency, formatCurrencyWithCode, getCurrencySymbol, getCurrencyDecimals, validateAmount } from '../src/lib/currency.js';
+
+
 
 
 
@@ -67,19 +70,36 @@ const CASHFREE_ENVIRONMENT = resolveCashfreeEnvironment(); // 'sandbox' | 'produ
 // anything the client sends (body/header/query), only from the hashed API
 // key record looked up server-side.
 function apiKeyEnvironmentMatchesServer(apiKeyEnvironment) {
+  if (process.env.CASHFREE_PROD_SECRET_KEY && process.env.CASHFREE_SECRET_KEY) {
+    return true;
+  }
   const expected = apiKeyEnvironment === 'test' ? 'sandbox' : 'production';
   return expected === CASHFREE_ENVIRONMENT;
 }
 const CASHFREE_API_VERSION = process.env.CASHFREE_API_VERSION || '2025-01-01';
 const PUBLIC_URL = (process.env.PUBLIC_URL || '').replace(/\/$/, '');
 
-function cashfreeBaseUrl() {
-  return CASHFREE_ENVIRONMENT === 'production'
+function normalizeEnvironment(env) {
+  const clean = String(env || '').toLowerCase().trim();
+  if (clean === 'production' || clean === 'live' || clean === 'prod') return 'production';
+  return 'sandbox';
+}
+
+function cashfreeBaseUrl(env = CASHFREE_ENVIRONMENT) {
+  const targetEnv = normalizeEnvironment(env);
+  return targetEnv === 'production'
     ? 'https://api.cashfree.com/pg'
     : 'https://sandbox.cashfree.com/pg';
 }
 
-function cashfreeCredentials() {
+function cashfreeCredentials(env = CASHFREE_ENVIRONMENT) {
+  const targetEnv = normalizeEnvironment(env);
+  if (targetEnv === 'production') {
+    return {
+      appId: process.env.CASHFREE_PROD_APP_ID || process.env.CASHFREE_APP_ID || '',
+      secretKey: process.env.CASHFREE_PROD_SECRET_KEY || process.env.CASHFREE_SECRET_KEY || ''
+    };
+  }
   return {
     appId: process.env.CASHFREE_APP_ID || '',
     secretKey: process.env.CASHFREE_SECRET_KEY || ''
@@ -114,7 +134,13 @@ function verifyCheckoutSession(token) {
   if (!secret) return null;
   const expected = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
   if (signature.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
-  try { return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch { return null; }
+  try {
+    const session = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+    if (!session || typeof session !== 'object') return null;
+    return session;
+  } catch {
+    return null;
+  }
 }
 
 // Minimal in-memory fixed-window rate limiter — no new dependency needed for
@@ -677,8 +703,8 @@ app.get('/api/v1/admin/clients/:merchantId/360', guardAdminHost, requireAdminAut
 
 // 4. Global Payments API
 app.get('/api/v1/admin/payments', guardAdminHost, requireAdminAuth(ROLES_PAYMENTS), ah(async (req, res) => {
-  const { page, pageSize, merchantId, status, search, minAmount, maxAmount, from, to, environment } = req.query;
-  const result = await listAdminPayments({ page, pageSize, merchantId, status, search, minAmount, maxAmount, from, to, environment });
+  const { page, pageSize, merchantId, status, search, minAmount, maxAmount, from, to, environment, currency } = req.query;
+  const result = await listAdminPayments({ page, pageSize, merchantId, status, search, minAmount, maxAmount, from, to, environment, currency });
   res.json({ success: true, data: result.data, pagination: result.pagination });
 }));
 
@@ -712,16 +738,17 @@ app.post('/api/v1/admin/payments/:paymentId/refresh-status', guardAdminHost, req
     return res.json({ success: true, data: updated, message: 'Payment status refreshed successfully' });
   }
 
-  const { appId, secretKey } = cashfreeCredentials();
+  const paymentEnv = payment.environment || 'sandbox';
+  const { appId, secretKey } = cashfreeCredentials(paymentEnv);
   if (!appId || !secretKey) {
-    return res.status(503).json({ success: false, error: 'Cashfree gateway credentials are not configured on server' });
+    return res.status(503).json({ success: false, error: `Cashfree gateway credentials for ${paymentEnv} are not configured on server` });
   }
 
   const refreshPromise = (async () => {
     let cfResponse;
     let cfData;
     try {
-      cfResponse = await fetch(`${cashfreeBaseUrl()}/orders/${encodeURIComponent(orderId)}`, {
+      cfResponse = await fetch(`${cashfreeBaseUrl(paymentEnv)}/orders/${encodeURIComponent(orderId)}`, {
         headers: {
           'x-api-version': CASHFREE_API_VERSION,
           'x-client-id': appId,
@@ -1335,7 +1362,7 @@ app.use('/api/v1', async (req, res, next) => {
 
   const publicPaths = [
     '/health', '/auth/me', '/auth/login', '/auth/signup', '/auth/logout', '/auth/google',
-    '/payments/session/',
+    '/payments/session/', '/payments/create-order', '/payments/orders/',
     '/india/cashfree/create-order', '/india/cashfree/session/', '/india/cashfree/orders/', '/webhooks/cashfree',
     '/support/chat'
   ];
@@ -1415,23 +1442,66 @@ app.get('/api/v1/products', async (req, res) => {
 });
 app.post('/api/v1/products', ah(async (req, res) => {
   const { name, description = '', price, currency = 'INR', type = 'one_time', active = true, credits } = req.body || {};
-  const amount = Number(price);
-  if (!String(name || '').trim() || !Number.isFinite(amount) || amount <= 0) return res.status(400).json({ success:false, error:'Product name and a positive price are required' });
+  const normalizedCurrency = String(currency || 'INR').trim().toUpperCase();
+  if (!isSupportedCurrency(normalizedCurrency)) {
+    return res.status(400).json({
+      success: false,
+      error: `Unsupported currency '${currency}'. Supported currencies: ${SUPPORTED_CURRENCIES.join(', ')}`
+    });
+  }
+  const amountVal = validateAmount(price, normalizedCurrency);
+  if (!String(name || '').trim() || !amountVal.valid) {
+    return res.status(400).json({
+      success: false,
+      error: amountVal.error || 'Product name and a positive price are required'
+    });
+  }
   if (!['one_time','credits'].includes(type)) return res.status(400).json({success:false,error:'QivroPay V1 supports one-time and credit products only'});
-  const product = { id:newId('prod'), name:String(name).trim(), description:String(description), price:Number(amount.toFixed(2)), currency:String(currency).toUpperCase(), type, active:Boolean(active), createdAt:new Date().toISOString(), ...(credits != null ? {credits:Number(credits)}:{}),  };
-  await saveResource(req.user.id, 'product', product); return res.status(201).json({success:true, product});
+  const product = {
+    id: newId('prod'),
+    name: String(name).trim(),
+    description: String(description),
+    price: amountVal.normalizedAmount,
+    currency: normalizedCurrency,
+    type,
+    active: Boolean(active),
+    createdAt: new Date().toISOString(),
+    ...(credits != null ? { credits: Number(credits) } : {})
+  };
+  await saveResource(req.user.id, 'product', product);
+  return res.status(201).json({ success: true, product });
 }));
 app.delete('/api/v1/products/:id', ah(async (req,res)=>{ await deleteResource(req.user.id,'product',req.params.id); return res.json({success:true}); }));
 
 app.get('/api/v1/customers', async (req,res)=>{ try{return res.json({success:true,customers:await listResources(req.user.id,'customer')});}catch(e){return res.status(503).json({success:false,error:'Customer storage unavailable'});} });
-app.get('/api/v1/transactions', async (req,res)=>{ try{return res.json({success:true,transactions:await listResources(req.user.id,'transaction')});}catch(e){return res.status(503).json({success:false,error:'Transaction storage unavailable'});} });
+app.get('/api/v1/transactions', async (req,res)=>{
+  try{
+    let txs = await listResources(req.user.id, 'transaction');
+    const { environment, currency } = req.query;
+    if (environment) {
+      const targetEnv = normalizeEnvironment(environment);
+      txs = txs.filter(t => (normalizeEnvironment(t.environment) === targetEnv) || (!t.environment && targetEnv === 'sandbox'));
+    }
+    if (currency) {
+      txs = txs.filter(t => String(t.currency || 'INR').toUpperCase() === String(currency).toUpperCase());
+    }
+    return res.json({ success: true, transactions: txs });
+  }catch(e){
+    return res.status(503).json({ success: false, error: 'Transaction storage unavailable' });
+  }
+});
 app.get('/api/v1/subscriptions', async (req,res)=>{ try{return res.json({success:true,subscriptions:await listResources(req.user.id,'subscription')});}catch(e){return res.status(503).json({success:false,error:'Subscription storage unavailable'});} });
 
 app.get('/api/v1/analytics', async (req,res)=>{
   try{
-    const txs=await listResources(req.user.id,'transaction');
+    let txs=await listResources(req.user.id,'transaction');
     const customers=await listResources(req.user.id,'customer');
     const subscriptions=await listResources(req.user.id,'subscription');
+    const { environment } = req.query;
+    if (environment) {
+      const targetEnv = normalizeEnvironment(environment);
+      txs = txs.filter(t => (normalizeEnvironment(t.environment) === targetEnv) || (!t.environment && targetEnv === 'sandbox'));
+    }
     // A 'refund_pending' transaction was still a real, successful payment —
     // it must keep counting toward gross volume while its refund is
     // unconfirmed (requirement: analytics stays internally consistent even
@@ -1441,10 +1511,41 @@ app.get('/api/v1/analytics', async (req,res)=>{
     // an unconfirmed refund must not already discount net revenue that may
     // never actually leave the account.
     const paid=txs.filter(t=>t.status==='succeeded' || t.status==='refunded' || t.status==='partially_refunded' || t.status==='refund_pending');
-    const totalVolume=paid.reduce((n,t)=>n+Number(t.amount||0),0);
-    const refunded=paid.filter(t=>t.status==='refunded' || t.status==='partially_refunded').reduce((n,t)=>n+Number(t.refundedAmount||0),0);
+
+    // Multi-currency volume breakdown: Never aggregate different currencies into a single number!
+    const byCurrency = {};
+    for (const t of paid) {
+      const cur = String(t.currency || 'INR').toUpperCase();
+      if (!byCurrency[cur]) {
+        byCurrency[cur] = { currency: cur, totalVolume: 0, totalRefunded: 0, totalNet: 0, count: 0 };
+      }
+      const amt = Number(t.amount || 0);
+      const ref = (t.status === 'refunded' || t.status === 'partially_refunded') ? Number(t.refundedAmount || 0) : 0;
+      byCurrency[cur].totalVolume = Number((byCurrency[cur].totalVolume + amt).toFixed(2));
+      byCurrency[cur].totalRefunded = Number((byCurrency[cur].totalRefunded + ref).toFixed(2));
+      byCurrency[cur].totalNet = Number((byCurrency[cur].totalVolume - byCurrency[cur].totalRefunded).toFixed(2));
+      byCurrency[cur].count += 1;
+    }
+
+    const primaryCurrency = byCurrency['USD'] ? 'USD' : (Object.keys(byCurrency)[0] || 'USD');
+    const primaryData = byCurrency[primaryCurrency] || { totalVolume: 0, totalRefunded: 0, totalNet: 0 };
     const activeSubscriptions=subscriptions.filter(s=>s.status==='active').length;
-    return res.json({success:true,analytics:{totalVolume:Number(totalVolume.toFixed(2)),totalFees:0,totalNet:Number((totalVolume-refunded).toFixed(2)),mrr:subscriptions.filter(s=>s.status==='active').reduce((n,s)=>n+Number(s.amount||0),0),activeSubscriptions,activeCustomers:customers.length,conversionRate:'—',chargebackRate:'—'}});
+
+    return res.json({
+      success: true,
+      analytics: {
+        totalVolume: primaryData.totalVolume,
+        totalFees: 0,
+        totalNet: primaryData.totalNet,
+        currency: primaryCurrency,
+        byCurrency,
+        mrr: subscriptions.filter(s=>s.status==='active').reduce((n,s)=>n+Number(s.amount||0),0),
+        activeSubscriptions,
+        activeCustomers: customers.length,
+        conversionRate: '—',
+        chargebackRate: '—'
+      }
+    });
   }catch(e){return res.status(503).json({success:false,error:'Analytics storage unavailable'});}
 });
 
@@ -1483,39 +1584,70 @@ function publicMerchantProfile(profile, user) {
     businessName: profile?.businessName || user?.company || '',
     supportEmail: profile?.supportEmail || '',
     onboardingCompletedAt: profile?.onboardingCompletedAt || null,
-    liveActivatedAt: profile?.liveActivatedAt || null
+    liveActivatedAt: profile?.liveActivatedAt || null,
+    activeEnvironment: profile?.activeEnvironment || 'test'
   };
 }
 
 // -------------------------------------------------------------
-// LIVE PAYMENT APPROVAL GATE (Phase 10.7A safety cleanup)
+// LIVE PAYMENT APPROVAL GATE (Phase 10.7A & Global Architecture)
 //
-// QivroPay has no real KYC/merchant-onboarding review yet — a merchant can
-// currently sign up and, if this server happens to be configured with
-// CASHFREE_ENV=production, immediately create a real checkout session
-// against the platform's live Cashfree account with zero review. Rather than
-// pretend some automated approval exists (there is none), every merchant is
-// blocked from live checkout-session/order creation by default. sandbox
-// (CASHFREE_ENVIRONMENT === 'sandbox') is never restricted, so local
-// development and pre-launch testing are unaffected.
-//
-// There is deliberately no API route that lets a merchant (or anyone else)
-// set `liveActivatedAt` themselves — that would just be a second fake
-// approval flow. Until a real Cashfree onboarding/KYC integration exists,
-// the only way to activate a merchant for live payments is the operator
-// running `node server/scripts/activate-merchant-live.js <email>` directly
-// against the production database. See PRODUCTION_READINESS.md.
+// Live activation authoritatively verifies Cashfree Partner state:
+// cf_merchant_id present, kyc_status === 'MIN_KYC_APPROVED',
+// activation_status === 'ACTIVE', and transaction_access === 'full'.
+// Operator manual activation (via activate-merchant-live.js) remains
+// supported as an operational override. Sandbox is never restricted.
+// -------------------------------------------------------------
+async function checkMerchantLiveEligibility(merchantId) {
+  try {
+    const partnerMapping = await getPartnerMerchantMapping(merchantId, 'production');
+    if (partnerMapping) {
+      const hasCfId = Boolean(partnerMapping.cf_merchant_id);
+      const kycApproved = partnerMapping.kyc_status === 'MIN_KYC_APPROVED' || partnerMapping.full_kyc_status === 'APPROVED';
+      const active = partnerMapping.activation_status === 'ACTIVE';
+      const fullAccess = partnerMapping.transaction_access === 'full';
+
+      if (hasCfId && kycApproved && active && fullAccess) {
+        return { eligible: true, mapping: partnerMapping, reason: 'Cashfree Partner production onboarding verified' };
+      }
+    }
+
+    const profile = await getResource(merchantId, 'merchant_profile', 'default');
+    if (profile?.liveActivatedAt) {
+      return { eligible: true, reason: 'Operator manual live activation' };
+    }
+
+    return {
+      eligible: false,
+      reason: partnerMapping
+        ? `Cashfree verification incomplete (kyc: ${partnerMapping.kyc_status || 'none'}, activation: ${partnerMapping.activation_status || 'none'}, access: ${partnerMapping.transaction_access || 'none'})`
+        : 'Cashfree production partner onboarding not started',
+      details: partnerMapping ? {
+        cfMerchantId: partnerMapping.cf_merchant_id,
+        kycStatus: partnerMapping.kyc_status,
+        activationStatus: partnerMapping.activation_status,
+        transactionAccess: partnerMapping.transaction_access
+      } : null
+    };
+  } catch (err) {
+    console.error('Failed to check merchant live eligibility:', err);
+    return { eligible: false, reason: 'Failed to verify live eligibility' };
+  }
+}
+
 async function isMerchantLiveActivated(merchantId) {
   try {
-    const profile = await getResource(merchantId, 'merchant_profile', 'default');
-    return Boolean(profile?.liveActivatedAt);
+    const eligibility = await checkMerchantLiveEligibility(merchantId);
+    return Boolean(eligibility?.eligible);
   } catch (e) {
     return false;
   }
 }
 
-async function requireLiveActivationIfProduction(req, res) {
-  if (CASHFREE_ENVIRONMENT !== 'production') return true;
+async function requireLiveActivationIfProduction(req, res, targetEnv) {
+  const env = targetEnv || (req.body?.environment || req.query?.environment || CASHFREE_ENVIRONMENT);
+  const normalized = normalizeEnvironment(env);
+  if (normalized !== 'production') return true;
   if (await isMerchantLiveActivated(req.user.id)) return true;
   res.status(403).json({
     success: false,
@@ -1524,6 +1656,49 @@ async function requireLiveActivationIfProduction(req, res) {
   });
   return false;
 }
+
+app.get('/api/v1/merchant/environment', ah(async (req, res) => {
+  const profile = await getResource(req.user.id, 'merchant_profile', 'default');
+  const eligibility = await checkMerchantLiveEligibility(req.user.id);
+  const activeEnvironment = profile?.activeEnvironment || (eligibility.eligible ? 'live' : 'test');
+  return res.json({
+    success: true,
+    environment: activeEnvironment,
+    liveEligible: eligibility.eligible,
+    eligibilityReason: eligibility.reason,
+    serverDefaultEnvironment: CASHFREE_ENVIRONMENT === 'production' ? 'live' : 'test'
+  });
+}));
+
+app.post('/api/v1/merchant/environment', ah(async (req, res) => {
+  const requestedEnv = String(req.body?.environment || '').toLowerCase().trim();
+  if (!['test', 'live', 'sandbox', 'production'].includes(requestedEnv)) {
+    return res.status(400).json({ success: false, error: "Environment must be 'test' or 'live'" });
+  }
+  const targetEnv = (requestedEnv === 'live' || requestedEnv === 'production') ? 'live' : 'test';
+
+  if (targetEnv === 'live') {
+    const eligibility = await checkMerchantLiveEligibility(req.user.id);
+    if (!eligibility.eligible) {
+      return res.status(403).json({
+        success: false,
+        error: "Cannot switch to LIVE: Account has not completed Cashfree verification and activation.",
+        errorCode: 'LIVE_PAYMENTS_NOT_ACTIVATED',
+        details: eligibility
+      });
+    }
+  }
+
+  const existing = await getResource(req.user.id, 'merchant_profile', 'default') || {};
+  const updated = {
+    ...existing,
+    id: 'default',
+    activeEnvironment: targetEnv,
+    updatedAt: new Date().toISOString()
+  };
+  await saveResource(req.user.id, 'merchant_profile', updated);
+  return res.json({ success: true, environment: targetEnv });
+}));
 
 app.get('/api/v1/merchant/profile', async (req, res) => {
   try {
@@ -1827,33 +2002,67 @@ app.post('/api/v1/merchant/reconciliation/refresh', ah(async (req, res) => {
 }));
 
 app.post('/api/v1/payments/create-session', ah(async (req,res)=>{
-  if (!(await requireLiveActivationIfProduction(req, res))) return;
-  const productId=String(req.body?.productId||'');
-  const product=productId ? await getResource(req.user.id,'product',productId) : null;
-  const amount=Number(req.body?.amount ?? product?.price);
-  const currency=String(product?.currency||req.body?.currency||'INR').toUpperCase();
-  if(!Number.isFinite(amount)||amount<=0) return res.status(400).json({success:false,error:'A valid product or positive amount is required'});
-  if(Math.abs(amount - Math.round(amount*100)/100) > 1e-9) return res.status(400).json({success:false,error:'Amount must have at most 2 decimal places'});
-  if(currency!=='INR') return res.status(400).json({success:false,error:'QivroPay V1 currently supports INR checkout only'});
-  const session={sessionId:`cs_${crypto.randomBytes(18).toString('hex')}`,merchantId:req.user.id,productId:product?.id||null,title:String(req.body?.title||product?.name||'Payment'),description:String(req.body?.description||product?.description||''),amount:Number(amount.toFixed(2)),currency,customerEmail:String(req.body?.customerEmail||'').trim().toLowerCase(),type:product?.type||'one_time',credits:product?.credits||0,createdAt:new Date().toISOString(),expiresAt:new Date(Date.now()+30*60*1000).toISOString()};
+  const productId = String(req.body?.productId || '');
+  const product = productId ? await getResource(req.user.id, 'product', productId) : null;
+  const rawAmount = req.body?.amount ?? product?.price;
+  const currency = String(product?.currency || req.body?.currency || 'INR').trim().toUpperCase();
+
+  if (!isSupportedCurrency(currency)) {
+    return res.status(400).json({
+      success: false,
+      errorCode: 'INVALID_CURRENCY',
+      error: `Unsupported currency '${currency}'. Supported currencies: ${SUPPORTED_CURRENCIES.join(', ')}`
+    });
+  }
+
+  const amountVal = validateAmount(rawAmount, currency);
+  if (!amountVal.valid) {
+    return res.status(400).json({
+      success: false,
+      errorCode: 'INVALID_AMOUNT',
+      error: amountVal.error || 'A valid product or positive amount is required'
+    });
+  }
+  const amount = amountVal.normalizedAmount;
+
+  const merchantProfile = await getResource(req.user.id, 'merchant_profile', 'default');
+  const targetEnv = normalizeEnvironment(req.body?.environment || req.apiKey?.environment || merchantProfile?.activeEnvironment || CASHFREE_ENVIRONMENT);
+  if (!(await requireLiveActivationIfProduction(req, res, targetEnv))) return;
+
+  const session = {
+    sessionId: `cs_${crypto.randomBytes(18).toString('hex')}`,
+    merchantId: req.user.id,
+    productId: product?.id || null,
+    title: String(req.body?.title || product?.name || 'Payment'),
+    description: String(req.body?.description || product?.description || ''),
+    amount,
+    currency,
+    environment: targetEnv,
+    customerEmail: String(req.body?.customerEmail || '').trim().toLowerCase(),
+    type: product?.type || 'one_time',
+    credits: product?.credits || 0,
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString()
+  };
+
   const publicOrigin = PUBLIC_URL || (process.env.NODE_ENV === 'production' ? '' : `http://localhost:${PORT}`);
-  if (!publicOrigin) return res.status(503).json({success:false,error:'PUBLIC_URL is required in production'});
-  if (!checkoutTokenSecret()) return res.status(503).json({success:false,error:'Checkout signing secret is not configured'});
+  if (!publicOrigin) return res.status(503).json({ success: false, error: 'PUBLIC_URL is required in production' });
+  if (!checkoutTokenSecret()) return res.status(503).json({ success: false, error: 'Checkout signing secret is not configured' });
   await createCheckoutSession(session);
-  const token=signCheckoutSession(session);
-  return res.status(201).json({success:true,sessionId:token,url:`${publicOrigin}/checkout/${token}`});
+  const token = signCheckoutSession(session);
+  return res.status(201).json({ success: true, sessionId: token, url: `${publicOrigin}/checkout/${token}`, session });
 }));
 
 app.get('/api/v1/payments/session/:id', ah(async (req,res)=>{
-  const verified=verifyCheckoutSession(req.params.id);
-  const session=verified || await getCheckoutSession(req.params.id);
-  if(!session) return res.status(404).json({success:false,error:'Session not found'});
-  if(session.expiresAt && new Date(session.expiresAt)<new Date()) return res.status(410).json({success:false,error:'Checkout session expired'});
+  const verified = verifyCheckoutSession(req.params.id);
+  const session = verified || await getCheckoutSession(req.params.id);
+  if (!session) return res.status(404).json({ success: false, error: 'Session not found' });
+  if (session.expiresAt && new Date(session.expiresAt) < new Date()) return res.status(410).json({ success: false, error: 'Checkout session expired' });
   // The Cashfree SDK mode (sandbox/production) comes from this same response
-  // — the frontend has no independent env config of its own — so the
-  // backend and the browser's Cashfree SDK can never disagree about which
-  // environment a payment runs against. Non-secret: no credentials here.
-  return res.json({success:true,session,cashfreeEnvironment:CASHFREE_ENVIRONMENT});
+  // scoped to the session itself, so the backend and the browser's Cashfree SDK
+  // can never disagree about which environment a payment runs against.
+  const cashfreeEnv = normalizeEnvironment(session.environment || CASHFREE_ENVIRONMENT);
+  return res.json({ success: true, session, cashfreeEnvironment: cashfreeEnv });
 }));
 
 // Database Helpers
@@ -2363,8 +2572,9 @@ app.post('/api/v1/payments/refund', ah(async (req, res) => {
   if(!tx) return res.status(404).json({success:false,error:'Transaction not found'});
   if(tx.status!=='succeeded') return res.status(409).json({success:false,error:'Only successful payments can be refunded'});
   const stored=await getPaymentOrder(transactionId);
-  const {appId,secretKey}=cashfreeCredentials();
-  if(!appId||!secretKey) return res.status(503).json({success:false,error:'Cashfree credentials are not configured'});
+  const refundEnv = normalizeEnvironment(tx.environment || stored?.environment || 'sandbox');
+  const { appId, secretKey } = cashfreeCredentials(refundEnv);
+  if(!appId||!secretKey) return res.status(503).json({success:false,error:`Cashfree credentials for ${refundEnv} are not configured`});
   const refundAmount=amount == null ? Number(tx.amount) : Number(amount);
   if(!Number.isFinite(refundAmount)||refundAmount<=0||refundAmount>Number(tx.amount)) return res.status(400).json({success:false,error:'Invalid refund amount'});
 
@@ -2379,7 +2589,7 @@ app.post('/api/v1/payments/refund', ah(async (req, res) => {
 
   try{
     const refundId=`refund_${crypto.randomBytes(10).toString('hex')}`;
-    const response=await fetch(`${cashfreeBaseUrl()}/orders/${encodeURIComponent(transactionId)}/refunds`,{method:'POST',headers:{'x-api-version':CASHFREE_API_VERSION,'x-client-id':appId,'x-client-secret':secretKey,'Content-Type':'application/json'},body:JSON.stringify({refund_amount:Number(refundAmount.toFixed(2)),refund_id:refundId,refund_note:note})});
+    const response=await fetch(`${cashfreeBaseUrl(refundEnv)}/orders/${encodeURIComponent(transactionId)}/refunds`,{method:'POST',headers:{'x-api-version':CASHFREE_API_VERSION,'x-client-id':appId,'x-client-secret':secretKey,'Content-Type':'application/json'},body:JSON.stringify({refund_amount:Number(refundAmount.toFixed(2)),refund_id:refundId,refund_note:note})});
     const data=await response.json();
     if(!response.ok) { await releaseRefundClaim(req.user.id,transactionId); return res.status(response.status).json({success:false,error:data.message||'Cashfree refund request failed'}); }
     // Never assume HTTP 2xx means the refund is complete — Cashfree's own
@@ -2408,10 +2618,11 @@ app.get('/api/v1/payments/refund-status/:transactionId', ah(async (req, res) => 
   if(!tx) return res.status(404).json({success:false,error:'Transaction not found'});
   if(tx.status!=='refund_pending') return res.json({success:true,transaction:tx,reconciled:false});
   if(!tx.refundId) return res.status(409).json({success:false,error:'No refund reference recorded for this transaction'});
-  const {appId,secretKey}=cashfreeCredentials();
-  if(!appId||!secretKey) return res.status(503).json({success:false,error:'Cashfree credentials are not configured'});
+  const refundEnv = normalizeEnvironment(tx.environment || 'sandbox');
+  const { appId, secretKey } = cashfreeCredentials(refundEnv);
+  if(!appId||!secretKey) return res.status(503).json({success:false,error:`Cashfree credentials for ${refundEnv} are not configured`});
   try{
-    const response=await fetch(`${cashfreeBaseUrl()}/orders/${encodeURIComponent(transactionId)}/refunds/${encodeURIComponent(tx.refundId)}`,{headers:{'x-api-version':CASHFREE_API_VERSION,'x-client-id':appId,'x-client-secret':secretKey,'Content-Type':'application/json'}});
+    const response=await fetch(`${cashfreeBaseUrl(refundEnv)}/orders/${encodeURIComponent(transactionId)}/refunds/${encodeURIComponent(tx.refundId)}`,{headers:{'x-api-version':CASHFREE_API_VERSION,'x-client-id':appId,'x-client-secret':secretKey,'Content-Type':'application/json'}});
     const data=await response.json();
     if(!response.ok) return res.status(response.status).json({success:false,error:data.message||'Cashfree refund status lookup failed'});
     const updated=await applyRefundStatus(req.user.id,transactionId,{refundId:data.refund_id||tx.refundId,refundAmount:data.refund_amount,refundStatus:data.refund_status});
@@ -2746,15 +2957,16 @@ app.post('/api/v1/copilot/generate', (req, res) => {
   db.products.unshift(newProd);
   writeDB(db);
 
-  const checkoutUrl = `http://localhost:4000/checkout/${newProd.id}`;
-  const embedSnippet = `<script src="http://localhost:4000/checkout.js"></script>\n<button onclick="QivroPay.openCheckout('${newProd.id}')">Pay ₹${price} INR</button>`;
+  const publicOrigin = PUBLIC_URL || (process.env.NODE_ENV === 'production' ? '' : `http://localhost:${PORT}`);
+  const checkoutUrl = `${publicOrigin}/checkout/${newProd.id}`;
+  const embedSnippet = `<script src="${publicOrigin}/checkout.js"></script>\n<button onclick="QivroPay.openCheckout('${newProd.id}')">Pay ₹${price} INR</button>`;
 
   res.json({
     success: true,
     product: newProd,
     checkoutUrl,
     embedSnippet,
-    reasoning: `Extracted ${type} model priced at ₹${price} INR with instant global MoR tax routing.`
+    reasoning: `Configured ${type} product priced at ₹${price} INR.`
   });
 });
 
@@ -3832,13 +4044,14 @@ app.get('/api/v1/india/jjm-water', (req, res) => {
 // 129. INDIA: CASHFREE PAYMENT INFRASTRUCTURE CREDENTIALS VERIFICATION API
 // -------------------------------------------------------------
 app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
-  if (!(await requireLiveActivationIfProduction(req, res))) return;
-  const { appId: currentAppId, secretKey: currentSecretKey } = cashfreeCredentials();
+  const targetEnv = normalizeEnvironment(req.body?.environment || req.query?.environment || CASHFREE_ENVIRONMENT);
+  if (!(await requireLiveActivationIfProduction(req, res, targetEnv))) return;
+  const { appId: currentAppId, secretKey: currentSecretKey } = cashfreeCredentials(targetEnv);
 
   if (!currentSecretKey) {
     return res.status(400).json({
       success: false,
-      error: 'Cashfree Secret Key is required. Please input in Settings or set CASHFREE_SECRET_KEY env.'
+      error: `Cashfree Secret Key for ${targetEnv} is required. Please input in Settings or set CASHFREE_${targetEnv === 'production' ? 'PROD_' : ''}SECRET_KEY env.`
     });
   }
 
@@ -3849,7 +4062,7 @@ app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
     // account, split configuration, or anything else. Report exactly that
     // and nothing more; no field here is ever fabricated.
     const testOrderId = `cf_test_${Date.now()}`;
-    const cfResponse = await fetch(`${cashfreeBaseUrl()}/orders`, {
+    const cfResponse = await fetch(`${cashfreeBaseUrl(targetEnv)}/orders`, {
       method: 'POST',
       headers: {
         'x-api-version': CASHFREE_API_VERSION,
@@ -3882,7 +4095,7 @@ app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
       await saveResource(req.user.id, 'cashfree_config', {
         id: 'default',
         appId: currentAppId,
-        environment: CASHFREE_ENVIRONMENT,
+        environment: targetEnv,
         status: 'connected',
         lastVerifiedAt: new Date().toISOString()
       });
@@ -3890,7 +4103,7 @@ app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
       return res.json({
         success: true,
         status: 'connected',
-        environment: CASHFREE_ENVIRONMENT,
+        environment: targetEnv,
         gateway: 'Cashfree Payment Gateway (Orders API)',
         testOrderId: cfData.order_id || testOrderId
       });
@@ -3909,17 +4122,18 @@ app.post('/api/v1/india/cashfree/verify-credentials', async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 130. INDIA: CASHFREE CREATE LIVE REAL ORDER API
+// 130. CASHFREE CREATE LIVE/SANDBOX REAL ORDER API
 // -------------------------------------------------------------
-app.post('/api/v1/india/cashfree/create-order', cashfreeCreateOrderRateLimit, ah(async (req, res) => {
-  const { secretKey, appId } = cashfreeCredentials();
-  const publicOrigin = PUBLIC_URL || (process.env.NODE_ENV === 'production' ? '' : `${req.protocol}://${req.get('host')}`);
-  if (!appId || !secretKey || !publicOrigin) return res.status(503).json({ success:false, error:'Cashfree credentials and PUBLIC_URL are required' });
-
+const handleCashfreeCreateOrder = async (req, res) => {
   const token = String(req.body?.sessionToken || '');
   const session = verifyCheckoutSession(token) || await getCheckoutSession(token);
   if (!session) return res.status(404).json({ success:false, error:'Checkout session not found' });
   if (session.expiresAt && new Date(session.expiresAt) < new Date()) return res.status(410).json({ success:false,error:'Checkout session expired' });
+
+  const orderEnv = normalizeEnvironment(session.environment || CASHFREE_ENVIRONMENT);
+  const { secretKey, appId } = cashfreeCredentials(orderEnv);
+  const publicOrigin = PUBLIC_URL || (process.env.NODE_ENV === 'production' ? '' : `${req.protocol}://${req.get('host')}`);
+  if (!appId || !secretKey || !publicOrigin) return res.status(503).json({ success:false, error:`Cashfree credentials for ${orderEnv} and PUBLIC_URL are required` });
 
   const normalizedEmail = String(req.body?.customerEmail || session.customerEmail || '').trim().toLowerCase();
   const normalizedPhone = String(req.body?.customerPhone || '').replace(/\D/g, '').slice(-10);
@@ -3928,13 +4142,17 @@ app.post('/api/v1/india/cashfree/create-order', cashfreeCreateOrderRateLimit, ah
   try {
     await ensurePaymentStore();
     const orderId = `qv_cf_${Date.now()}_${crypto.randomBytes(5).toString('hex')}`;
-    const cfResponse = await fetch(`${cashfreeBaseUrl()}/orders`, {
+    const orderCurrency = String(session.currency || 'INR').toUpperCase();
+    const decimals = getCurrencyDecimals(orderCurrency);
+    const orderAmount = Number(Number(session.amount).toFixed(decimals));
+
+    const cfResponse = await fetch(`${cashfreeBaseUrl(orderEnv)}/orders`, {
       method:'POST',
       headers:{'x-api-version':CASHFREE_API_VERSION,'x-client-id':appId,'x-client-secret':secretKey,'Content-Type':'application/json'},
       body:JSON.stringify({
         order_id:orderId,
-        order_amount:Number(Number(session.amount).toFixed(2)),
-        order_currency:String(session.currency || 'INR').toUpperCase(),
+        order_amount:orderAmount,
+        order_currency:orderCurrency,
         customer_details:{customer_id:`cus_${crypto.randomBytes(8).toString('hex')}`,customer_email:normalizedEmail,customer_phone:normalizedPhone},
         // Cashfree caps order_meta.return_url at 500 chars. The full signed
         // checkout token (payload + HMAC signature) can be 500+ chars on its
@@ -3949,25 +4167,34 @@ app.post('/api/v1/india/cashfree/create-order', cashfreeCreateOrderRateLimit, ah
     });
     const cfData=await cfResponse.json();
     if(!cfResponse.ok || !cfData.payment_session_id) return res.status(cfResponse.status || 400).json({success:false,error:cfData.message || 'Failed to create order on Cashfree'});
-    await recordPaymentOrder({orderId,cfOrderId:cfData.cf_order_id,orderAmount:cfData.order_amount,orderCurrency:cfData.order_currency,orderStatus:cfData.order_status,customerEmail:normalizedEmail,customerPhone:normalizedPhone,sessionToken:token,merchantId:session.merchantId,productId:session.productId,productName:session.title,sessionAmount:session.amount,sessionType:session.type});
-    return res.status(201).json({success:true,orderId,cfOrderId:cfData.cf_order_id,paymentSessionId:cfData.payment_session_id,orderAmount:cfData.order_amount,orderCurrency:cfData.order_currency,orderStatus:cfData.order_status,environment:CASHFREE_ENVIRONMENT});
+    await recordPaymentOrder({orderId,cfOrderId:cfData.cf_order_id,orderAmount:cfData.order_amount,orderCurrency:cfData.order_currency,orderStatus:cfData.order_status,customerEmail:normalizedEmail,customerPhone:normalizedPhone,sessionToken:token,merchantId:session.merchantId,productId:session.productId,productName:session.title,sessionAmount:session.amount,sessionType:session.type,environment:orderEnv});
+    return res.status(201).json({success:true,orderId,cfOrderId:cfData.cf_order_id,paymentSessionId:cfData.payment_session_id,orderAmount:cfData.order_amount,orderCurrency:cfData.order_currency,orderStatus:cfData.order_status,environment:orderEnv});
   } catch(err){ return res.status(502).json({success:false,error:'Failed to communicate with Cashfree'}); }
-}));
+};
 
-app.get('/api/v1/india/cashfree/session/:sessionToken/status', async (req, res) => {
+app.post('/api/v1/india/cashfree/create-order', cashfreeCreateOrderRateLimit, ah(handleCashfreeCreateOrder));
+app.post('/api/v1/payments/create-order', cashfreeCreateOrderRateLimit, ah(handleCashfreeCreateOrder));
+
+const handleCashfreeSessionStatus = async (req, res) => {
   const token = String(req.params.sessionToken || '');
   if (!token) return res.status(400).json({ success: false, error: 'Missing checkout session' });
   try {
+    const session = verifyCheckoutSession(token) || await getCheckoutSession(token);
+    const sessionEnv = session ? normalizeEnvironment(session.environment || 'sandbox') : 'sandbox';
     const stored = await getPaymentOrderForSession(token);
-    if (!stored?.orderId) return res.json({ success: true, found: false });
-    const { appId, secretKey } = cashfreeCredentials();
-    if (!appId || !secretKey) return res.status(503).json({ success: false, error: 'Cashfree credentials are not configured' });
-    const cfResponse = await fetch(`${cashfreeBaseUrl()}/orders/${encodeURIComponent(stored.orderId)}`, { headers: { 'x-api-version': CASHFREE_API_VERSION, 'x-client-id': appId, 'x-client-secret': secretKey, 'Content-Type': 'application/json' } });
+    if (!stored?.orderId) return res.json({ success: true, found: false, environment: sessionEnv });
+    const orderEnv = normalizeEnvironment(stored.environment || sessionEnv);
+    const { appId, secretKey } = cashfreeCredentials(orderEnv);
+    if (!appId || !secretKey) return res.status(503).json({ success: false, error: `Cashfree credentials for ${orderEnv} are not configured` });
+    const cfResponse = await fetch(`${cashfreeBaseUrl(orderEnv)}/orders/${encodeURIComponent(stored.orderId)}`, { headers: { 'x-api-version': CASHFREE_API_VERSION, 'x-client-id': appId, 'x-client-secret': secretKey, 'Content-Type': 'application/json' } });
     const cfData = await cfResponse.json();
     if (!cfResponse.ok) return res.status(cfResponse.status).json({ success: false, error: cfData.message || 'Cashfree order lookup failed' });
-    res.json({ success: true, found: true, orderId: stored.orderId, orderStatus: cfData.order_status, orderAmount: cfData.order_amount, orderCurrency: cfData.order_currency, customerEmail: stored.customerEmail });
+    res.json({ success: true, found: true, orderId: stored.orderId, orderStatus: cfData.order_status, orderAmount: cfData.order_amount, orderCurrency: cfData.order_currency, customerEmail: stored.customerEmail, environment: orderEnv });
   } catch (err) { res.status(503).json({ success: false, error: err.message || 'Payment status restore failed' }); }
-});
+};
+
+app.get('/api/v1/india/cashfree/session/:sessionToken/status', handleCashfreeSessionStatus);
+app.get('/api/v1/payments/session/:sessionToken/status', handleCashfreeSessionStatus);
 
 // Verify the payment server-to-server after the browser returns from Cashfree.
 // A redirect alone is never treated as proof of payment.
@@ -3977,7 +4204,7 @@ app.get('/api/v1/india/cashfree/session/:sessionToken/status', async (req, res) 
 // Cashfree order that was actually created for that specific checkout
 // session — an unguessable, unrelated orderId cannot be used to look up
 // someone else's payment status.
-app.get('/api/v1/india/cashfree/orders/:orderId/status', ah(async (req, res) => {
+const handleCashfreeOrderStatus = ah(async (req, res) => {
   const orderId=String(req.params.orderId || '').trim();
   if(!/^qv_cf_[A-Za-z0-9_-]+$/.test(orderId)) return res.status(400).json({success:false,error:'Invalid order ID'});
   const sessionToken=String(req.query.sessionToken || '');
@@ -3987,10 +4214,11 @@ app.get('/api/v1/india/cashfree/orders/:orderId/status', ah(async (req, res) => 
   if(session.expiresAt && new Date(session.expiresAt) < new Date()) return res.status(410).json({success:false,error:'Checkout session expired'});
   const stored=await getPaymentOrderForSession(sessionToken);
   if(!stored?.orderId || stored.orderId !== orderId) return res.status(403).json({success:false,error:'This order does not belong to your checkout session'});
-  const { appId, secretKey } = cashfreeCredentials();
-  if(!appId || !secretKey) return res.status(503).json({success:false,error:'Cashfree credentials are not configured'});
+  const orderEnv = normalizeEnvironment(stored.environment || session.environment || 'sandbox');
+  const { appId, secretKey } = cashfreeCredentials(orderEnv);
+  if(!appId || !secretKey) return res.status(503).json({success:false,error:`Cashfree credentials for ${orderEnv} are not configured`});
   try {
-    const cfResponse=await fetch(`${cashfreeBaseUrl()}/orders/${encodeURIComponent(orderId)}`,{headers:{'x-api-version':CASHFREE_API_VERSION,'x-client-id':appId,'x-client-secret':secretKey,'Content-Type':'application/json'}});
+    const cfResponse=await fetch(`${cashfreeBaseUrl(orderEnv)}/orders/${encodeURIComponent(orderId)}`,{headers:{'x-api-version':CASHFREE_API_VERSION,'x-client-id':appId,'x-client-secret':secretKey,'Content-Type':'application/json'}});
     const cfData=await cfResponse.json();
     if(!cfResponse.ok) return res.status(cfResponse.status).json({success:false,error:cfData.message || 'Cashfree order lookup failed'});
     const providerStatus=String(cfData.order_status||'').toUpperCase();
@@ -4002,12 +4230,16 @@ app.get('/api/v1/india/cashfree/orders/:orderId/status', ah(async (req, res) => 
         customerEmail: stored.customerEmail,
         customerName: 'Customer',
         productName: stored.productName,
-        succeeded: paid
+        succeeded: paid,
+        environment: orderEnv
       });
     }
-    return res.json({success:true,orderId,orderStatus:cfData.order_status,orderAmount:cfData.order_amount,orderCurrency:cfData.order_currency,paid});
+    return res.json({success:true,orderId,orderStatus:cfData.order_status,orderAmount:cfData.order_amount,orderCurrency:cfData.order_currency,paid,environment:orderEnv});
   } catch(err){return res.status(502).json({success:false,error:'Cashfree order lookup failed'});}
-}));
+});
+
+app.get('/api/v1/india/cashfree/orders/:orderId/status', handleCashfreeOrderStatus);
+app.get('/api/v1/payments/orders/:orderId/status', handleCashfreeOrderStatus);
 
 // Cashfree production webhook receiver. The raw body is verified before JSON
 // parsing and every provider delivery is recorded idempotently.
@@ -4072,31 +4304,6 @@ app.post('/api/v1/webhooks/cashfree', async (req, res) => {
   }catch(err){console.error('Cashfree webhook processing failed',err);return res.status(503).json({success:false,error:'Payment event storage is unavailable; please retry webhook delivery'});}
 });
 
-// Analytics Dashboard Endpoint
-app.get('/api/v1/analytics', (req, res) => {
-  const db = readDB();
-  const txs = db.transactions || [];
-  const activeSubs = (db.subscriptions || []).filter(s => s.status === 'active');
-
-  const totalVolume = txs.reduce((acc, t) => acc + (t.status === 'succeeded' ? t.amount : 0), 0);
-  const totalFees = txs.reduce((acc, t) => acc + (t.status === 'succeeded' ? t.fee : 0), 0);
-  const totalNet = txs.reduce((acc, t) => acc + (t.status === 'succeeded' ? t.net : 0), 0);
-  const mrr = activeSubs.reduce((acc, s) => acc + s.amount, 0);
-
-  res.json({
-    success: true,
-    analytics: {
-      totalVolume: Number(totalVolume.toFixed(2)),
-      totalFees: Number(totalFees.toFixed(2)),
-      totalNet: Number(totalNet.toFixed(2)),
-      mrr: Number(mrr.toFixed(2)),
-      activeSubscriptions: activeSubs.length,
-      activeCustomers: (db.customers || []).length,
-      conversionRate: '5.2%',
-      chargebackRate: '0.00%'
-    }
-  });
-});
 
 // Serve frontend static build
 const distPath = path.join(__dirname, '../dist');

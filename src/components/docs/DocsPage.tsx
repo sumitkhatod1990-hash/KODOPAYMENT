@@ -44,8 +44,8 @@ export const DocsPage: React.FC = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             title: "Demo Product",
-            amount: 4999.00,
-            currency: "INR",
+            amount: 49.00,
+            currency: "USD",
             customerEmail: "customer@example.com"
           })
         });
@@ -55,8 +55,8 @@ export const DocsPage: React.FC = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: "Demo Product",
-            price: 9999,
-            currency: "INR",
+            price: 99.00,
+            currency: "USD",
             type: "one_time"
           })
         });
@@ -197,7 +197,8 @@ export const DocsPage: React.FC = () => {
                     <div>
                       <div className="font-bold text-[#1d1d1f]">Currently supported in V1</div>
                       <ul className="mt-1.5 list-disc pl-5 space-y-1">
-                        <li>INR-only checkout via Cashfree (UPI, Visa, Mastercard, RuPay)</li>
+                        <li>Multi-currency card checkout (9 supported currencies: USD, EUR, GBP, INR, AED, AUD, CAD, SGD, JPY)</li>
+                        <li>Domestic Indian payment rails via Cashfree (UPI, RuPay, Netbanking)</li>
                         <li>One-time payments and shareable payment links</li>
                         <li>API-key authentication for server-to-server requests</li>
                         <li>Signed, tamper-proof checkout sessions</li>
@@ -211,7 +212,7 @@ export const DocsPage: React.FC = () => {
                     <div>
                       <div className="font-bold text-[#1d1d1f]">Not yet available</div>
                       <ul className="mt-1.5 list-disc pl-5 space-y-1">
-                        <li>Multi-currency or non-INR settlement</li>
+                        <li>Alternative local payment rails outside standard card rails and Cashfree</li>
                         <li>Subscriptions or recurring billing (UPI AutoPay included)</li>
                         <li>Outbound webhooks to your own backend</li>
                         <li>A first-party SDK — integrate via the REST API directly</li>
@@ -239,10 +240,13 @@ export const DocsPage: React.FC = () => {
   -H "Content-Type: application/json" \\
   -d '{
     "title": "Demo Product",
-    "amount": 4999.00,
-    "currency": "INR",
+    "amount": 49.00,
+    "currency": "USD",
     "customerEmail": "customer@example.com"
-  }'`}
+  }'
+
+# Domestic India flow (UPI, RuPay):
+# "currency": "INR", "amount": 4999.00`}
                       </pre>
                     )}
 
@@ -253,8 +257,8 @@ export const DocsPage: React.FC = () => {
   -H "Content-Type: application/json" \\
   -d '{
     "name": "Demo Product",
-    "price": 9999.00,
-    "currency": "INR",
+    "price": 99.00,
+    "currency": "USD",
     "type": "one_time"
   }'`}
                       </pre>
@@ -267,7 +271,7 @@ export const DocsPage: React.FC = () => {
   -H "Content-Type: application/json" \\
   -d '{
     "transactionId": "cs_...",
-    "amount": 4999.00,
+    "amount": 49.00,
     "note": "Customer requested refund"
   }'
 

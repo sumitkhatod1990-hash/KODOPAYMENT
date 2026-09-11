@@ -71,13 +71,13 @@ export const TaxNexusTab: React.FC = () => {
             Global Tax Nexus & Automated VAT/GST World Radar
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
-            QIVROPAY acts as your official Merchant of Record: registering, calculating, collecting, and remitting digital goods taxes in 220+ territories with zero liability for your business.
+            Automated GST and international tax compliance calculator for digital goods and software invoicing.
           </p>
         </div>
 
         <div className="opp-badge self-start sm:self-auto text-emerald-700 font-bold bg-emerald-50 border-emerald-200">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>220+ TERRITORIES INSULATED</span>
+          <span>GLOBAL TAX CALCULATOR</span>
         </div>
       </div>
 

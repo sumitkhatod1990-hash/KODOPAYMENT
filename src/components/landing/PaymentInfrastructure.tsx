@@ -24,8 +24,8 @@ const STRIPES: FeatureStripe[] = [
     bgColor: 'bg-[#0055FF]'
   },
   {
-    id: 'upi-cards',
-    title: 'UPI & Cards',
+    id: 'global-cards',
+    title: 'Global Cards & Rails',
     icon: CreditCard,
     bgColor: 'bg-[#0A0D14]'
   },
@@ -107,7 +107,7 @@ export const PaymentInfrastructure: React.FC = () => {
 
             {/* Supporting Copy */}
             <p className="text-base sm:text-lg text-[#6E717D] leading-relaxed max-w-xl font-normal pt-1">
-              Accept payments, create checkout links, track transactions, and manage your payment operations from one place — built for businesses in India.
+              Accept payments, create checkout links, track transactions, and manage your payment operations from one place — multi-currency payment infrastructure built for modern businesses.
             </p>
 
             {/* CTA Button Group */}

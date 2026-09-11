@@ -49,12 +49,13 @@ export const MERCHANT_KYC_STATUS = Object.freeze({
 // signatory_details, additional_details) is passed through untouched, as-is,
 // so this wrapper never has to guess at nested-object shapes it hasn't
 // independently confirmed.
-export async function createMerchant({ merchantId, merchantEmail, merchantName, pocPhone, merchantSiteUrl, ...optionalFields }) {
+export async function createMerchant({ merchantId, merchantEmail, merchantName, pocPhone, merchantSiteUrl, environment, ...optionalFields }) {
   if (!merchantId || !merchantEmail || !merchantName || !pocPhone || !merchantSiteUrl) {
     throw new Error('createMerchant requires merchantId, merchantEmail, merchantName, pocPhone and merchantSiteUrl');
   }
   return partnerRequest('/merchants', {
     method: 'POST',
+    environment,
     body: {
       merchant_id: merchantId,
       merchant_email: merchantEmail,
@@ -67,39 +68,19 @@ export async function createMerchant({ merchantId, merchantEmail, merchantName, 
 }
 
 // Fetches onboarding/KYC status for an existing sub-merchant. Read-only —
-// safe to call as often as needed, including as the "first real documented
-// operation" connectivity check once a real sandbox merchant_id exists (see
-// the Phase 10.8A report for why this could not be turned into a
-// zero-argument health check).
-export async function getMerchantStatus(merchantId) {
+// safe to call as often as needed. Supports explicit environment selection.
+export async function getMerchantStatus(merchantId, environment) {
   if (!merchantId) throw new Error('getMerchantStatus requires a merchantId');
-  return partnerRequest(`/merchants/${encodeURIComponent(merchantId)}`);
+  return partnerRequest(`/merchants/${encodeURIComponent(merchantId)}`, { environment });
 }
 
-// Phase 10.8D: creates a Cashfree-hosted, embeddable merchant onboarding/KYC
-// link — confirmed against Cashfree's own API reference
-// (.../merchant-onboarding/create-embeddable-onboarding-link-does-not-require-login):
-//
-//   POST {partnerBaseUrl}/merchants/{merchant_id}/onboarding_link
-//   body: { "type": "account_onboarding", "return_url": <string> }
-//   200 response: { created_at, expires_at, onboarding_link }
-//
-// Documented as "The link remains active for 1 hour only" and intended to be
-// "embed[ded] within your platform" — i.e. no separate Cashfree login step
-// for the merchant, unlike the sibling "standard" onboarding link endpoint
-// (.../onboarding_link/standard, requires the merchant to log in with a
-// Cashfree password or email OTP), which this phase deliberately does not
-// wrap: QivroPay's desired UX keeps the merchant inside the QivroPay product
-// throughout, which only the embeddable variant supports.
-//
-// Cashfree documents a 409 ("product already active for merchant") for this
-// endpoint — i.e. requesting a new link for a merchant whose product is
-// already active is a real, expected error, not a bug in this wrapper.
-export async function createEmbeddableOnboardingLink(merchantId, returnUrl) {
+// Phase 10.8D: creates a Cashfree-hosted, embeddable merchant onboarding/KYC link.
+export async function createEmbeddableOnboardingLink(merchantId, returnUrl, environment) {
   if (!merchantId) throw new Error('createEmbeddableOnboardingLink requires a merchantId');
   if (!returnUrl) throw new Error('createEmbeddableOnboardingLink requires a returnUrl');
   return partnerRequest(`/merchants/${encodeURIComponent(merchantId)}/onboarding_link`, {
     method: 'POST',
+    environment,
     body: { type: 'account_onboarding', return_url: returnUrl }
   });
 }

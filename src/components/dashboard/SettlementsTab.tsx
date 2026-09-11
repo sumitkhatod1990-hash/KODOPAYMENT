@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   FlaskConical
 } from 'lucide-react';
+import { formatCurrency } from '../../lib/currency';
 
 // Phase 10.8F. This screen only ever renders rows this project actually
 // retrieved from Cashfree's documented settlement APIs (see
@@ -182,7 +183,7 @@ export const SettlementsTab: React.FC = () => {
                         {r.stale && <div className="text-[11px] text-amber-700 mt-1">Showing last known status — Cashfree could not be reached on the last refresh.</div>}
                       </td>
                       <td className="py-3.5 px-5 font-mono font-semibold text-[#0A0D14]">
-                        {tx ? `₹${Number(tx.amount).toFixed(2)}` : '—'}
+                        {tx ? formatCurrency(tx.amount, tx.currency) : '—'}
                       </td>
                       <td className="py-3.5 px-5 text-[#0A0D14]">
                         {settlement?.settlementProcessedOn ? new Date(settlement.settlementProcessedOn).toLocaleDateString() : '—'}
