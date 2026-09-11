@@ -524,7 +524,7 @@ app.post('/api/v1/auth/google', authRateLimit, async (req, res) => {
       await triggerWelcomeEmailIfNew(user);
     }
     res.setHeader('Set-Cookie', authCookieOptions(60 * 60 * 24 * 30).replace('qivropay_session=;', `qivropay_session=${encodeURIComponent(session.token)};`));
-    res.json({ success: true, user: publicUser(user) });
+    res.json({ success: true, user: publicUser(user), isNewUser: Boolean(user.isNewUser) });
   } catch (error) {
     console.error('Google sign-in failed', error);
     res.status(401).json({ success: false, error: 'Could not verify Google sign-in' });

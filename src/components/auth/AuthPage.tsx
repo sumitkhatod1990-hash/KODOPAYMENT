@@ -4,6 +4,7 @@ import { Logo } from '../common/Logo';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import { GoogleSignInButton } from './GoogleSignInButton';
+import { trackMetaEvent } from '../../utils/metaPixel';
 
 export const AuthPage: React.FC = () => {
   const { signIn, signUp, signInWithGoogle } = useAuth();
@@ -16,12 +17,26 @@ export const AuthPage: React.FC = () => {
     event.preventDefault(); setError(''); setBusy(true);
     const result = mode === 'signup' ? await signUp({ name, company, email, password }) : await signIn(email, password);
     setBusy(false); if (!result.success) { setError(result.error || 'Please try again'); return; }
+    if (mode === 'signup') {
+      trackMetaEvent('CompleteRegistration', {
+        content_name: 'QivroPay merchant account',
+        registration_method: 'email',
+        status: true,
+      });
+    }
     setCurrentView('dashboard');
   };
   const submitGoogle = async (credential: string) => {
     setError(''); setBusy(true);
     const result = await signInWithGoogle(credential);
     setBusy(false); if (!result.success) { setError(result.error || 'Please try again'); return; }
+    if (result.isNewUser) {
+      trackMetaEvent('CompleteRegistration', {
+        content_name: 'QivroPay merchant account',
+        registration_method: 'google',
+        status: true,
+      });
+    }
     setCurrentView('dashboard');
   };
   return <div className="min-h-screen bg-[#f7f8fb] flex items-center justify-center px-4 py-10">

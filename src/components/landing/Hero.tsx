@@ -2,16 +2,26 @@ import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowRight, CalendarDays } from 'lucide-react';
+import { trackMetaEvent } from '../../utils/metaPixel';
 
 export const Hero: React.FC = () => {
   const { setCurrentView } = useApp();
   const { user } = useAuth();
 
+  const openSignup = (source: string, contentName = 'QivroPay merchant signup') => {
+    trackMetaEvent('Lead', {
+      content_name: contentName,
+      content_category: 'Merchant acquisition',
+      source,
+    });
+    setCurrentView('auth', { mode: 'signup' });
+  };
+
   const handleBookDemo = () => {
     // A demo request starts with merchant signup. The pricing section is
     // informational and is not a booking flow, so scrolling there made this
     // CTA appear to do nothing for users.
-    setCurrentView('auth', { mode: 'signup' });
+    openSignup('hero_book_demo', 'QivroPay demo request');
   };
 
   return (
@@ -48,7 +58,7 @@ export const Hero: React.FC = () => {
 
             <div className="hero-reveal hero-reveal-delay-2 flex flex-wrap items-center gap-3 pt-2 sm:gap-3.5">
               <button
-                onClick={() => (user ? setCurrentView('dashboard') : setCurrentView('auth', { mode: 'signup' }))}
+                onClick={() => (user ? setCurrentView('dashboard') : openSignup('hero_start_building'))}
                 className="opp-btn-primary px-8 py-3.5 text-sm gap-2"
               >
                 <span>{user ? 'Go to dashboard' : 'Start building'}</span>

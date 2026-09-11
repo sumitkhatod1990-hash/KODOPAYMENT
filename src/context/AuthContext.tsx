@@ -6,7 +6,7 @@ interface AuthContextValue {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signUp: (data: { name: string; company: string; email: string; password: string }) => Promise<{ success: boolean; error?: string }>;
-  signInWithGoogle: (credential: string) => Promise<{ success: boolean; error?: string }>;
+  signInWithGoogle: (credential: string) => Promise<{ success: boolean; error?: string; isNewUser?: boolean }>;
   signOut: () => Promise<void>;
 }
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await fetch('/api/v1/auth/google', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ credential }) });
       const data = await res.json();
       if (!res.ok || !data.success) return { success: false, error: data.error || 'Unable to sign in with Google' };
-      setUser(data.user); return { success: true };
+      setUser(data.user); return { success: true, isNewUser: Boolean(data.isNewUser) };
     } catch { return { success: false, error: 'Network error. Please try again.' }; }
   };
   const signOut = async () => { await fetch('/api/v1/auth/logout', { method: 'POST' }).catch(() => undefined); setUser(null); };

@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { Logo } from './Logo';
 import { ArrowRight, Menu, X } from 'lucide-react';
+import { trackMetaEvent } from '../../utils/metaPixel';
 
 // Scrolls to an in-page landing anchor, navigating to the landing view first
 // if we're not already there. Only used for genuinely public destinations
@@ -27,6 +28,15 @@ export const Navbar: React.FC = () => {
   const goToSection = useScrollToLandingSection();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const headerRef = useRef<HTMLElement>(null);
+
+  const openSignup = (source: string) => {
+    trackMetaEvent('Lead', {
+      content_name: 'QivroPay merchant signup',
+      content_category: 'Merchant acquisition',
+      source,
+    });
+    setCurrentView('auth', { mode: 'signup' });
+  };
 
   const navLinks = [
     { label: 'Product', onClick: () => goToSection('product') },
@@ -93,7 +103,7 @@ export const Navbar: React.FC = () => {
                 Login
               </button>
               <button
-                onClick={() => setCurrentView('auth', { mode: 'signup' })}
+                onClick={() => openSignup('navbar_desktop')}
                 className="opp-btn-primary py-2 px-5 text-xs font-semibold gap-1.5 shadow-sm"
               >
                 <span>Get Started</span>
@@ -144,7 +154,7 @@ export const Navbar: React.FC = () => {
                   Login
                 </button>
                 <button
-                  onClick={() => { setCurrentView('auth', { mode: 'signup' }); setMobileOpen(false); }}
+                  onClick={() => { openSignup('navbar_mobile'); setMobileOpen(false); }}
                   className="opp-btn-primary w-full py-3 text-sm font-semibold flex items-center justify-center gap-2"
                 >
                   <span>Get Started</span>

@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardThemeProvider, useDashboardTheme } from '../../hooks/useDashboardTheme';
 import { ArrowRight, CheckCircle2, Copy, Package, Link2, Sparkles } from 'lucide-react';
+import { trackMetaEvent } from '../../utils/metaPixel';
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -66,6 +67,12 @@ const FirstMerchantOnboardingShell: React.FC = () => {
     const sessionId = await createCheckoutSession({ productId: createdProduct.id, amount: createdProduct.price, title: createdProduct.name });
     setSaving(false);
     if (!sessionId) { setError('Could not create the payment link. Please try again.'); return; }
+    trackMetaEvent('StartTrial', {
+      content_name: 'QivroPay sandbox',
+      content_category: 'First payment link',
+      currency: 'INR',
+      value: 0,
+    });
     setLinkUrl(`${window.location.origin}/checkout/${sessionId}`);
     // Onboarding is marked complete only from step 5's own actions (or Skip) —
     // completing it here would flip merchantProfile.onboardingCompletedAt and
