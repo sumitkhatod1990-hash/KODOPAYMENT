@@ -44,7 +44,7 @@ export const Logo: React.FC<LogoProps> = ({
 
       {showSubtitle && (
         <span className="text-[11px] text-[#8C90A0] tracking-tight font-medium ml-1 hidden lg:inline-block">
-          • India-first payment infrastructure
+          • Global payment workspace
         </span>
       )}
     </div>

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import { deriveOnboardingState } from '../../lib/cashfreeOnboardingState';
+import { useGlobalCurrency } from '../../context/GlobalCurrencyContext';
 import {
   DollarSign,
   TrendingUp,
@@ -14,6 +15,7 @@ import {
 
 export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNavigateTab }) => {
   const { analytics, transactions, setCurrentView, createCheckoutSession, products, cashfreePartnerStatus, cashfreePartnerStatusLoading } = useApp();
+  const { currency, format, region } = useGlobalCurrency();
 
   const handleQuickCheckout = async () => {
     const prod = products[0];
@@ -68,10 +70,10 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
           </div>
           <div>
             <h4 className="font-bold text-[#1d1d1f] text-sm font-sans">
-              Payment Infrastructure Active · India
+              Global payment workspace · {region}
             </h4>
             <p className="text-xs text-[#86868b]">
-              Accept UPI and card payments in India, powered by Cashfree.
+              View payment activity in {currency}. Checkout availability remains based on your approved payment-provider configuration.
             </p>
           </div>
         </div>
@@ -102,7 +104,7 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
             <DollarSign className="w-4 h-4 text-[#0071e3]" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ₹{analytics?.totalVolume.toLocaleString() || '0.00'}
+            {format(analytics?.totalVolume || 0)}
           </div>
         </div>
 
@@ -113,10 +115,10 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
             <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ₹{analytics?.totalNet.toLocaleString() || '0.00'}
+            {format(analytics?.totalNet || 0)}
           </div>
           <div className="text-xs text-[#86868b]">
-            Platform fee: <strong>₹{analytics?.totalFees || '0.00'}</strong>
+            Platform fee: <strong>{format(analytics?.totalFees || 0)}</strong>
           </div>
         </div>
 
@@ -127,7 +129,7 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
             <CreditCard className="w-4 h-4 text-purple-600" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ₹{analytics?.mrr.toLocaleString() || '0.00'}
+            {format(analytics?.mrr || 0)}
           </div>
           <div className="text-xs text-[#86868b]">
             <strong>{analytics?.activeSubscriptions || 0}</strong> active records
@@ -218,10 +220,10 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
                       {tx.productName}
                     </td>
                     <td className="py-3.5 font-bold text-[#1d1d1f] font-mono">
-                      ₹{(Number(tx.amount) || 0).toFixed(2)}
+                      {tx.currency === currency ? format(tx.amount) : new Intl.NumberFormat(undefined, { style: 'currency', currency: tx.currency }).format(Number(tx.amount) || 0)}
                     </td>
                     <td className="py-3.5 font-mono text-emerald-700 font-bold">
-                      ₹{(Number(tx.net) || 0).toFixed(2)}
+                      {tx.currency === currency ? format(tx.net) : new Intl.NumberFormat(undefined, { style: 'currency', currency: tx.currency }).format(Number(tx.net) || 0)}
                     </td>
                     <td className="py-3.5">
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px] border border-emerald-200">

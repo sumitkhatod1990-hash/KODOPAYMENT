@@ -35,7 +35,7 @@ export const Hero: React.FC = () => {
         <div className="mb-6 flex justify-center sm:mb-8">
           <div className="opp-badge max-w-full bg-white/70 text-[9px] text-[#151a4a] sm:text-[11px]">
             <span className="w-2 h-2 rounded-full bg-[#7054E8] animate-pulse" />
-            <span>🇮🇳 INDIA PAYMENTS / BUILT FOR DEVELOPERS</span>
+            <span>GLOBAL PAYMENT INFRASTRUCTURE / BUILT FOR DEVELOPERS</span>
           </div>
         </div>
 
@@ -53,7 +53,7 @@ export const Hero: React.FC = () => {
             </h1>
 
             <p className="hero-reveal hero-reveal-delay-1 max-w-md text-base font-normal leading-relaxed text-[#4d5475] sm:text-xl">
-              India-first infrastructure for UPI, cards, and payment links—designed to make every payment feel simple.
+              Accept payments, manage transactions, and scale across markets with one developer-first payment workspace.
             </p>
 
             <div className="hero-reveal hero-reveal-delay-2 flex flex-wrap items-center gap-3 pt-2 sm:gap-3.5">

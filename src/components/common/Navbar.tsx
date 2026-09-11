@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Logo } from './Logo';
 import { ArrowRight, Menu, X } from 'lucide-react';
 import { trackMetaEvent } from '../../utils/metaPixel';
+import { GLOBAL_CURRENCIES, useGlobalCurrency } from '../../context/GlobalCurrencyContext';
 
 // Scrolls to an in-page landing anchor, navigating to the landing view first
 // if we're not already there. Only used for genuinely public destinations
@@ -27,6 +28,7 @@ export const Navbar: React.FC = () => {
   const { user } = useAuth();
   const goToSection = useScrollToLandingSection();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const { currency, setCurrency } = useGlobalCurrency();
   const headerRef = useRef<HTMLElement>(null);
 
   const openSignup = (source: string) => {
@@ -86,6 +88,10 @@ export const Navbar: React.FC = () => {
 
         {/* Right: Actions */}
         <div className="hidden md:flex items-center gap-3">
+          <label className="sr-only" htmlFor="global-currency">Display currency</label>
+          <select id="global-currency" value={currency} onChange={(event) => setCurrency(event.target.value as typeof currency)} className="rounded-xl border border-black/10 bg-white px-2.5 py-2 text-xs font-semibold text-[#0A0D14]">
+            {GLOBAL_CURRENCIES.map(item => <option key={item.code} value={item.code}>{item.label} · {item.code}</option>)}
+          </select>
           {user ? (
             <button
               onClick={() => setCurrentView('dashboard')}
@@ -137,6 +143,9 @@ export const Navbar: React.FC = () => {
             </button>
           ))}
           <div className="pt-2 flex flex-col gap-2">
+            <select value={currency} onChange={(event) => setCurrency(event.target.value as typeof currency)} className="rounded-xl border border-black/10 bg-white px-3 py-3 text-sm font-semibold text-[#0A0D14]">
+              {GLOBAL_CURRENCIES.map(item => <option key={item.code} value={item.code}>{item.label} · {item.code}</option>)}
+            </select>
             {user ? (
               <button
                 onClick={() => { setCurrentView('dashboard'); setMobileOpen(false); }}
