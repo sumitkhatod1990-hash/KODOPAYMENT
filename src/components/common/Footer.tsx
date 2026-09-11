@@ -23,7 +23,7 @@ export const Footer: React.FC = () => {
           <div className="col-span-2 space-y-4">
             <Logo size="lg" showSubtitle={true} onClick={() => setCurrentView('landing')} />
             <p className="text-xs text-[#86868b] max-w-sm leading-relaxed">
-              A merchant checkout and payment product for businesses in India, built on secure payment infrastructure.
+              A developer-first merchant checkout and payment workspace for businesses operating across markets.
             </p>
           </div>
 
@@ -77,7 +77,7 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-4">
             <span>© 2026 QivroPay. All rights reserved.</span>
             <span>•</span>
-            <span>India Payments</span>
+            <span>Global payment workspace</span>
           </div>
 
           <div className="flex items-center gap-6">
