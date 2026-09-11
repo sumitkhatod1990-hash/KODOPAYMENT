@@ -37,7 +37,7 @@ export const DashboardLayout: React.FC = () => (
 );
 
 const DashboardLayoutShell: React.FC = () => {
-  const { dashboardTab, setDashboardTab, setCurrentView } = useApp();
+  const { dashboardTab, setDashboardTab, setCurrentView, isTestMode, setIsTestMode } = useApp();
   const { user, signOut } = useAuth();
   const { dark, toggleDark } = useDashboardTheme();
 
@@ -88,6 +88,10 @@ const DashboardLayoutShell: React.FC = () => {
         <header className="h-16 shrink-0 bg-white dark:bg-[#0c0f17] border-b border-black/10 dark:border-white/10 px-4 sm:px-7 flex items-center justify-between">
           <div><div className="text-lg font-bold">{title}</div><div className="text-xs text-slate-500 hidden sm:block">Payments, customers and checkout infrastructure</div></div>
           <div className="flex items-center gap-2">
+            <div className="hidden sm:flex rounded-xl border border-black/10 dark:border-white/10 p-1 text-[11px] font-bold" aria-label="Workspace mode">
+              <button onClick={() => setIsTestMode(true)} className={`rounded-lg px-2.5 py-1.5 transition ${isTestMode ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-200' : 'text-slate-500'}`}>Test mode</button>
+              <button onClick={() => setIsTestMode(false)} className={`rounded-lg px-2.5 py-1.5 transition ${!isTestMode ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-200' : 'text-slate-500'}`}>Live mode</button>
+            </div>
             <button onClick={toggleDark} className="w-9 h-9 rounded-xl border border-black/10 dark:border-white/10 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/5" aria-label="Toggle theme">{dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}</button>
             <button onClick={() => setDashboardTab('payment-links' as any)} className="hidden sm:flex px-4 py-2 rounded-xl bg-[#111827] text-white text-xs font-bold">Create payment link</button>
           </div>
