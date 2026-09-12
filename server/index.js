@@ -16,7 +16,7 @@ import { CashfreePartnerError, resolvePartnerEnvironment } from './cashfreePartn
 import { reconcilePayment, reconcileMerchantPayments, listStoredReconciliations, listStoredSettlements, ReconciliationError } from './paymentReconciliation.js';
 import Groq from 'groq-sdk';
 import { buildPublicSystemPrompt, buildMerchantSystemPrompt } from './supportAiContext.js';
-import { sendWelcomeEmail } from './brevoEmail.js';
+import { sendWelcomeEmail, syncBrevoContact } from './brevoEmail.js';
 
 
 
@@ -479,6 +479,13 @@ app.post('/api/v1/auth/signup', authRateLimit, async (req, res) => {
     const session = await createAuthSession(user.id);
     // Safe, error-isolated welcome email trigger
     await triggerWelcomeEmailIfNew(user);
+    // Safe, error-isolated contact sync for Brevo automation workflows.
+    try {
+      const syncResult = await syncBrevoContact({ email: user.email, name: user.name, company: user.company });
+      console.log(`[Brevo] Contact sync: ${syncResult.success ? 'SUCCESS' : `SKIPPED/FAILED (${syncResult.reason || syncResult.error})`}`);
+    } catch (syncError) {
+      console.error('[Brevo] Contact sync exception:', syncError?.message || syncError);
+    }
     res.setHeader('Set-Cookie', authCookieOptions(60 * 60 * 24 * 30).replace('qivropay_session=;', `qivropay_session=${encodeURIComponent(session.token)};`));
     res.status(201).json({ success: true, user: publicUser(user) });
   } catch (error) {
