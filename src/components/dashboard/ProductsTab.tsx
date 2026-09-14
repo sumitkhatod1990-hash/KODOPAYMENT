@@ -4,13 +4,11 @@ import { Product, ProductType } from '../../types';
 import { Modal } from '../common/Modal';
 import { Plus, Trash2, ExternalLink, Copy, CheckCircle2, Coins, CreditCard, Key, Zap, Package } from 'lucide-react';
 import { SUPPORTED_CURRENCIES, CURRENCY_METADATA, formatCurrency } from '../../lib/currency';
-import { useRegion } from '../../context/RegionContext';
 
 const emptyErrors: { name?: string; price?: string } = {};
 
 export const ProductsTab: React.FC = () => {
   const { products, refreshData, deleteProduct, createCheckoutSession, setCurrentView } = useApp();
-  const { currency: preferredCurrency } = useRegion();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -21,7 +19,10 @@ export const ProductsTab: React.FC = () => {
   const [taxCategory, setTaxCategory] = useState('');
   const [discount, setDiscount] = useState('');
   const [price, setPrice] = useState('');
-  const [currency, setCurrency] = useState<string>(preferredCurrency || 'USD');
+  // Cashfree checkout in the current production architecture supports INR.
+  // Keep product creation aligned with that capability so links cannot be
+  // created in a currency the checkout endpoint will reject.
+  const [currency, setCurrency] = useState<string>('INR');
   const [type, setType] = useState<ProductType>('one_time');
   const [credits, setCredits] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,7 +36,7 @@ export const ProductsTab: React.FC = () => {
     setTaxCategory('');
     setDiscount('');
     setPrice('');
-    setCurrency(preferredCurrency || 'USD');
+    setCurrency('INR');
     setType('one_time');
     setCredits('');
     setErrors(emptyErrors);
@@ -331,12 +332,13 @@ export const ProductsTab: React.FC = () => {
                 onChange={(e) => setCurrency(e.target.value)}
                 className="w-full p-2.5 rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] focus:border-[#0071e3] outline-none font-medium text-xs"
               >
-                {SUPPORTED_CURRENCIES.map((c) => (
+                {SUPPORTED_CURRENCIES.filter((c) => c === 'INR').map((c) => (
                   <option key={c} value={c}>
                     {c} ({CURRENCY_METADATA[c]?.symbol || c})
                   </option>
                 ))}
               </select>
+              <p className="text-[10px] text-[#86868b] mt-1">INR is currently supported for Cashfree checkout.</p>
             </div>
 
             <div className={`space-y-1.5 ${type === 'credits' ? 'sm:col-span-1' : 'sm:col-span-2'}`}>
