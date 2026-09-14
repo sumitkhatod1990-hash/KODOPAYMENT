@@ -70,8 +70,13 @@ interface AppContextType {
   checkoutReturnTo: 'landing' | 'dashboard';
   isTestMode: boolean;
   setIsTestMode: (val: boolean) => void;
+  activeEnvironment: 'test' | 'live';
+  switchEnvironment: (env: 'test' | 'live') => Promise<{ success: boolean; error?: string }>;
+  isLiveEligible: boolean;
+  liveEligibilityReason: string;
   currentBrand: Brand | null;
   setCurrentBrand: (b: Brand) => void;
+
 
   // Data
   products: Product[];
@@ -130,7 +135,8 @@ interface AppContextType {
   generateApiKey: (name: string, environment: 'live' | 'test') => Promise<ApiKey | null>;
   revokeApiKey: (id: string) => Promise<void>;
   inviteTeamMember: (data: any) => Promise<TeamMember | null>;
-  createCheckoutSession: (params: { productId?: string; amount?: number; title?: string; currency?: string; customerEmail?: string }) => Promise<string | null>;
+  createCheckoutSession: (params: { productId?: string; amount?: number; title?: string; currency?: string; customerEmail?: string; environment?: string }) => Promise<string | null>;
+
   processPayment: (params: any) => Promise<{ success: boolean; transaction?: Transaction; error?: string }>;
   processRefund: (transactionId: string) => Promise<{ success: boolean; error?: string }>;
   checkRefundStatus: (transactionId: string) => Promise<{ success: boolean; error?: string }>;
@@ -148,8 +154,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeSessionId, setActiveSessionId] = useState<string | null>(initialRoute?.sessionId ?? null);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>(initialRoute?.authMode ?? 'signup');
   const [checkoutReturnTo, setCheckoutReturnTo] = useState<'landing' | 'dashboard'>('landing');
-  const [isTestMode, setIsTestMode] = useState<boolean>(false);
+  const [isTestMode, setIsTestMode] = useState<boolean>(true);
+  const [activeEnvironment, setActiveEnvironmentState] = useState<'test' | 'live'>('test');
+  const [isLiveEligible, setIsLiveEligible] = useState<boolean>(false);
+  const [liveEligibilityReason, setLiveEligibilityReason] = useState<string>('');
   const [currentBrand, setCurrentBrand] = useState<Brand | null>(null);
+
 
   const [products, setProducts] = useState<Product[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -260,15 +270,49 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const fetchMerchantEnvironment = async () => {
+    try {
+      const data = await safeFetch('/api/v1/merchant/environment');
+      if (data && data.success) {
+        const env = data.environment === 'live' ? 'live' : 'test';
+        setActiveEnvironmentState(env);
+        setIsTestMode(env === 'test');
+        setIsLiveEligible(Boolean(data.liveEligible));
+        setLiveEligibilityReason(data.eligibilityReason || '');
+      }
+    } catch {}
+  };
+
+  const switchEnvironment = async (env: 'test' | 'live'): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await fetch('/api/v1/merchant/environment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ environment: env })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data?.error || 'Failed to switch environment' };
+      }
+      setActiveEnvironmentState(env);
+      setIsTestMode(env === 'test');
+      await refreshData();
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Network error' };
+    }
+  };
+
   const refreshData = async () => {
     try {
+      const envParam = isTestMode ? 'sandbox' : 'production';
       const [
         prods, txs, subs, custs, discs,
         lics, mtrs, keys, whs, brs,
         team, audit, anal
       ] = await Promise.all([
         safeFetch('/api/v1/products'),
-        safeFetch('/api/v1/transactions'),
+        safeFetch(`/api/v1/transactions?environment=${envParam}`),
         safeFetch('/api/v1/subscriptions'),
         safeFetch('/api/v1/customers'),
         safeFetch('/api/v1/discounts'),
@@ -279,7 +323,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         safeFetch('/api/v1/brands'),
         safeFetch('/api/v1/team'),
         safeFetch('/api/v1/audit-logs'),
-        safeFetch('/api/v1/analytics')
+        safeFetch(`/api/v1/analytics?environment=${envParam}`)
       ]);
 
       if (prods && prods.success && Array.isArray(prods.products)) setProducts(prods.products);
@@ -320,9 +364,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     refreshData();
-    if (user) { fetchMerchantProfile(); fetchCashfreePartnerStatus(); }
-    else { setMerchantProfile(null); setProfileLoading(false); setCashfreePartnerStatus(null); setCashfreePartnerStatusLoading(false); }
-  }, [user?.id]);
+    if (user) {
+      fetchMerchantProfile();
+      fetchCashfreePartnerStatus();
+      fetchMerchantEnvironment();
+    } else {
+      setMerchantProfile(null);
+      setProfileLoading(false);
+      setCashfreePartnerStatus(null);
+      setCashfreePartnerStatusLoading(false);
+    }
+  }, [user?.id, isTestMode]);
 
   const saveMerchantProfile = async (fields: { businessName: string; supportEmail: string }) => {
     try {
@@ -646,12 +698,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const createCheckoutSession = async (params: { productId?: string; amount?: number; title?: string; currency?: string; customerEmail?: string }) => {
+  const createCheckoutSession = async (params: { productId?: string; amount?: number; title?: string; currency?: string; customerEmail?: string; environment?: string }) => {
     try {
+      const payload = {
+        ...params,
+        environment: params.environment || (isTestMode ? 'sandbox' : 'production')
+      };
       const res = await fetch('/api/v1/payments/create-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (data.success) {
@@ -749,6 +805,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         checkoutReturnTo,
         isTestMode,
         setIsTestMode,
+        activeEnvironment,
+        switchEnvironment,
+        isLiveEligible,
+        liveEligibilityReason,
         currentBrand,
         setCurrentBrand,
         products,

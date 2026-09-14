@@ -63,11 +63,14 @@ export function partnerBaseUrl(environment = resolvePartnerEnvironment()) {
 // Exported (Phase 10.8F): the Partner settlement service needs the same raw
 // credential this file already loads for the /partners onboarding surface —
 // exporting the getter avoids a second module reading
-// CASHFREE_PARTNER_API_KEY from process.env itself, which is exactly the
-// "do not duplicate Partner authentication" this file's callers are asked to
-// respect.
-export function partnerApiKey() {
-  return process.env.CASHFREE_PARTNER_API_KEY || '';
+// CASHFREE_PARTNER_API_KEY from process.env itself. Supports explicit environment
+// scoping for production vs sandbox while defaulting to CASHFREE_PARTNER_API_KEY.
+export function partnerApiKey(environment = resolvePartnerEnvironment()) {
+  const env = environment === 'production' || environment === 'prod' ? 'production' : 'sandbox';
+  if (env === 'production') {
+    return process.env.CASHFREE_PROD_PARTNER_API_KEY || (resolvePartnerEnvironment() === 'production' ? process.env.CASHFREE_PARTNER_API_KEY : '') || process.env.CASHFREE_PARTNER_API_KEY || '';
+  }
+  return process.env.CASHFREE_SANDBOX_PARTNER_API_KEY || process.env.CASHFREE_PARTNER_API_KEY || '';
 }
 
 // Default per the OpenAPI reference for the merchant-onboarding endpoints
@@ -156,11 +159,11 @@ async function doPartnerFetch(url, apiKey, { method, body, timeoutMs, headers })
 // the Phase 10.8F refactor above; only the internal fetch/timeout/error
 // plumbing moved into doPartnerFetch().
 export async function partnerRequest(pathname, { method = 'GET', body, timeoutMs = DEFAULT_TIMEOUT_MS, environment } = {}) {
-  const apiKey = partnerApiKey();
+  const env = environment || resolvePartnerEnvironment();
+  const apiKey = partnerApiKey(env);
   if (!apiKey) {
     throw new CashfreePartnerError('CASHFREE_PARTNER_API_KEY is not configured', { code: 'missing_credential' });
   }
-  const env = environment || resolvePartnerEnvironment();
   const url = `${partnerBaseUrl(env)}${pathname.startsWith('/') ? pathname : `/${pathname}`}`;
   return doPartnerFetch(url, apiKey, { method, body, timeoutMs, headers: { 'x-api-version': partnerApiVersion() } });
 }
@@ -222,14 +225,14 @@ function partnerPgApiVersion() {
 // x-partner-merchantid, exactly like partnerRequest() above always sends
 // the shared Partner API key.
 export async function partnerPgRequest(cfMerchantId, pathname, { method = 'GET', body, timeoutMs = DEFAULT_TIMEOUT_MS, environment } = {}) {
-  const apiKey = partnerApiKey();
+  const env = environment || resolvePartnerEnvironment();
+  const apiKey = partnerApiKey(env);
   if (!apiKey) {
     throw new CashfreePartnerError('CASHFREE_PARTNER_API_KEY is not configured', { code: 'missing_credential' });
   }
   if (!cfMerchantId) {
     throw new Error('partnerPgRequest requires cfMerchantId');
   }
-  const env = environment || resolvePartnerEnvironment();
   const url = `${partnerPgBaseUrl(env)}${pathname.startsWith('/') ? pathname : `/${pathname}`}`;
   return doPartnerFetch(url, apiKey, {
     method,

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import { deriveOnboardingState } from '../../lib/cashfreeOnboardingState';
-import { useGlobalCurrency } from '../../context/GlobalCurrencyContext';
+import { formatCurrency } from '../../lib/currency';
 import {
   DollarSign,
   TrendingUp,
@@ -15,12 +15,11 @@ import {
 
 export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNavigateTab }) => {
   const { analytics, transactions, setCurrentView, createCheckoutSession, products, cashfreePartnerStatus, cashfreePartnerStatusLoading } = useApp();
-  const { currency, format, region } = useGlobalCurrency();
 
   const handleQuickCheckout = async () => {
     const prod = products[0];
     if (prod) {
-      const sessionId = await createCheckoutSession({ productId: prod.id, amount: prod.price, title: prod.name });
+      const sessionId = await createCheckoutSession({ productId: prod.id, amount: prod.price, title: prod.name, currency: prod.currency });
       if (sessionId) setCurrentView('checkout', { sessionId, returnTo: 'dashboard' });
     }
   };
@@ -30,6 +29,7 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
   // button) so a merchant who has already finished setup is never
   // interrupted by it again.
   const onboardingState = useMemo(() => deriveOnboardingState(cashfreePartnerStatus).state, [cashfreePartnerStatus]);
+  const primaryCurrency = analytics?.currency || 'USD';
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -70,10 +70,10 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
           </div>
           <div>
             <h4 className="font-bold text-[#1d1d1f] text-sm font-sans">
-              Global payment workspace · {region}
+              Payment Infrastructure Active
             </h4>
             <p className="text-xs text-[#86868b]">
-              View payment activity in {currency}. Checkout availability remains based on your approved payment-provider configuration.
+              Accept multi-currency card payments globally and domestic UPI in India, powered by Cashfree.
             </p>
           </div>
         </div>
@@ -100,25 +100,25 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
         {/* Gross Volume */}
         <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-sm space-y-2">
           <div className="flex justify-between items-center text-xs text-[#86868b] font-medium">
-            <span>Gross Volume</span>
+            <span>Gross Volume ({primaryCurrency})</span>
             <DollarSign className="w-4 h-4 text-[#0071e3]" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            {format(analytics?.totalVolume || 0)}
+            {formatCurrency(analytics?.totalVolume || 0, primaryCurrency)}
           </div>
         </div>
 
         {/* Net Payouts */}
         <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-sm space-y-2">
           <div className="flex justify-between items-center text-xs text-[#86868b] font-medium">
-            <span>Net Payouts</span>
+            <span>Net Payouts ({primaryCurrency})</span>
             <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            {format(analytics?.totalNet || 0)}
+            {formatCurrency(analytics?.totalNet || 0, primaryCurrency)}
           </div>
           <div className="text-xs text-[#86868b]">
-            Platform fee: <strong>{format(analytics?.totalFees || 0)}</strong>
+            Platform fee: <strong>{formatCurrency(analytics?.totalFees || 0, primaryCurrency)}</strong>
           </div>
         </div>
 
@@ -129,7 +129,7 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
             <CreditCard className="w-4 h-4 text-purple-600" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            {format(analytics?.mrr || 0)}
+            {formatCurrency(analytics?.mrr || 0, primaryCurrency)}
           </div>
           <div className="text-xs text-[#86868b]">
             <strong>{analytics?.activeSubscriptions || 0}</strong> active records
@@ -151,6 +151,33 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
         </div>
 
       </div>
+
+      {/* Multi-currency Breakdown Grid */}
+      {analytics?.byCurrency && Object.keys(analytics.byCurrency).length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">
+              Volume by Currency
+            </h4>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {Object.entries(analytics.byCurrency).map(([curr, data]) => (
+              <div key={curr} className="p-4 rounded-2xl bg-white border border-black/10 shadow-xs space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-bold text-slate-800 dark:text-slate-200">{curr}</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{data.count} tx</span>
+                </div>
+                <div className="text-base font-bold text-slate-900 dark:text-white font-mono">
+                  {formatCurrency(data.totalVolume, curr)}
+                </div>
+                <div className="text-[10px] text-emerald-600 font-mono">
+                  Net: {formatCurrency(data.totalNet, curr)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recent Transactions — real data only, no fabricated chart or activity */}
       {transactions.length === 0 ? (
@@ -220,10 +247,10 @@ export const OverviewTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ o
                       {tx.productName}
                     </td>
                     <td className="py-3.5 font-bold text-[#1d1d1f] font-mono">
-                      {tx.currency === currency ? format(tx.amount) : new Intl.NumberFormat(undefined, { style: 'currency', currency: tx.currency }).format(Number(tx.amount) || 0)}
+                      {formatCurrency(Number(tx.amount) || 0, tx.currency)}
                     </td>
                     <td className="py-3.5 font-mono text-emerald-700 font-bold">
-                      {tx.currency === currency ? format(tx.net) : new Intl.NumberFormat(undefined, { style: 'currency', currency: tx.currency }).format(Number(tx.net) || 0)}
+                      {formatCurrency(Number(tx.net) || 0, tx.currency)}
                     </td>
                     <td className="py-3.5">
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px] border border-emerald-200">

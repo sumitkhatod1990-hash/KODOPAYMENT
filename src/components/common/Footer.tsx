@@ -1,6 +1,7 @@
 import React from 'react';
 import { Logo } from './Logo';
 import { useApp } from '../../context/AppContext';
+import { RegionSelector } from './RegionSelector';
 
 export const Footer: React.FC = () => {
   const { setCurrentView } = useApp();
@@ -23,7 +24,7 @@ export const Footer: React.FC = () => {
           <div className="col-span-2 space-y-4">
             <Logo size="lg" showSubtitle={true} onClick={() => setCurrentView('landing')} />
             <p className="text-xs text-[#86868b] max-w-sm leading-relaxed">
-              A developer-first merchant checkout and payment workspace for businesses operating across markets.
+              A merchant checkout and global payment platform, built on Cashfree's regulated payment infrastructure.
             </p>
           </div>
 
@@ -36,6 +37,11 @@ export const Footer: React.FC = () => {
               <li>
                 <button onClick={() => goToSection('product')} className="hover:text-[#1d1d1f] hover:underline text-left">
                   Overview
+                </button>
+              </li>
+              <li>
+                <button onClick={() => goToSection('solutions')} className="hover:text-[#1d1d1f] hover:underline text-left">
+                  Solutions
                 </button>
               </li>
               <li>
@@ -77,10 +83,11 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-4">
             <span>© 2026 QivroPay. All rights reserved.</span>
             <span>•</span>
-            <span>Global payment workspace</span>
+            <span>Global Payment Infrastructure</span>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
+            <RegionSelector compact />
             <button onClick={() => setCurrentView('privacy')} className="hover:text-[#1d1d1f] hover:underline text-left transition-colors">
               Privacy Policy
             </button>

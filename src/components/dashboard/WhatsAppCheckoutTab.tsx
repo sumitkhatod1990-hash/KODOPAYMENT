@@ -33,7 +33,7 @@ export const WhatsAppCheckoutTab: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-[#0A0D14] font-heading flex items-center gap-2">
             <MessageSquare className="w-6 h-6 text-[#0055FF]" />
-            <span>Indian WhatsApp Conversational Checkout &amp; UPI Payment Bot</span>
+            <span>WhatsApp Conversational Checkout &amp; UPI Payment Bot</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
             Complete SaaS tier selection, plan customization, and 1-click UPI Intent payment processing without leaving the WhatsApp chat window via official Meta Cloud API.
@@ -63,7 +63,7 @@ export const WhatsAppCheckoutTab: React.FC = () => {
         </div>
 
         <div className="opp-card p-6 space-y-2">
-          <div className="text-xs font-mono text-[#8C90A0] uppercase">Indian Mobile Shoppers Reach</div>
+          <div className="text-xs font-mono text-[#8C90A0] uppercase">Mobile Shoppers Reach</div>
           <div className="text-2xl font-bold font-mono text-[#0A0D14]">500M+ Active Users</div>
           <div className="text-[11px] text-purple-700 font-mono">Zero app install barrier</div>
         </div>

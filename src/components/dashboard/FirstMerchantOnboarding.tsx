@@ -3,6 +3,8 @@ import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { DashboardThemeProvider, useDashboardTheme } from '../../hooks/useDashboardTheme';
 import { ArrowRight, CheckCircle2, Copy, Package, Link2, Sparkles } from 'lucide-react';
+import { useRegion } from '../../context/RegionContext';
+import { SUPPORTED_CURRENCIES, CURRENCY_METADATA, formatCurrencyWithCode } from '../../lib/currency';
 import { trackMetaEvent } from '../../utils/metaPixel';
 
 type Step = 1 | 2 | 3 | 4 | 5;
@@ -16,6 +18,7 @@ export const FirstMerchantOnboarding: React.FC = () => (
 const FirstMerchantOnboardingShell: React.FC = () => {
   const { user } = useAuth();
   const { merchantProfile, saveMerchantProfile, createProduct, createCheckoutSession, completeOnboarding, setDashboardTab } = useApp();
+  const { currency: preferredCurrency } = useRegion();
   const { dark } = useDashboardTheme();
 
   const [step, setStep] = useState<Step>(1);
@@ -29,7 +32,8 @@ const FirstMerchantOnboardingShell: React.FC = () => {
   // Step 3 — first product
   const [productName, setProductName] = useState('');
   const [productPrice, setProductPrice] = useState('');
-  const [createdProduct, setCreatedProduct] = useState<{ id: string; name: string; price: number } | null>(null);
+  const [currency, setCurrency] = useState<string>(preferredCurrency || 'USD');
+  const [createdProduct, setCreatedProduct] = useState<{ id: string; name: string; price: number; currency?: string } | null>(null);
 
   // Step 4 — first payment link
   const [linkUrl, setLinkUrl] = useState<string | null>(null);
@@ -53,10 +57,10 @@ const FirstMerchantOnboardingShell: React.FC = () => {
     if (!Number.isFinite(price) || price <= 0) { setError('Enter a valid price greater than 0'); return; }
     setError('');
     setSaving(true);
-    const product = await createProduct({ name: productName.trim(), price, currency: 'INR', type: 'one_time' });
+    const product = await createProduct({ name: productName.trim(), price, currency, type: 'one_time' });
     setSaving(false);
     if (!product) { setError('Could not create the product. Please try again.'); return; }
-    setCreatedProduct({ id: product.id, name: product.name, price: product.price });
+    setCreatedProduct({ id: product.id, name: product.name, price: product.price, currency: product.currency });
     setStep(4);
   };
 
@@ -70,8 +74,8 @@ const FirstMerchantOnboardingShell: React.FC = () => {
     trackMetaEvent('StartTrial', {
       content_name: 'QivroPay sandbox',
       content_category: 'First payment link',
-      currency: 'INR',
-      value: 0,
+      currency: createdProduct.currency || 'USD',
+      value: createdProduct.price || 0,
     });
     setLinkUrl(`${window.location.origin}/checkout/${sessionId}`);
     // Onboarding is marked complete only from step 5's own actions (or Skip) —
@@ -140,7 +144,7 @@ const FirstMerchantOnboardingShell: React.FC = () => {
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
                   className="w-full p-3 rounded-xl border border-black/10 dark:border-white/10 bg-[#f5f5f7] dark:bg-white/5 text-[#1d1d1f] dark:text-slate-100 outline-none focus:border-[#0071e3]"
-                  placeholder="e.g. Acme Software Pvt Ltd"
+                  placeholder="e.g. Acme Corp"
                 />
               </div>
               <div className="space-y-1.5">
@@ -153,6 +157,9 @@ const FirstMerchantOnboardingShell: React.FC = () => {
                   placeholder="support@yourcompany.com"
                 />
               </div>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed">
+                Availability of payment rails and settlement depends on business location, payment capabilities, and partner verification.
+              </p>
             </div>
             {error && <p role="alert" className="text-xs text-red-600 bg-red-50 dark:bg-red-950/20 rounded-lg px-3 py-2">{error}</p>}
             <button type="submit" disabled={saving} className="apple-btn-black w-full py-3.5 text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50">
@@ -184,17 +191,33 @@ const FirstMerchantOnboardingShell: React.FC = () => {
                   placeholder="e.g. Pro Plan License"
                 />
               </div>
-              <div className="space-y-1.5">
-                <label className="font-semibold text-[#1d1d1f] dark:text-slate-200">Price (INR)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={productPrice}
-                  onChange={(e) => setProductPrice(e.target.value)}
-                  className="w-full p-3 rounded-xl border border-black/10 dark:border-white/10 bg-[#f5f5f7] dark:bg-white/5 text-[#1d1d1f] dark:text-slate-100 outline-none focus:border-[#0071e3] font-mono"
-                  placeholder="499.00"
-                />
+              <div className="grid grid-cols-3 gap-3">
+                <div className="col-span-2 space-y-1.5">
+                  <label className="font-semibold text-[#1d1d1f] dark:text-slate-200">Price ({currency})</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={productPrice}
+                    onChange={(e) => setProductPrice(e.target.value)}
+                    className="w-full p-3 rounded-xl border border-black/10 dark:border-white/10 bg-[#f5f5f7] dark:bg-white/5 text-[#1d1d1f] dark:text-slate-100 outline-none focus:border-[#0071e3] font-mono"
+                    placeholder="49.00"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="font-semibold text-[#1d1d1f] dark:text-slate-200">Currency</label>
+                  <select
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="w-full p-3 rounded-xl border border-black/10 dark:border-white/10 bg-[#f5f5f7] dark:bg-white/5 text-[#1d1d1f] dark:text-slate-100 outline-none focus:border-[#0071e3] font-medium text-xs"
+                  >
+                    {SUPPORTED_CURRENCIES.map((code) => (
+                      <option key={code} value={code} className="dark:bg-[#0c0f17]">
+                        {code} ({CURRENCY_METADATA[code]?.symbol || code})
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
             {error && <p role="alert" className="text-xs text-red-600 bg-red-50 dark:bg-red-950/20 rounded-lg px-3 py-2">{error}</p>}
@@ -219,7 +242,7 @@ const FirstMerchantOnboardingShell: React.FC = () => {
             <div className="p-4 rounded-2xl bg-[#f5f5f7] dark:bg-white/5 border border-black/5 dark:border-white/10 flex items-center justify-between">
               <div>
                 <div className="font-semibold text-[#1d1d1f] dark:text-slate-100 text-sm">{createdProduct.name}</div>
-                <div className="text-xs text-slate-500 font-mono">₹{createdProduct.price.toFixed(2)} INR</div>
+                <div className="text-xs text-slate-500 font-mono">{formatCurrencyWithCode(createdProduct.price, createdProduct.currency || currency)}</div>
               </div>
             </div>
             {error && <p role="alert" className="text-xs text-red-600 bg-red-50 dark:bg-red-950/20 rounded-lg px-3 py-2">{error}</p>}

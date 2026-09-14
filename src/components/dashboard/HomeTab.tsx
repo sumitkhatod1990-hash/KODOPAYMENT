@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
+import { formatCurrency } from '../../lib/currency';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -15,6 +16,7 @@ import {
 
 export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNavigateTab }) => {
   const { analytics, transactions, setCurrentView, createCheckoutSession, products } = useApp();
+  const primaryCurrency = analytics?.currency || 'USD';
 
   const handleQuickCheckout = async () => {
     const prod = products[0];
@@ -35,10 +37,10 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
           </div>
           <div>
             <h4 className="font-bold text-[#1d1d1f] text-sm font-sans">
-              Payment Infrastructure Active · India
+              Payment Infrastructure Active
             </h4>
             <p className="text-xs text-[#86868b]">
-              Sandbox-ready INR checkout, payment records, refunds, and settlement reconciliation in one QivroPay dashboard.
+              Multi-currency checkout, UPI & card payments, refunds, and settlement reconciliation in one QivroPay dashboard.
             </p>
           </div>
         </div>
@@ -69,7 +71,7 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
             <DollarSign className="w-4 h-4 text-[#0071e3]" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ₹{analytics?.totalVolume?.toLocaleString() || '0.00'}
+            {formatCurrency(analytics?.totalVolume || 0, primaryCurrency)}
           </div>
           <div className="flex items-center gap-1.5 text-xs text-[#86868b] font-semibold">
             <TrendingUp className="w-3.5 h-3.5" />
@@ -84,10 +86,10 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
             <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ₹{analytics?.totalNet?.toLocaleString() || '0.00'}
+            {formatCurrency(analytics?.totalNet || 0, primaryCurrency)}
           </div>
           <div className="text-xs text-[#86868b]">
-            Platform fee: <strong>₹{analytics?.totalFees || '0.00'}</strong>
+            Platform fee: <strong>{formatCurrency(analytics?.totalFees || 0, primaryCurrency)}</strong>
           </div>
         </div>
 
@@ -98,7 +100,7 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
             <CreditCard className="w-4 h-4 text-purple-600" />
           </div>
           <div className="text-3xl font-extrabold text-[#1d1d1f] font-sans">
-            ₹{analytics?.mrr?.toLocaleString() || '0.00'}
+            {formatCurrency(analytics?.mrr || 0, primaryCurrency)}
           </div>
           <div className="text-xs text-[#86868b]">
             <strong>{analytics?.activeSubscriptions || 0}</strong> active records
@@ -265,10 +267,10 @@ export const HomeTab: React.FC<{ onNavigateTab: (tab: any) => void }> = ({ onNav
                     {tx.productName}
                   </td>
                   <td className="py-3.5 font-bold text-[#1d1d1f] font-mono">
-                    ₹{tx.amount.toFixed(2)}
+                    {formatCurrency(tx.amount, tx.currency)}
                   </td>
                   <td className="py-3.5 font-mono text-emerald-700 font-bold">
-                    ₹{tx.net.toFixed(2)}
+                    {formatCurrency(tx.net, tx.currency)}
                   </td>
                   <td className="py-3.5">
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px] border border-emerald-200">

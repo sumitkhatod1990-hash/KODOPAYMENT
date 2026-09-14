@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { Transaction } from '../../types';
 import { Search, CheckCircle2, RefreshCw, FileText, RotateCcw, Clock, CreditCard, Smartphone, Globe2, Zap, DollarSign, Inbox } from 'lucide-react';
 import { printOrDownloadInvoice } from '../../utils/invoiceGenerator';
+import { formatCurrency } from '../../lib/currency';
 
 export const PaymentsTab: React.FC = () => {
   const { transactions, refreshData, processRefund, checkRefundStatus, setDashboardTab } = useApp();
@@ -49,7 +50,8 @@ export const PaymentsTab: React.FC = () => {
   const getRailBadge = (method: string) => {
     const m = method.toLowerCase();
     if (m === 'upi') return { label: 'UPI 🇮🇳', color: 'bg-orange-100 text-orange-800' };
-    return { label: 'Card · India', color: 'bg-slate-100 text-slate-800' };
+    if (m === 'card' || m === 'international_card') return { label: 'Card 💳', color: 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300' };
+    return { label: method.replace('_', ' ').toUpperCase(), color: 'bg-slate-100 text-slate-800 dark:bg-white/10 dark:text-slate-200' };
   };
 
   return (
@@ -62,7 +64,7 @@ export const PaymentsTab: React.FC = () => {
             Payments Ledger & Invoices
           </h2>
           <p className="text-xs sm:text-sm text-[#86868b]">
-            Complete India payment ledger with UPI and secure card payments.
+            Multi-currency payment ledger with Cashfree processing rails.
           </p>
         </div>
 
@@ -161,7 +163,18 @@ export const PaymentsTab: React.FC = () => {
                 return (
                   <tr key={tx.id} className="hover:bg-[#f5f5f7] transition-colors">
                     <td className="p-4 font-mono font-semibold text-[#1d1d1f]">
-                      {tx.id}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span>{tx.id}</span>
+                        {tx.environment && (
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                            tx.environment === 'production'
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
+                              : 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
+                          }`}>
+                            {tx.environment === 'production' ? 'LIVE' : 'TEST'}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="p-4">
                       <div className="font-semibold text-[#1d1d1f]">{tx.customerName}</div>
@@ -171,13 +184,13 @@ export const PaymentsTab: React.FC = () => {
                       {tx.productName}
                     </td>
                     <td className="p-4 font-bold text-[#1d1d1f] font-mono">
-                      ₹{tx.amount.toFixed(2)}
+                      {formatCurrency(tx.amount, tx.currency)}
                     </td>
                     <td className="p-4 font-mono text-[#86868b]">
-                      -₹{tx.fee.toFixed(2)}
+                      -{formatCurrency(tx.fee, tx.currency)}
                     </td>
                     <td className="p-4 font-mono text-emerald-700 font-bold">
-                      ₹{tx.net.toFixed(2)}
+                      {formatCurrency(tx.net, tx.currency)}
                     </td>
                     <td className="p-4">
                       <span className={`px-2 py-0.5 rounded-full font-mono text-[10px] font-bold ${badge.color}`}>
@@ -261,6 +274,11 @@ export const PaymentsTab: React.FC = () => {
                 }`}>
                   {selectedTx.status.replace('_', ' ').toUpperCase()}
                 </span>
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold border ${
+                  selectedTx.environment === 'production' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'
+                }`}>
+                  {selectedTx.environment === 'production' ? 'LIVE' : 'TEST'}
+                </span>
               </div>
               <button onClick={() => setSelectedTx(null)} className="text-[#86868b] hover:text-[#1d1d1f] text-sm">✕</button>
             </div>
@@ -294,15 +312,15 @@ export const PaymentsTab: React.FC = () => {
               <div className="pt-3 border-t border-black/5 space-y-1.5">
                 <div className="flex justify-between text-[#86868b]">
                   <span>Gross Amount:</span>
-                  <span className="font-mono text-[#1d1d1f] font-semibold">₹{selectedTx.amount.toFixed(2)} INR</span>
+                  <span className="font-mono text-[#1d1d1f] font-semibold">{formatCurrency(selectedTx.amount, selectedTx.currency)}</span>
                 </div>
                 <div className="flex justify-between text-[#86868b]">
                   <span>Platform Fee:</span>
-                  <span className="font-mono text-[#1d1d1f]">-₹{selectedTx.fee.toFixed(2)} INR</span>
+                  <span className="font-mono text-[#1d1d1f]">-{formatCurrency(selectedTx.fee, selectedTx.currency)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-sm pt-2 border-t border-black/5 text-[#1d1d1f]">
                   <span>Net Settled Payout:</span>
-                  <span className="font-mono text-emerald-700">₹{selectedTx.net.toFixed(2)} INR</span>
+                  <span className="font-mono text-emerald-700">{formatCurrency(selectedTx.net, selectedTx.currency)}</span>
                 </div>
               </div>
 
@@ -314,7 +332,7 @@ export const PaymentsTab: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#86868b]">Refund Amount:</span>
-                    <span className="font-mono text-[#1d1d1f]">₹{Number(selectedTx.refundedAmount || 0).toFixed(2)} INR</span>
+                    <span className="font-mono text-[#1d1d1f]">{formatCurrency(Number(selectedTx.refundedAmount || 0), selectedTx.currency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#86868b]">Refund ID:</span>

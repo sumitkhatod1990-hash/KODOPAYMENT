@@ -27,15 +27,15 @@ export { PartnerMappingError, CashfreePartnerError };
 // Creates the QivroPay merchant <-> Cashfree merchant mapping. Deliberately
 // thin — just validates presence of both ids and delegates to the store,
 // which owns the actual uniqueness guarantees.
-export async function mapMerchantToCashfreePartner(merchantId, cfMerchantId) {
+export async function mapMerchantToCashfreePartner(merchantId, cfMerchantId, environment = 'sandbox') {
   if (!merchantId) throw new Error('mapMerchantToCashfreePartner requires merchantId');
   if (!cfMerchantId) throw new Error('mapMerchantToCashfreePartner requires cfMerchantId');
-  return createPartnerMerchantMapping({ merchantId, cfMerchantId });
+  return createPartnerMerchantMapping({ merchantId, cfMerchantId, environment });
 }
 
-export async function getStoredMapping(merchantId) {
+export async function getStoredMapping(merchantId, environment = null) {
   if (!merchantId) throw new Error('getStoredMapping requires merchantId');
-  return getPartnerMerchantMapping(merchantId);
+  return getPartnerMerchantMapping(merchantId, environment);
 }
 
 // Extracts the status fields this phase tracks from a raw Cashfree
@@ -71,19 +71,16 @@ export function normalizeCashfreeMerchantStatus(data) {
 // result. Never fabricates a status:
 //   - no mapping yet            -> { started: false, mapping: null, error: null }
 //   - Cashfree call fails       -> { started: true, mapping: <last known row>, error: {...} }
-//                                   (stored status is left untouched — a
-//                                   failed lookup must never be recorded as
-//                                   any particular status, approved or
-//                                   otherwise)
 //   - Cashfree call succeeds    -> { started: true, mapping: <freshly updated row>, error: null }
-export async function refreshMerchantStatus(merchantId) {
+export async function refreshMerchantStatus(merchantId, environment = null) {
   if (!merchantId) throw new Error('refreshMerchantStatus requires merchantId');
-  const mapping = await getStoredMapping(merchantId);
+  const mapping = await getStoredMapping(merchantId, environment);
   if (!mapping) return { started: false, mapping: null, error: null };
 
+  const targetEnv = mapping.environment || environment || 'sandbox';
   let response;
   try {
-    response = await getMerchantStatus(mapping.cf_merchant_id);
+    response = await getMerchantStatus(mapping.cf_merchant_id, targetEnv);
   } catch (err) {
     if (err instanceof CashfreePartnerError) {
       return { started: true, mapping, error: { status: err.status, code: err.code, message: err.message } };
@@ -92,6 +89,6 @@ export async function refreshMerchantStatus(merchantId) {
   }
 
   const normalized = normalizeCashfreeMerchantStatus(response.data);
-  const updated = await updatePartnerMerchantStatus(merchantId, normalized);
+  const updated = await updatePartnerMerchantStatus(merchantId, normalized, targetEnv);
   return { started: true, mapping: updated, error: null };
 }

@@ -18,9 +18,6 @@ export const Hero: React.FC = () => {
   };
 
   const handleBookDemo = () => {
-    // A demo request starts with merchant signup. The pricing section is
-    // informational and is not a booking flow, so scrolling there made this
-    // CTA appear to do nothing for users.
     openSignup('hero_book_demo', 'QivroPay demo request');
   };
 
@@ -53,7 +50,7 @@ export const Hero: React.FC = () => {
             </h1>
 
             <p className="hero-reveal hero-reveal-delay-1 max-w-md text-base font-normal leading-relaxed text-[#4d5475] sm:text-xl">
-              Accept payments, manage transactions, and scale across markets with one developer-first payment workspace.
+              Accept payments, manage transactions, and scale across markets with one developer-first payment infrastructure.
             </p>
 
             <div className="hero-reveal hero-reveal-delay-2 flex flex-wrap items-center gap-3 pt-2 sm:gap-3.5">
@@ -61,7 +58,7 @@ export const Hero: React.FC = () => {
                 onClick={() => (user ? setCurrentView('dashboard') : openSignup('hero_start_building'))}
                 className="opp-btn-primary px-8 py-3.5 text-sm gap-2"
               >
-                <span>{user ? 'Go to dashboard' : 'Start building'}</span>
+                <span>{user ? 'Go to dashboard' : 'Get Started'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -76,7 +73,7 @@ export const Hero: React.FC = () => {
                 onClick={() => setCurrentView('docs')}
                 className="opp-btn-secondary px-7 py-3.5 text-sm gap-2"
               >
-                <span>Read the docs</span>
+                <span>See Documentation</span>
               </button>
             </div>
           </div>

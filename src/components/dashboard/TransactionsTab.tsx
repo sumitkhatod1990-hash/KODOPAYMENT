@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Transaction } from '../../types';
 import { Search, CheckCircle2, RefreshCw, FileText } from 'lucide-react';
+import { formatCurrency, formatCurrencyWithCode } from '../../lib/currency';
 
 export const TransactionsTab: React.FC = () => {
   const { transactions, refreshData } = useApp();
@@ -22,10 +23,10 @@ export const TransactionsTab: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-[#1d1d1f] font-heading">
-            Transactions & MoR Settlement
+            Transactions & Settlements
           </h2>
           <p className="text-xs sm:text-sm text-[#86868b]">
-            Real-time feed of all charges, fees, VAT breakdowns, and merchant payouts.
+            Real-time feed of all charges, fees, and merchant payouts.
           </p>
         </div>
 
@@ -87,13 +88,13 @@ export const TransactionsTab: React.FC = () => {
                     {tx.productName}
                   </td>
                   <td className="p-4 font-bold text-[#1d1d1f] font-mono">
-                    ${tx.amount.toFixed(2)}
+                    {formatCurrency(tx.amount, tx.currency)}
                   </td>
                   <td className="p-4 font-mono text-[#86868b]">
-                    -₹{tx.fee.toFixed(2)}
+                    -{formatCurrency(tx.fee, tx.currency)}
                   </td>
                   <td className="p-4 font-mono text-emerald-700 font-bold">
-                    ${tx.net.toFixed(2)}
+                    {formatCurrency(tx.net, tx.currency)}
                   </td>
                   <td className="p-4 font-mono uppercase text-[#6e6e73]">
                     {tx.paymentMethod} {tx.cardLast4 ? `(•${tx.cardLast4})` : ''}
@@ -126,7 +127,7 @@ export const TransactionsTab: React.FC = () => {
           <div className="w-full max-w-md rounded-3xl bg-white border border-black/10 shadow-2xl p-6 sm:p-8 space-y-5">
             <div className="flex justify-between items-center pb-3 border-b border-black/5">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-[#1d1d1f] text-base font-sans">QIVROPAY MoR Invoice</span>
+                <span className="font-bold text-[#1d1d1f] text-base font-sans">QivroPay Receipt</span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">PAID</span>
               </div>
               <button onClick={() => setSelectedTx(null)} className="text-[#86868b] hover:text-[#1d1d1f] text-sm">✕</button>
@@ -153,15 +154,15 @@ export const TransactionsTab: React.FC = () => {
               <div className="pt-3 border-t border-black/5 space-y-1.5">
                 <div className="flex justify-between text-[#86868b]">
                   <span>Gross Charged:</span>
-                  <span className="font-mono text-[#1d1d1f] font-semibold">₹{selectedTx.amount.toFixed(2)} INR</span>
+                  <span className="font-mono text-[#1d1d1f] font-semibold">{formatCurrencyWithCode(selectedTx.amount, selectedTx.currency)}</span>
                 </div>
                 <div className="flex justify-between text-[#86868b]">
-                  <span>MoR Platform Fee:</span>
-                  <span className="font-mono text-[#1d1d1f]">-₹{selectedTx.fee.toFixed(2)} INR</span>
+                  <span>Platform Fee:</span>
+                  <span className="font-mono text-[#1d1d1f]">-{formatCurrencyWithCode(selectedTx.fee, selectedTx.currency)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-sm pt-2 border-t border-black/5 text-[#1d1d1f]">
                   <span>Net Settled Payout:</span>
-                  <span className="font-mono text-emerald-700">₹{selectedTx.net.toFixed(2)} INR</span>
+                  <span className="font-mono text-emerald-700">{formatCurrencyWithCode(selectedTx.net, selectedTx.currency)}</span>
                 </div>
               </div>
             </div>

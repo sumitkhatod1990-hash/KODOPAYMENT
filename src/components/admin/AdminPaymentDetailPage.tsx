@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { formatINR, navigateAdmin } from '../../utils/adminDomain';
+import { formatCurrency } from '../../lib/currency';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import {
   CreditCard,
@@ -377,7 +378,7 @@ export const AdminPaymentDetailPage: React.FC<Props> = ({ paymentId }) => {
         <div className="flex sm:flex-col items-end justify-between sm:justify-center gap-2">
           <div className="text-right">
             <div className="text-2xl font-bold text-white font-mono tracking-tight">
-              {formatINR(payment.amount)}
+              {formatCurrency(payment.amount, payment.currency || 'INR')}
             </div>
             <div className="text-[10px] text-slate-500 font-mono">Gross Transaction Volume</div>
           </div>
@@ -416,7 +417,7 @@ export const AdminPaymentDetailPage: React.FC<Props> = ({ paymentId }) => {
 
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">Gross Amount</span>
-                <span className="font-bold text-white font-mono text-sm">{formatINR(payment.amount)}</span>
+                <span className="font-bold text-white font-mono text-sm">{formatCurrency(payment.amount, payment.currency || 'INR')}</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -760,7 +761,7 @@ export const AdminPaymentDetailPage: React.FC<Props> = ({ paymentId }) => {
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Refunded Amount</span>
                   <span className="font-bold text-indigo-300 font-mono text-sm">
-                    {formatINR(payment.refund.amount)}
+                    {formatCurrency(payment.refund.amount, payment.currency || 'INR')}
                   </span>
                 </div>
 

@@ -9,6 +9,8 @@ import { BentoFeatures } from './components/landing/BentoFeatures';
 import { ArchitectureFlow } from './components/landing/ArchitectureFlow';
 import { CodeIntegration } from './components/landing/CodeIntegration';
 import { PricingSection } from './components/landing/PricingSection';
+import { GlobalPaymentsSection } from './components/landing/GlobalPaymentsSection';
+import { SolutionsSection } from './components/landing/SolutionsSection';
 import { DashboardLayout } from './components/dashboard/DashboardLayout';
 import { FirstMerchantOnboarding } from './components/dashboard/FirstMerchantOnboarding';
 import { HostedCheckout } from './components/checkout/HostedCheckout';
@@ -69,33 +71,10 @@ export const App: React.FC = () => {
       
       <main className="flex-1">
         <Hero />
-
-        {/* Built for businesses operating across markets */}
-        <section className="bg-[#f7f6f2] px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-8 flex items-end justify-between gap-6 text-[#151a4a]">
-              <div>
-                <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.24em] text-[#7054E8]">
-                  Built for modern businesses
-                </p>
-                <h2 className="max-w-xl text-3xl font-bold tracking-tight sm:text-5xl">
-                  Payments made simple, wherever you grow.
-                </h2>
-              </div>
-              <span className="hidden text-sm text-[#4d5475]/60 sm:block">
-                Cards · Regional rails · Payment links
-              </span>
-            </div>
-            <img
-              src="/qivropay-businesses.png"
-              alt="QivroPay helping businesses manage payments"
-              className="qp-image-lock mx-auto aspect-[16/8] max-w-5xl rounded-[1.5rem] object-cover shadow-[0_18px_50px_-28px_rgba(21,26,74,.3)]"
-            />
-          </div>
-        </section>
-
         <ProductPreview />
+        <GlobalPaymentsSection />
         <FeatureCards />
+        <SolutionsSection />
         <BentoFeatures />
         <ArchitectureFlow />
         <CodeIntegration />
@@ -107,3 +86,4 @@ export const App: React.FC = () => {
     </div>
   );
 };
+

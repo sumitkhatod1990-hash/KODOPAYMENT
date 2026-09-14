@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import {
   LayoutDashboard,
   ShieldCheck,
@@ -20,6 +20,8 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { PaymentMarquee } from './PaymentMarquee';
+import { useRegion } from '../../context/RegionContext';
+import { formatCurrency, CURRENCY_METADATA } from '../../lib/currency';
 
 // ---------------------------------------------------------------------------
 // Marketing-only demo dashboard. Everything below is fabricated preview data
@@ -65,43 +67,54 @@ interface DemoTxn {
   date: string;
 }
 
-const DEMO_TRANSACTIONS: DemoTxn[] = [
-  { ref: 'pay_qp_7f3a91', customerName: 'Ananya Sharma', customerEmail: 'ananya.sharma@example.com', product: 'Pro Plan · Monthly', amount: '₹2,499.00', method: 'UPI', status: 'Succeeded', date: '3 Sep 2026 · 4:12 PM' },
-  { ref: 'pay_qp_5c18e4', customerName: 'Rohan Verma', customerEmail: 'rohan.verma@example.com', product: 'Website Design Package', amount: '₹18,000.00', method: 'Card · Visa', status: 'Succeeded', date: '3 Sep 2026 · 11:47 AM' },
-  { ref: 'pay_qp_9d22b7', customerName: 'Priya Iyer', customerEmail: 'priya.iyer@example.com', product: '1:1 Consulting Session', amount: '₹4,500.00', method: 'UPI', status: 'Pending', date: '2 Sep 2026 · 6:03 PM' },
-  { ref: 'pay_qp_3a67f0', customerName: 'Vikram Nair', customerEmail: 'vikram.nair@example.com', product: 'E-book Bundle', amount: '₹799.00', method: 'Card · RuPay', status: 'Failed', date: '2 Sep 2026 · 2:15 PM' },
-  { ref: 'pay_qp_8e41c2', customerName: 'Kavya Reddy', customerEmail: 'kavya.reddy@example.com', product: 'Pro Plan · Monthly', amount: '₹2,499.00', method: 'UPI', status: 'Refunded', date: '1 Sep 2026 · 9:28 AM' },
-  { ref: 'pay_qp_1b95d6', customerName: 'Arjun Menon', customerEmail: 'arjun.menon@example.com', product: 'Brand Strategy Package', amount: '₹32,000.00', method: 'Card · Mastercard', status: 'Succeeded', date: '31 Aug 2026 · 8:02 AM' },
-  { ref: 'pay_qp_6f04a8', customerName: 'Neha Kapoor', customerEmail: 'neha.kapoor@example.com', product: 'Website Design Package', amount: '₹18,000.00', method: 'UPI', status: 'Succeeded', date: '30 Aug 2026 · 5:44 PM' },
+interface BaseDemoTxn {
+  ref: string;
+  customerName: string;
+  customerEmail: string;
+  product: string;
+  baseAmount: number;
+  method: string;
+  status: DemoStatus;
+  date: string;
+}
+
+const BASE_DEMO_TRANSACTIONS: BaseDemoTxn[] = [
+  { ref: 'pay_qp_7f3a91', customerName: 'Acme Inc.', customerEmail: 'billing@acme.corp', product: 'Pro Plan · Monthly', baseAmount: 149, method: 'Card · Visa', status: 'Succeeded', date: '3 Sep 2026 · 4:12 PM' },
+  { ref: 'pay_qp_5c18e4', customerName: 'Studio Labs', customerEmail: 'accounts@studiolabs.io', product: 'Website Design Package', baseAmount: 499, method: 'Card · Visa', status: 'Succeeded', date: '3 Sep 2026 · 11:47 AM' },
+  { ref: 'pay_qp_9d22b7', customerName: 'Global Services Ltd', customerEmail: 'finance@globalservices.co.uk', product: '1:1 Consulting Session', baseAmount: 299, method: 'Card · Mastercard', status: 'Pending', date: '2 Sep 2026 · 6:03 PM' },
+  { ref: 'pay_qp_3a67f0', customerName: 'India Store Online', customerEmail: 'orders@indiastore.in', product: 'E-book Bundle', baseAmount: 49, method: 'UPI / RuPay', status: 'Failed', date: '2 Sep 2026 · 2:15 PM' },
+  { ref: 'pay_qp_8e41c2', customerName: 'Elena Rostova', customerEmail: 'elena.rostova@example.com', product: 'Pro Plan · Monthly', baseAmount: 149, method: 'Card · Visa', status: 'Refunded', date: '1 Sep 2026 · 9:28 AM' },
+  { ref: 'pay_qp_1b95d6', customerName: 'Marcus Vance', customerEmail: 'marcus.vance@example.com', product: 'Brand Strategy Package', baseAmount: 1299, method: 'Card · Mastercard', status: 'Succeeded', date: '31 Aug 2026 · 8:02 AM' },
+  { ref: 'pay_qp_6f04a8', customerName: 'Rohan Verma', customerEmail: 'rohan.verma@example.com', product: 'Website Design Package', baseAmount: 499, method: 'UPI', status: 'Succeeded', date: '30 Aug 2026 · 5:44 PM' },
 ];
 
-const DEMO_LINKS = [
-  { id: 'wd', title: 'Website Design Package', amount: '₹18,000.00', slug: 'qivropay.com/pay/wd-package-x4k9', payments: 12 },
-  { id: 'pro', title: 'Pro Plan · Monthly', amount: '₹2,499.00', slug: 'qivropay.com/pay/pro-monthly-7h2p', payments: 64 },
-  { id: 'consult', title: '1:1 Consulting Session', amount: '₹4,500.00', slug: 'qivropay.com/pay/consult-q1z8', payments: 9 },
-  { id: 'ebook', title: 'E-book Bundle', amount: '₹799.00', slug: 'qivropay.com/pay/ebook-bundle-m3v6', payments: 31 },
+const BASE_DEMO_LINKS = [
+  { id: 'wd', title: 'Website Design Package', baseAmount: 499, slug: 'qivropay.com/pay/wd-package-x4k9', payments: 12 },
+  { id: 'pro', title: 'Pro Plan · Monthly', baseAmount: 149, slug: 'qivropay.com/pay/pro-monthly-7h2p', payments: 64 },
+  { id: 'consult', title: '1:1 Consulting Session', baseAmount: 299, slug: 'qivropay.com/pay/consult-q1z8', payments: 9 },
+  { id: 'ebook', title: 'E-book Bundle', baseAmount: 49, slug: 'qivropay.com/pay/ebook-bundle-m3v6', payments: 31 },
 ];
 
-const DEMO_CUSTOMERS = [
-  { name: 'Ananya Sharma', email: 'ananya.sharma@example.com', total: '₹12,450.00', orders: 5, status: 'Active' },
-  { name: 'Arjun Menon', email: 'arjun.menon@example.com', total: '₹32,000.00', orders: 1, status: 'Active' },
-  { name: 'Rohan Verma', email: 'rohan.verma@example.com', total: '₹18,000.00', orders: 1, status: 'Active' },
-  { name: 'Neha Kapoor', email: 'neha.kapoor@example.com', total: '₹18,000.00', orders: 1, status: 'Active' },
-  { name: 'Priya Iyer', email: 'priya.iyer@example.com', total: '₹4,500.00', orders: 1, status: 'Active' },
-  { name: 'Kavya Reddy', email: 'kavya.reddy@example.com', total: '₹2,499.00', orders: 1, status: 'Refunded' },
+const BASE_DEMO_CUSTOMERS = [
+  { name: 'Alex Morgan', email: 'alex.morgan@example.com', baseTotal: 745, orders: 5, status: 'Active' },
+  { name: 'Marcus Vance', email: 'marcus.vance@example.com', baseTotal: 1299, orders: 1, status: 'Active' },
+  { name: 'Rohan Verma', email: 'rohan.verma@example.com', baseTotal: 499, orders: 1, status: 'Active' },
+  { name: 'Neha Kapoor', email: 'neha.kapoor@example.com', baseTotal: 499, orders: 1, status: 'Active' },
+  { name: 'Sarah Chen', email: 'sarah.chen@example.com', baseTotal: 299, orders: 1, status: 'Active' },
+  { name: 'Elena Rostova', email: 'elena.rostova@example.com', baseTotal: 149, orders: 1, status: 'Refunded' },
 ];
 
-const DEMO_PRODUCTS = [
-  { name: 'Pro Plan · Monthly', type: 'Subscription', price: '₹2,499.00' },
-  { name: 'Website Design Package', type: 'One-time', price: '₹18,000.00' },
-  { name: '1:1 Consulting Session', type: 'One-time', price: '₹4,500.00' },
-  { name: 'E-book Bundle', type: 'Digital download', price: '₹799.00' },
+const BASE_DEMO_PRODUCTS = [
+  { name: 'Pro Plan · Monthly', type: 'Subscription', basePrice: 149 },
+  { name: 'Website Design Package', type: 'One-time', basePrice: 499 },
+  { name: '1:1 Consulting Session', type: 'One-time', basePrice: 299 },
+  { name: 'E-book Bundle', type: 'Digital download', basePrice: 49 },
 ];
 
-const DEMO_SETTLEMENTS = [
-  { date: '5 Sep 2026', amount: '₹1,42,880.00', status: 'Expected' },
-  { date: '27 Aug 2026', amount: '₹96,420.00', status: 'Settled' },
-  { date: '20 Aug 2026', amount: '₹88,150.00', status: 'Settled' },
+const BASE_DEMO_SETTLEMENTS = [
+  { date: '5 Sep 2026', baseAmount: 14288, status: 'Expected' },
+  { date: '27 Aug 2026', baseAmount: 9642, status: 'Settled' },
+  { date: '20 Aug 2026', baseAmount: 8815, status: 'Settled' },
 ];
 
 const ACTIVITY = [
@@ -150,6 +163,7 @@ interface DemoStep {
 }
 
 export const ProductPreview: React.FC = () => {
+  const { currency } = useRegion();
   const [tab, setTab] = useState<PreviewTab>('overview');
   const [selectedTxn, setSelectedTxn] = useState<DemoTxn | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -158,8 +172,67 @@ export const ProductPreview: React.FC = () => {
   const [userPaused, setUserPaused] = useState(false);
   const [cursor, setCursor] = useState({ x: 0, y: 0, visible: false, clicking: false });
 
+  const demoTransactions: DemoTxn[] = useMemo(() => {
+    return BASE_DEMO_TRANSACTIONS.map(t => ({
+      ref: t.ref,
+      customerName: t.customerName,
+      customerEmail: t.customerEmail,
+      product: t.product,
+      amount: formatCurrency(t.baseAmount, currency),
+      method: currency === 'INR' && t.method.includes('UPI') ? 'UPI' : t.method,
+      status: t.status,
+      date: t.date,
+    }));
+  }, [currency]);
+
+  const demoTransactionsRef = useRef(demoTransactions);
+  demoTransactionsRef.current = demoTransactions;
+
+  const demoLinks = useMemo(() => {
+    return BASE_DEMO_LINKS.map(l => ({
+      id: l.id,
+      title: l.title,
+      amount: formatCurrency(l.baseAmount, currency),
+      slug: l.slug,
+      payments: l.payments,
+    }));
+  }, [currency]);
+
+  const demoCustomers = useMemo(() => {
+    return BASE_DEMO_CUSTOMERS.map(c => ({
+      name: c.name,
+      email: c.email,
+      total: formatCurrency(c.baseTotal, currency),
+      orders: c.orders,
+      status: c.status,
+    }));
+  }, [currency]);
+
+  const demoProducts = useMemo(() => {
+    return BASE_DEMO_PRODUCTS.map(p => ({
+      name: p.name,
+      type: p.type,
+      price: formatCurrency(p.basePrice, currency),
+    }));
+  }, [currency]);
+
+  const demoSettlements = useMemo(() => {
+    return BASE_DEMO_SETTLEMENTS.map(s => ({
+      date: s.date,
+      amount: formatCurrency(s.baseAmount, currency),
+      status: s.status,
+    }));
+  }, [currency]);
+
   const frameRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
+
+  useEffect(() => {
+    if (selectedTxn) {
+      const match = demoTransactions.find(t => t.ref === selectedTxn.ref);
+      if (match) setSelectedTxn(match);
+    }
+  }, [currency, demoTransactions]);
 
   useEffect(() => {
     pausedRef.current = userPaused;
@@ -186,7 +259,7 @@ export const ProductPreview: React.FC = () => {
 
     const steps: DemoStep[] = [
       { selector: '[data-demo="nav-payments"]', run: () => setTab('payments'), hold: 1400 },
-      { selector: '[data-demo="txn-row-0"]', run: () => setSelectedTxn(DEMO_TRANSACTIONS[0]), hold: 2200 },
+      { selector: '[data-demo="txn-row-0"]', run: () => setSelectedTxn(demoTransactionsRef.current[0]), hold: 2200 },
       { selector: '[data-demo="modal-close"]', run: () => setSelectedTxn(null), hold: 900 },
       { selector: '[data-demo="nav-payment-links"]', run: () => setTab('payment-links'), hold: 1700 },
       { selector: '[data-demo="nav-customers"]', run: () => setTab('customers'), hold: 1700 },
@@ -356,10 +429,13 @@ export const ProductPreview: React.FC = () => {
                     <div className="text-sm sm:text-base font-bold text-[#0A0D14] truncate">
                       {NAV.find(n => n.id === tab)?.label}
                     </div>
-                    <div className="hidden sm:block text-[11px] text-[#86868b]">Preview Merchant Pvt Ltd</div>
+                    <div className="hidden sm:block text-[11px] text-[#86868b]">Preview Merchant · Sample Data ({currency})</div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full bg-blue-50 text-[#0055FF] text-[10px] font-mono font-bold border border-blue-100">
+                      LIVE PRODUCT PREVIEW · SAMPLE DATA ({currency})
+                    </span>
+                    <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-[10px] font-mono font-bold border border-slate-200">
                       TEST MODE
                     </span>
                     <div className="w-8 h-8 rounded-full bg-[#111827] text-white flex items-center justify-center text-[11px] font-bold">
@@ -396,11 +472,11 @@ export const ProductPreview: React.FC = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <PreviewCard className="space-y-1.5">
                             <div className="text-xs text-[#86868b] font-medium">Gross Volume</div>
-                            <div className="text-2xl font-extrabold text-[#1d1d1f]">₹1,84,650</div>
+                            <div className="text-2xl font-extrabold text-[#1d1d1f]">{formatCurrency(18465, currency)}</div>
                           </PreviewCard>
                           <PreviewCard className="space-y-1.5">
                             <div className="text-xs text-[#86868b] font-medium">Net Payouts</div>
-                            <div className="text-2xl font-extrabold text-[#1d1d1f]">₹1,79,115</div>
+                            <div className="text-2xl font-extrabold text-[#1d1d1f]">{formatCurrency(17911, currency)}</div>
                           </PreviewCard>
                           <PreviewCard className="space-y-1.5">
                             <div className="text-xs text-[#86868b] font-medium">Total Customers</div>
@@ -418,7 +494,7 @@ export const ProductPreview: React.FC = () => {
                           </div>
                           <div className="flex items-end justify-between gap-2 h-24">
                             {ACTIVITY.map((d, i) => (
-                              <div key={d.day} className="flex-1 h-full flex flex-col items-center justify-end gap-1.5" title={`${d.day}: ₹${d.value * 350}`}>
+                              <div key={d.day} className="flex-1 h-full flex flex-col items-center justify-end gap-1.5" title={`${d.day}: ${formatCurrency(d.value * 25, currency)}`}>
                                 <div
                                   className={`w-full rounded-md ${i === ACTIVITY.length - 1 ? 'bg-[#0055FF]' : 'bg-blue-100'}`}
                                   style={{ height: `${d.value}%` }}
@@ -439,7 +515,7 @@ export const ProductPreview: React.FC = () => {
                           <div className="overflow-x-auto px-5 sm:px-6 pb-5">
                             <table className="w-full text-left border-collapse text-xs min-w-[420px]">
                               <tbody className="divide-y divide-black/5">
-                                {DEMO_TRANSACTIONS.slice(0, 4).map(txn => <TxnRow key={txn.ref} txn={txn} compact />)}
+                                {demoTransactions.slice(0, 4).map(txn => <TxnRow key={txn.ref} txn={txn} compact />)}
                               </tbody>
                             </table>
                           </div>
@@ -466,7 +542,7 @@ export const ProductPreview: React.FC = () => {
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-black/5">
-                              {DEMO_TRANSACTIONS.map((txn, i) => (
+                              {demoTransactions.map((txn, i) => (
                                 <TxnRow key={txn.ref} txn={txn} demoId={i === 0 ? 'txn-row-0' : undefined} />
                               ))}
                             </tbody>
@@ -481,7 +557,7 @@ export const ProductPreview: React.FC = () => {
                     {tab === 'payment-links' && (
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {DEMO_LINKS.map(link => (
+                          {demoLinks.map(link => (
                             <PreviewCard key={link.id} className="space-y-3">
                               <div className="flex items-start justify-between gap-2">
                                 <div className="font-bold text-[#1d1d1f] text-sm">{link.title}</div>
@@ -519,7 +595,7 @@ export const ProductPreview: React.FC = () => {
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-black/5">
-                              {DEMO_CUSTOMERS.map(c => (
+                              {demoCustomers.map(c => (
                                 <tr key={c.email}>
                                   <td className="py-3 pr-3">
                                     <div className="font-semibold text-[#1d1d1f] whitespace-nowrap">{c.name}</div>
@@ -564,7 +640,7 @@ export const ProductPreview: React.FC = () => {
 
                     {tab === 'products' && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {DEMO_PRODUCTS.map(p => (
+                        {demoProducts.map(p => (
                           <PreviewCard key={p.name} className="space-y-2">
                             <div className="flex items-start justify-between gap-2">
                               <div className="font-bold text-[#1d1d1f] text-sm">{p.name}</div>
@@ -585,7 +661,7 @@ export const ProductPreview: React.FC = () => {
                             </div>
                             <div>
                               <div className="text-xs text-[#86868b] font-medium">Next settlement</div>
-                              <div className="text-xl font-extrabold text-[#1d1d1f] font-mono">₹1,42,880.00</div>
+                              <div className="text-xl font-extrabold text-[#1d1d1f] font-mono">{formatCurrency(14288, currency)}</div>
                             </div>
                           </div>
                           <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold border border-amber-200">Expected 5 Sep 2026</span>
@@ -595,7 +671,7 @@ export const ProductPreview: React.FC = () => {
                           <div className="overflow-x-auto px-5 sm:px-6 pb-5">
                             <table className="w-full text-left border-collapse text-xs min-w-[360px]">
                               <tbody className="divide-y divide-black/5">
-                                {DEMO_SETTLEMENTS.map(s => (
+                                {demoSettlements.map(s => (
                                   <tr key={s.date}>
                                     <td className="py-3 pr-3 text-[#1d1d1f] font-mono whitespace-nowrap">{s.date}</td>
                                     <td className="py-3 pr-3 font-bold font-mono text-[#1d1d1f] whitespace-nowrap">{s.amount}</td>
@@ -640,7 +716,7 @@ export const ProductPreview: React.FC = () => {
                           <pre className="text-emerald-300">{`POST /api/v1/payments/create-session
 Authorization: Bearer qivro_test_...
 
-{ "productId": "prod_web_design", "currency": "INR" }`}</pre>
+{ "productId": "prod_web_design", "currency": "${currency}" }`}</pre>
                         </div>
                       </div>
                     )}
@@ -649,10 +725,10 @@ Authorization: Bearer qivro_test_...
                       <PreviewCard className="space-y-3">
                         <div className="text-xs font-bold text-[#1d1d1f] mb-1">Business profile</div>
                         {[
-                          ['Business name', 'Studio Nine Design Co.'],
+                          ['Business name', 'Studio Nine Global Co.'],
                           ['Support email', 'support@studionine.example'],
-                          ['Currency', 'INR · Indian Rupee'],
-                          ['Payout account', '•••• 4821 (HDFC Bank)'],
+                          ['Display currency', `${currency} · ${(CURRENCY_METADATA as any)[currency]?.name || currency}`],
+                          ['Payout account', '•••• 4821 (Primary Bank)'],
                         ].map(([label, value]) => (
                           <div key={label} className="flex items-center justify-between py-2 border-b border-black/5 last:border-0 gap-3">
                             <span className="text-xs text-[#86868b]">{label}</span>

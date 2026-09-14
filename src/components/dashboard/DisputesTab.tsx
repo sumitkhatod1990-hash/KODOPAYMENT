@@ -53,13 +53,13 @@ export const DisputesTab: React.FC = () => {
             Automated Chargeback Defense AI & Dispute Shield
           </h2>
           <p className="text-xs sm:text-sm text-[#8C90A0]">
-            QIVROPAY Merchant of Record insulates 100% of chargeback financial liabilities while our AI automatically compiles forensic evidence packages for card networks.
+            Automated dispute tracking and forensic evidence package compilation for payment network inquiries.
           </p>
         </div>
 
         <div className="opp-badge self-start sm:self-auto text-emerald-700 font-bold bg-emerald-50 border-emerald-200">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>100% MoR INSULATED GUARANTEE</span>
+          <span>DISPUTE MANAGEMENT SHIELD</span>
         </div>
       </div>
 

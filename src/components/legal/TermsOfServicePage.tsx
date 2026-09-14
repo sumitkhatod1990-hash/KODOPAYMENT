@@ -49,13 +49,13 @@ export const TermsOfServicePage: React.FC = () => {
             </h2>
             <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-sm space-y-3 text-xs sm:text-sm text-[#3a3a3c] leading-relaxed">
               <p>
-                <strong>Software &amp; Checkout Infrastructure:</strong> QivroPay is a software technology platform offering payment checkout session generation, merchant analytics, product link management, developer REST APIs, and billing software tools for Indian businesses.
+                <strong>Software &amp; Checkout Infrastructure:</strong> QivroPay is a software technology platform offering payment checkout session generation, merchant analytics, product link management, developer REST APIs, and billing software tools for businesses selling worldwide.
               </p>
               <p>
                 <strong>Payment Acquiring &amp; Settlement:</strong> Payment processing, banking gateway connectivity, card/UPI acquiring, and monetary settlements are facilitated through licensed payment infrastructure partners, including Cashfree Payments India Private Limited.
               </p>
               <p>
-                <strong>Regulatory Clarification:</strong> QivroPay operates as a software technology platform and does not claim standalone banking licenses or independent central bank authorizations. All monetary funds and transaction settlements are handled directly through authorized payment acquiring partners in compliance with applicable Indian financial regulations.
+                <strong>Regulatory Clarification:</strong> QivroPay operates as a software technology platform and does not claim standalone banking licenses or independent central bank authorizations. All monetary funds and transaction settlements are handled directly through authorized payment acquiring partners in compliance with applicable financial regulations.
               </p>
             </div>
           </div>

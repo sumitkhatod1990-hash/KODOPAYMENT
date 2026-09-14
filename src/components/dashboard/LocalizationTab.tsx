@@ -18,36 +18,36 @@ export const LocalizationTab: React.FC = () => {
   const translations = {
     en: {
       name: 'English (US)',
-      btn: 'Pay ₹49.00 INR (1-Click Apple Pay)',
-      vatNotice: 'Prices include all applicable sales taxes under QIVROPAY Merchant of Record.',
+      btn: 'Pay $49.00 USD (Cards / UPI)',
+      vatNotice: 'Prices include all applicable taxes.',
       cardPlaceholder: 'Card number • MM / YY • CVC',
-      trust: '100% Tax Nexus Insulated'
+      trust: '100% Tax Compliant'
     },
     de: {
       name: 'Deutsch (Germany & Austria)',
-      btn: 'Jetzt 49,00 € bezahlen (1-Klick Apple Pay)',
-      vatNotice: 'Preise inkl. gesetzlicher MwSt. Abgewickelt über QIVROPAY als Merchant of Record.',
+      btn: 'Jetzt 49,00 € bezahlen (Karten)',
+      vatNotice: 'Preise inkl. gesetzlicher MwSt.',
       cardPlaceholder: 'Kartennummer • MM / JJ • CVC',
       trust: '100% MwSt.-sicher abgewickelt'
     },
     fr: {
       name: 'Français (France & EU)',
-      btn: 'Payer 49,00 € (1-Clic Apple Pay)',
-      vatNotice: 'Prix TTC avec TVA incluse gérée par QIVROPAY Merchant of Record.',
+      btn: 'Payer 49,00 € (Cartes)',
+      vatNotice: 'Prix TTC avec TVA incluse.',
       cardPlaceholder: 'Numéro de carte • MM / AA • CVC',
       trust: '100% Conforme TVA UE'
     },
     es: {
       name: 'Español (Spain & LatAm)',
-      btn: 'Pagar ₹49.00 INR (Apple Pay en 1 Clic)',
-      vatNotice: 'Precios con impuestos incluidos bajo QIVROPAY Merchant of Record.',
+      btn: 'Pagar 49.00 USD (Tarjetas)',
+      vatNotice: 'Precios con impuestos incluidos.',
       cardPlaceholder: 'Número de tarjeta • MM / AA • CVC',
-      trust: '100% Libre de Responsabilidad Fiscal'
+      trust: '100% Cumplimiento Fiscal'
     },
     ja: {
       name: '日本語 (Japan)',
-      btn: '¥7,500 を支払う (Apple Pay 1クリック)',
-      vatNotice: '消費税込・QIVROPAY Merchant of Recordにより安全に処理されます。',
+      btn: '¥7,500 を支払う (カード決済)',
+      vatNotice: '消費税込・安全に処理されます。',
       cardPlaceholder: 'カード番号 • MM / YY • セキュリティコード',
       trust: '100% 税務完全準拠'
     },

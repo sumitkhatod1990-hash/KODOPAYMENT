@@ -20,7 +20,7 @@ const newCustomerId = () => `cus_${crypto.randomBytes(10).toString('hex')}`;
 // under true concurrency: two callers can both read "not yet counted"
 // before either has written back. See neonStore.js for why the claim is
 // safe where that check was not.
-export async function recordCashfreeOrderOutcome(merchantId, orderId, { amount, currency, customerEmail, customerName, productName, succeeded }) {
+export async function recordCashfreeOrderOutcome(merchantId, orderId, { amount, currency, customerEmail, customerName, productName, succeeded, environment, gatewayOrderId, paymentId }) {
   const existing = await getResource(merchantId, 'transaction', String(orderId));
   const hasExistingRefund = existing && (
     existing.status === 'refunded' ||
@@ -35,21 +35,28 @@ export async function recordCashfreeOrderOutcome(merchantId, orderId, { amount, 
 
   const now = new Date().toISOString();
   const txAmount = (typeof amount === 'number' && !Number.isNaN(amount)) ? amount : (existing?.amount || 0);
+  const txCurrency = String(currency || existing?.currency || 'INR').toUpperCase();
+  const txEnv = (environment === 'production' || environment === 'live' || existing?.environment === 'production' || existing?.environment === 'live') ? 'production' : (existing?.environment || 'sandbox');
 
   const transaction = {
     ...existing,
     id: String(orderId),
+    orderId: String(orderId),
+    merchantId,
+    gatewayOrderId: gatewayOrderId || existing?.gatewayOrderId || String(orderId),
+    paymentId: paymentId || existing?.paymentId || null,
+    environment: txEnv,
     provider: existing?.provider || 'cashfree',
     amount: txAmount,
-    currency: currency || existing?.currency || 'INR',
+    currency: txCurrency,
     status,
     customerEmail: customerEmail || existing?.customerEmail || '',
     customerName: customerName || existing?.customerName || 'Customer',
     productName: productName || existing?.productName || 'QivroPay payment',
-    paymentMethod: existing?.paymentMethod || 'cashfree',
+    paymentMethod: existing?.paymentMethod || (txCurrency === 'INR' ? 'upi' : 'card'),
     fee: existing?.fee ?? 0,
     net: succeeded ? txAmount : (existing?.net ?? 0),
-    country: existing?.country || 'IN',
+    country: existing?.country || (txCurrency === 'INR' ? 'IN' : 'US'),
     createdAt: existing?.createdAt || now,
     updatedAt: now
   };

@@ -23,7 +23,9 @@ export interface Transaction {
   customerName: string;
   productName: string;
   paymentMethod: string;
+  environment?: string;
   cardLast4?: string;
+
   fee: number;
   net: number;
   country: string;
@@ -126,6 +128,8 @@ export interface MerchantProfile {
   businessName: string;
   supportEmail: string;
   onboardingCompletedAt: string | null;
+  liveActivatedAt?: string | null;
+  activeEnvironment?: 'test' | 'live';
 }
 
 // Phase 10.8D. Mirrors the sanitized shape returned by
@@ -177,16 +181,27 @@ export interface PaymentReconciliation {
   error: { status: number | null; code: string | null; message: string | null } | null;
 }
 
+export interface CurrencyAnalytics {
+  currency: string;
+  totalVolume: number;
+  totalRefunded: number;
+  totalNet: number;
+  count: number;
+}
+
 export interface Analytics {
   totalVolume: number;
   totalFees: number;
   totalNet: number;
+  currency?: string;
+  byCurrency?: Record<string, CurrencyAnalytics>;
   mrr: number;
   activeSubscriptions: number;
   activeCustomers: number;
   conversionRate: string;
   chargebackRate: string;
 }
+
 
 export interface TeamMember {
   id: string;
