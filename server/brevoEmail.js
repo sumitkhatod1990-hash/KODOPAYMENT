@@ -22,6 +22,48 @@ export function isBrevoConfigured() {
   return Boolean(process.env.BREVO_API_KEY && process.env.BREVO_API_KEY.trim());
 }
 
+/**
+ * Adds or updates a merchant contact for Brevo automations. This is a
+ * backend-only sync; it does not change the website UI or signup response.
+ * Set BREVO_CONTACT_LIST_ID to override the QivroPay automation list.
+ */
+export async function syncBrevoContact({ email, name, company }, options = {}) {
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (!normalizedEmail || !/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+    return { success: false, error: 'Invalid recipient email address' };
+  }
+  const apiKey = options.apiKey || process.env.BREVO_API_KEY || '';
+  // Brevo's existing marketing_automation list is ID 5. An environment
+  // variable can override it for another Brevo workspace.
+  const listId = options.listId || process.env.BREVO_CONTACT_LIST_ID || '5';
+  if (!apiKey.trim()) return { success: false, skipped: true, reason: 'unconfigured' };
+  if (!listId) return { success: false, skipped: true, reason: 'contact_list_unconfigured' };
+
+  const attributes = {
+    FIRSTNAME: String(name || '').trim() || undefined,
+    COMPANY: String(company || '').trim() || undefined,
+  };
+  Object.keys(attributes).forEach((key) => {
+    if (!attributes[key]) delete attributes[key];
+  });
+
+  try {
+    const response = await fetch('https://api.brevo.com/v3/contacts', {
+      method: 'POST',
+      headers: { 'accept': 'application/json', 'api-key': apiKey, 'content-type': 'application/json' },
+      body: JSON.stringify({ email: normalizedEmail, attributes, listIds: [Number(listId)], updateEnabled: true }),
+    });
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Brevo contact sync failed (${response.status}): ${body}`);
+    }
+    return { success: true };
+  } catch (error) {
+    console.error(`[Brevo] Contact sync failed for ${normalizedEmail}:`, error?.message || error);
+    return { success: false, error: 'Brevo contact sync failed' };
+  }
+}
+
 export function createTransactionalEmailsApi(apiKey) {
   const key = apiKey || process.env.BREVO_API_KEY || '';
   if (!key) return null;
