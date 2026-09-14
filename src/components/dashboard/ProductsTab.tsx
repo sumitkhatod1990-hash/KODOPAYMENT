@@ -17,6 +17,9 @@ export const ProductsTab: React.FC = () => {
   // Form State — fields start empty; nothing here is a pre-filled demo value.
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [brand, setBrand] = useState('');
+  const [taxCategory, setTaxCategory] = useState('');
+  const [discount, setDiscount] = useState('');
   const [price, setPrice] = useState('');
   const [currency, setCurrency] = useState<string>(preferredCurrency || 'USD');
   const [type, setType] = useState<ProductType>('one_time');
@@ -28,6 +31,9 @@ export const ProductsTab: React.FC = () => {
   const resetForm = () => {
     setName('');
     setDescription('');
+    setBrand('');
+    setTaxCategory('');
+    setDiscount('');
     setPrice('');
     setCurrency(preferredCurrency || 'USD');
     setType('one_time');
@@ -69,6 +75,9 @@ export const ProductsTab: React.FC = () => {
         body: JSON.stringify({
           name: name.trim(),
           description: description.trim(),
+          brand: brand.trim(),
+          taxCategory,
+          discount: discount ? Number(discount) : undefined,
           price: Number(price),
           currency,
           type,
@@ -238,8 +247,28 @@ export const ProductsTab: React.FC = () => {
       </div>
 
       {/* Create Modal */}
-      <Modal open={showCreateModal} onClose={closeCreateModal} title="Create New Product">
+      <Modal open={showCreateModal} onClose={closeCreateModal} title="Add New Product">
         <form onSubmit={handleSubmit} noValidate className="space-y-4 text-xs">
+
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800">
+            Add the product details customers will see on the payment page.
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="product-brand" className="font-semibold text-[#1d1d1f]">Brand <span className="font-normal text-[#86868b]">(optional)</span></label>
+            <input id="product-brand" type="text" placeholder="Your brand name" value={brand} onChange={(e) => setBrand(e.target.value)} className="w-full p-2.5 rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] focus:border-[#0071e3] outline-none" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label htmlFor="product-tax" className="font-semibold text-[#1d1d1f]">Tax category</label>
+            <select id="product-tax" value={taxCategory} onChange={(e) => setTaxCategory(e.target.value)} className="w-full p-2.5 rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] outline-none"><option value="">Select category</option><option value="standard">Standard</option><option value="digital">Digital goods</option><option value="services">Services</option><option value="exempt">Tax exempt</option></select>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="product-discount" className="font-semibold text-[#1d1d1f]">Discount (%) <span className="font-normal text-[#86868b]">(optional)</span></label>
+            <input id="product-discount" type="number" min="0" max="100" placeholder="0" value={discount} onChange={(e) => setDiscount(e.target.value)} className="w-full p-2.5 rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] outline-none" />
+          </div>
+          </div>
 
           <div className="space-y-1.5">
             <label className="font-semibold text-[#1d1d1f]" id="product-type-label">Product Type</label>
