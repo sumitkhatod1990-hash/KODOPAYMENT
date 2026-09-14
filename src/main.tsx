@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { AppProvider } from './context/AppContext';
+import { GlobalCurrencyProvider } from './context/GlobalCurrencyContext';
 import { AuthProvider } from './context/AuthContext';
 import { isAdminDomain } from './utils/adminDomain';
 import { AdminAuthProvider } from './context/AdminAuthContext';
@@ -110,9 +111,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       ) : (
         <AuthProvider>
           <RegionProvider>
-            <AppProvider>
-              <App />
-            </AppProvider>
+            <GlobalCurrencyProvider>
+              <AppProvider>
+                <App />
+              </AppProvider>
+            </GlobalCurrencyProvider>
           </RegionProvider>
         </AuthProvider>
       )}
