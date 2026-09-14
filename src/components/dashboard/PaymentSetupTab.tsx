@@ -147,12 +147,10 @@ export const PaymentSetupTab: React.FC = () => {
     const result = await launchCashfreePartnerOnboardingLink();
     setLaunching(false);
     if (!result.success || !result.onboardingLink) {
-      // Cashfree may temporarily reject link generation while the partner
-      // account's verification feature is being enabled. Still take the
-      // merchant to Cashfree's hosted onboarding page so the client can
-      // continue KYC instead of leaving the button with no action.
-      window.open('https://merchant.cashfree.com/onboarding?type=oblink&formType=NEW', '_blank', 'noopener');
-      setLaunchError('Cashfree verification link generation is temporarily unavailable. We opened the Cashfree onboarding page; complete KYC there, then refresh status.');
+      // Never open Cashfree's generic onboarding URL: it follows the current
+      // browser session and can expose the wrong merchant's KYC flow. Only a
+      // merchant-specific signed link returned by the Partner API is safe.
+      setLaunchError(result.error || 'Cashfree verification link is temporarily unavailable. Please retry after Cashfree enables verification for this merchant.');
       return;
     }
     // Opened in a new tab, not an iframe: Cashfree documents this link as
