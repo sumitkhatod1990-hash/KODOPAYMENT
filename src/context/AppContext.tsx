@@ -286,7 +286,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const switchEnvironment = async (env: 'test' | 'live'): Promise<{ success: boolean; error?: string }> => {
     try {
-      const res = await fetch('/api/v1/merchant/environment', {
+      const res = await apiClient('/api/v1/merchant/environment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ environment: env })
@@ -379,7 +379,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const saveMerchantProfile = async (fields: { businessName: string; supportEmail: string }) => {
     try {
-      const res = await fetch('/api/v1/merchant/profile', {
+      const res = await apiClient('/api/v1/merchant/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fields)
@@ -451,7 +451,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // shapes this reads).
   const startCashfreePartnerOnboarding = async (fields: { pocPhone: string; merchantSiteUrl: string }) => {
     try {
-      const res = await fetch('/api/v1/merchant/cashfree-partner/onboard', {
+      const res = await apiClient('/api/v1/merchant/cashfree-partner/onboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fields)
@@ -525,7 +525,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // is now actually stored, not just what this one call returned.
   const refreshReconciliation = async (orderId?: string) => {
     try {
-      const res = await fetch('/api/v1/merchant/reconciliation/refresh', {
+      const res = await apiClient('/api/v1/merchant/reconciliation/refresh', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderId ? { orderId } : {})
@@ -563,7 +563,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const createProduct = async (productData: Partial<Product>) => {
     try {
-      const res = await fetch('/api/v1/products', {
+      const res = await apiClient('/api/v1/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(productData)
@@ -590,7 +590,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const cancelSubscription = async (subscriptionId: string) => {
     try {
-      await fetch('/api/v1/subscriptions/cancel', {
+      await apiClient('/api/v1/subscriptions/cancel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subscriptionId })
@@ -603,7 +603,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const createDiscount = async (discData: Partial<Discount>) => {
     try {
-      const res = await fetch('/api/v1/discounts', {
+      const res = await apiClient('/api/v1/discounts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(discData)
@@ -630,7 +630,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const generateLicense = async (productName: string, customerEmail: string, maxActivations = 3) => {
     try {
-      const res = await fetch('/api/v1/licenses/generate', {
+      const res = await apiClient('/api/v1/licenses/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productName, customerEmail, maxActivations })
@@ -648,7 +648,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const revokeLicense = async (licenseId: string) => {
     try {
-      await fetch('/api/v1/licenses/revoke', {
+      await apiClient('/api/v1/licenses/revoke', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ licenseId })
@@ -661,7 +661,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const trackMeterEvent = async (eventName: string, units: number, customerId?: string) => {
     try {
-      await fetch('/api/v1/meters/track', {
+      await apiClient('/api/v1/meters/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ eventName, units, customerId })
@@ -674,7 +674,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const generateApiKey = async (name: string, environment: 'live' | 'test') => {
     try {
-      const res = await fetch('/api/v1/keys/generate', {
+      const res = await apiClient('/api/v1/keys/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, environment })
@@ -705,7 +705,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         ...params,
         environment: params.environment || (isTestMode ? 'sandbox' : 'production')
       };
-      const res = await fetch('/api/v1/payments/create-session', {
+      const res = await apiClient('/api/v1/payments/create-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -727,7 +727,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const processPayment = async (params: any) => {
     try {
-      const res = await fetch('/api/v1/payments/process', {
+      const res = await apiClient('/api/v1/payments/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params)
@@ -745,7 +745,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const processRefund = async (transactionId: string) => {
     try {
-      const res = await fetch('/api/v1/payments/refund', {
+      const res = await apiClient('/api/v1/payments/refund', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transactionId })
@@ -777,7 +777,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const inviteTeamMember = async (data: any) => {
     try {
-      const res = await fetch('/api/v1/team/invite', {
+      const res = await apiClient('/api/v1/team/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
