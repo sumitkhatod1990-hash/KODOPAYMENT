@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { apiClient } from '../../lib/apiClient';
 import { useApp } from '../../context/AppContext';
 import {
   Building,
@@ -48,7 +49,7 @@ export const SettingsTab: React.FC = () => {
     setChecking(true);
     setStatusResult(null);
     try {
-      const res = await fetch('/api/v1/india/cashfree/verify-credentials', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      const res = await apiClient('/api/v1/india/cashfree/verify-credentials', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
       const data = await res.json();
       setStatusResult(data);
       if (data.success) confetti({ particleCount: 40, spread: 55, origin: { y: 0.8 } });

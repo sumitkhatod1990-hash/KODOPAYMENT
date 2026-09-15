@@ -160,7 +160,7 @@ export const PaymentSetupTab: React.FC = () => {
     // merchant inside a real Cashfree-hosted page for the sensitive KYC
     // step; Cashfree's own return_url brings them back here afterward and
     // the bounded refresh sequence above picks up the new status.
-    window.open(result.onboardingLink, '_blank', 'noopener');
+    window.location.href = result.onboardingLink;
   };
 
   const handleRefresh = async () => {

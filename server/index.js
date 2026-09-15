@@ -1360,7 +1360,13 @@ app.use('/api/v1', async (req, res, next) => {
       if (user) req.user = user;
     }
   } catch (error) {
-    // Expired or invalid session cookie — safely keep req.user undefined
+    // If decoding the cookie fails, ignore it and let req.user remain undefined
+    if (error instanceof URIError) {
+      // safely keep req.user undefined
+    } else {
+      console.error('Session lookup failed:', error);
+      return res.status(503).json({ success: false, error: 'Authentication service is temporarily unavailable' });
+    }
   }
 
   // Public paths (such as /support/chat or public checkout) never block on auth

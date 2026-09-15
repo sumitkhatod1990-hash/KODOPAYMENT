@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { apiClient } from '../lib/apiClient';
 import { 
   Product, 
   Transaction, 
@@ -262,7 +263,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const safeFetch = async (url: string) => {
     try {
-      const res = await fetch(url);
+      const res = await apiClient(url);
       if (!res.ok) return null;
       return await res.json();
     } catch {
@@ -394,7 +395,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const completeOnboarding = async () => {
     try {
-      const res = await fetch('/api/v1/merchant/onboarding/complete', { method: 'POST' });
+      const res = await apiClient('/api/v1/merchant/onboarding/complete', { method: 'POST' });
       const data = await res.json();
       if (data?.success && data.profile) setMerchantProfile(data.profile);
     } catch (err) {
@@ -479,7 +480,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const launchCashfreePartnerOnboardingLink = async () => {
     try {
-      const res = await fetch('/api/v1/merchant/cashfree-partner/onboarding-link', { method: 'POST' });
+      const res = await apiClient('/api/v1/merchant/cashfree-partner/onboarding-link', { method: 'POST' });
       const data = await res.json();
       if (!res.ok) {
         const errorCode = data?.error?.code as string | undefined;
@@ -580,7 +581,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const deleteProduct = async (id: string) => {
     try {
-      await fetch(`/api/v1/products/${id}`, { method: 'DELETE' });
+      await apiClient(`/api/v1/products/${id}`, { method: 'DELETE' });
       await refreshData();
     } catch (err) {
       console.error('Failed to delete product', err);
@@ -620,7 +621,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const deleteDiscount = async (id: string) => {
     try {
-      await fetch(`/api/v1/discounts/${id}`, { method: 'DELETE' });
+      await apiClient(`/api/v1/discounts/${id}`, { method: 'DELETE' });
       await refreshData();
     } catch (err) {
       console.error('Failed to delete discount', err);
@@ -691,7 +692,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const revokeApiKey = async (id: string) => {
     try {
-      await fetch(`/api/v1/keys/${id}`, { method: 'DELETE' });
+      await apiClient(`/api/v1/keys/${id}`, { method: 'DELETE' });
       await refreshData();
     } catch (err) {
       console.error('Failed to revoke key', err);
@@ -762,7 +763,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const checkRefundStatus = async (transactionId: string) => {
     try {
-      const res = await fetch(`/api/v1/payments/refund-status/${encodeURIComponent(transactionId)}`);
+      const res = await apiClient(`/api/v1/payments/refund-status/${encodeURIComponent(transactionId)}`);
       const data = await res.json();
       if (res.ok && data.success) {
         if (data.reconciled) await refreshData();
